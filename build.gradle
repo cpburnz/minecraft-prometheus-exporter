@@ -1,0 +1,221 @@
+// Forge buildscript.
+buildscript {
+	// Buildscript Maven repositories.
+	repositories {
+		// Forge.
+		maven {
+			url = 'https://files.minecraftforge.net/maven'
+		}
+
+		// JCenter.
+		jcenter()
+
+		// Maven Central.
+		mavenCentral()
+	}
+
+	// Buildscript dependencies.
+	dependencies {
+		// Forge Gradle plugin.
+		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+	}
+}
+
+plugins {
+	// Eclipse plugin (makes life easier using Eclipse).
+	id 'eclipse'
+
+	// Java plugin (required).
+	id 'java'
+
+	// Shadow Jar plugin: bundle dependencies.
+	id 'com.github.johnrengelman.shadow' version '4.0.4'
+
+	// TODO: Curse Gradle (publishing)
+	//id 'com.matthewprenger.cursegradle' version '1.4.0'
+}
+
+// Forge Gradle plugin (required).
+apply plugin: 'net.minecraftforge.gradle'
+
+// Project settings.
+archivesBaseName = 'Prometheus-Exporter'
+group = 'com.github.cpburnz'
+version = '0.1.0'
+
+// Extra project settings.
+ext {
+	modAuthors = 'cpburnz'
+	modId = 'prometheus_exporter'
+	modName = 'Prometheus Exporter'
+	modPackage = "${project.group}.minecraft_prometheus_exporter"
+	modTrackerUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter/issues'
+	modUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter'
+
+	forgeMinVersion = '28'
+	minecraftMinVersion = '1.14.4'
+}
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+
+minecraft {
+	// The mappings can be changed at any time, and must be in the following format.
+	// snapshot_YYYYMMDD   Snapshot are built nightly.
+	// stable_#			Stables are built at the discretion of the MCP team.
+	// Use non-default mappings at your own risk. they may not always work.
+	// Simply re-run your setup task after changing the mappings to update your workspace.
+	mappings channel: 'snapshot', version: '20190719-1.14.3'
+	// makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+
+	// accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+	// Default run configurations.
+	// These can be tweaked, removed, or duplicated as needed.
+	runs {
+		client {
+			workingDirectory project.file('run')
+
+			// Recommended logging data for a userdev environment
+			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+			// Recommended logging level for the console
+			property 'forge.logging.console.level', 'debug'
+
+			mods {
+				prometheus_exporter {
+					source sourceSets.main
+				}
+			}
+		}
+
+		server {
+			workingDirectory project.file('run')
+
+			// Recommended logging data for a userdev environment
+			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+			// Recommended logging level for the console
+			property 'forge.logging.console.level', 'debug'
+
+			mods {
+				prometheus_exporter {
+					source sourceSets.main
+				}
+			}
+		}
+
+		data {
+			workingDirectory project.file('run')
+
+			// Recommended logging data for a userdev environment
+			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+			// Recommended logging level for the console
+			property 'forge.logging.console.level', 'debug'
+
+			args '--mod', project.modId, '--all', '--output', file('src/generated/resources/')
+
+			mods {
+				prometheus_exporter {
+					source sourceSets.main
+				}
+			}
+		}
+	}
+}
+
+configurations {
+	// Create the `compileAndShadow` group to be both compile time dependencies
+	// and shadow dependencies (bundle via Shadow Jar).
+	compileAndShadow
+	compile.extendsFrom compileAndShadow
+	shadow.extendsFrom compileAndShadow
+}
+
+dependencies {
+	// Specify the version of Minecraft to use, If this is any group other then
+	// 'net.minecraft' it is assumed that the dep is a ForgeGradle 'patcher'
+	// dependency. And it's patches will be applied. The userdev artifact is a
+	// special name and will get all sorts of transformations applied to it.
+	minecraft 'net.minecraftforge:forge:1.14.4-28.1.0'
+
+	// Prometheus dependencies.
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.8.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.8.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.8.0'
+}
+
+// Expand variables in resource files.
+processResources {
+	def vars = [
+		'forgeMinVersion': project.forgeMinVersion,
+		'minecraftMinVersion': project.minecraftMinVersion,
+		'modAuthors': project.modAuthors,
+		'modName': project.modName,
+		'modId': project.modId,
+		'modTrackerUrl': project.modTrackerUrl,
+		'modUrl': project.modUrl,
+		'version': project.version,
+	]
+
+	// Record the inputs so Gradle knows when to regenerate the resource files.
+	inputs.properties vars
+
+	from(sourceSets.main.resources.srcDirs) {
+		include 'META-INF/mods.toml'
+		expand vars
+	}
+
+	from(sourceSets.main.resources.srcDirs) {
+		exclude 'META-INF/mods.toml'
+	}
+}
+
+// Project JAR settings.
+jar {
+	// Include the Minecraft version in the JAR name.
+	appendix = project.minecraftMinVersion
+
+	manifest {
+		attributes([
+			"Specification-Title": "examplemod",
+			"Specification-Vendor": "examplemodsareus",
+			"Specification-Version": "1", // We are version 1 of ourselves
+			"Implementation-Title": project.modName,
+			"Implementation-Version": project.version,
+			"Implementation-Vendor": project.modAuthors,
+			"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+		])
+	}
+}
+
+// Configure Shadow Jar.
+shadowJar {
+	// Remove JAR suffix.
+	appendix = tasks.jar.appendix
+	classifier = tasks.jar.classifier
+
+	// Only bundle dependencies explicitly marked instead of every damn one.
+	configurations = [project.configurations.shadow]
+
+	// Exclude unused classes.
+	minimize()
+}
+
+// Vendor dependencies with Shadow Jar.
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
+task vendorShadowJarDeps(type: ConfigureShadowRelocation) {
+	target = tasks.shadowJar
+	prefix = "${project.modPackage}.vendors"
+}
+
+tasks.shadowJar.dependsOn tasks.vendorShadowJarDeps
+
+// Reobfuscate the Shadow Jar because the Minecraft classes must be
+// obfuscated.
+reobf {
+	shadowJar {}
+}
+
+tasks.build.dependsOn tasks.reobfShadowJar
