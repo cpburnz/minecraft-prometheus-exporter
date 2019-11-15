@@ -141,8 +141,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	private GaugeMetricFamily collectWorldChunksLoaded() {
 		GaugeMetricFamily metric = newWorldChunksLoadedMetric();
 		for (ServerWorld world : this.mc_server.getWorlds()) {
-			String id = Integer.toString(world.getDimension().getType().getId());
-			String name = world.getWorldInfo().getWorldName();
+			DimensionType type = world.getDimension().getType();
+			String id = Integer.toString(type.getId());
+			String name = DimensionType.getKey(type).getPath();
 			int loaded = world.getChunkProvider().getLoadedChunkCount();
 			metric.addMetric(Arrays.asList(id, name), loaded);
 		}
@@ -205,9 +206,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		if (this.world_tick_timer != null) {
 			throw new IllegalStateException("World tick started before stopping previous tick.");
 		}
-		String id = Integer.toString(world.getDimension().getType().getId());
-		//String name = world.getWorldInfo().getWorldName();
-		String name = DimensionType.getKey(world.getDimension().getType()).getPath();
+		DimensionType type = world.getDimension().getType();
+		String id = Integer.toString(type.getId());
+		String name = DimensionType.getKey(type).getPath();
 		this.world_tick_timer = this.world_tick_seconds.labels(id, name).startTimer();
 	}
 
