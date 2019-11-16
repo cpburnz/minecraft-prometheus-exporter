@@ -41,7 +41,7 @@ apply plugin: 'net.minecraftforge.gradle'
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
 group = 'com.github.cpburnz'
-version = '0.1.0'
+version = '0.2.0'
 
 // Extra project settings.
 ext {
@@ -174,7 +174,7 @@ processResources {
 // Project JAR settings.
 jar {
 	// Include the Minecraft version in the JAR name.
-	appendix = project.minecraftMinVersion
+	appendix = "${project.minecraftMinVersion}-forge"
 
 	manifest {
 		attributes([

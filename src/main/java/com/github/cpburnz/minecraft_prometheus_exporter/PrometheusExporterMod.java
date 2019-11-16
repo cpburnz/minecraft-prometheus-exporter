@@ -12,8 +12,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 
 /**
  * This class is the Prometheus Exporter mod.
@@ -27,23 +26,14 @@ public class PrometheusExporterMod {
 	public static final String MOD_ID = "prometheus_exporter";
 
 	/**
-	 * The default port to use.
-	 */
-	private static final int DEFAULT_PORT = 19565;
-
-	/**
 	 * The logger to use.
 	 */
 	private static final Logger LOG = LogManager.getLogger();
 
 	/**
-	 * The HTTP port to use.
-	 */
-	private int http_port;
-
-	/**
 	 * The HTTP server.
 	 */
+	@SuppressWarnings("unused")
 	private HTTPServer http_server;
 
 	/**
@@ -57,13 +47,20 @@ public class PrometheusExporterMod {
 	private MinecraftServer mc_server;
 
 	/**
+	 * The server configuration.
+	 */
+	private ServerConfig config;
+
+	/**
 	 * Construct the instance.
 	 */
 	public PrometheusExporterMod() {
-		this.http_port = DEFAULT_PORT;
-
-		// Register to recieve events.
+		// Register to receive events.
 		MinecraftForge.EVENT_BUS.register(this);
+
+		// Register the server config.
+		this.config = new ServerConfig();
+		this.config.register();
 	}
 
 	/**
@@ -71,32 +68,84 @@ public class PrometheusExporterMod {
 	 */
 	private void initCollectors() {
 		// Collect JVM stats.
-		DefaultExports.initialize();
+		if (this.config.collector_jvm) {
+			DefaultExports.initialize();
+		}
 
 		// Collect Minecraft stats.
-		this.mc_collector = new MinecraftCollector(this.mc_server).register();
+		if (this.config.collector_mc) {
+			this.mc_collector = new MinecraftCollector(this.mc_server);
+			this.mc_collector.register();
+		}
 	}
 
 	/**
-	 * Load the mod configuration file.
+	 * Initialize the HTTP server.
 	 */
-	private void loadConfig() {
-		// TODO: Load the config file.
+	private void initHttpServer() throws IOException {
+		// WARNING: Make sure the HTTP server thread is daemonized, otherwise the
+		// Minecraft server process will actually terminate.
+		String address = this.config.web_listen_address;
+		int port = this.config.web_listen_port;
+		this.http_server = new HTTPServer(address, port, true);
+		LOG.info("Listening on {}:{}", address, port);
 	}
 
+	// NOTE: Does not receive event.
 	/**
-	 * Called when the server is starting.
+	 * Called when the mod configuration is loaded. This occurs right before the
+	 * `FMLServerAboutToStartEvent` event.
+	 *
+	 * @param event The event.
+	 */
+	/*
+	@SubscribeEvent
+	public void onConfigLoad(ModConfig.Loading event) {
+		LOG.info("CONFIG LOAD");
+		ModConfig config = event.getConfig();
+		if (config.getType() == ModConfig.Type.SERVER) {
+			this.config.loadConfig(config);
+		}
+	}
+	*/
+
+	// NOTE: Does not receive event.
+	/**
+	 * Called when the server-side mod configuration is reloaded.
+	 *
+	 * @param event The event.
+	 */
+	/*
+	@SubscribeEvent
+	public void onConfigReload(ModConfig.ConfigReloading event) {
+		LOG.info("CONFIG RELOAD");
+		// TODO: Restart HTTP server when config is reloaded.
+		// TODO: Reinitialize the collectors.
+		ModConfig config = event.getConfig();
+		if (config.getType() == ModConfig.Type.SERVER) {
+			this.config.loadConfig(config);
+		}
+	}
+	*/
+
+	/**
+	 * Called when the server has started.
 	 *
 	 * @param event The event.
 	 * @throws IOException
 	 */
 	@SubscribeEvent
-	public void onServerStarting(FMLServerStartingEvent event) throws IOException {
+	public void onServerStarted(FMLServerStartedEvent event) throws IOException {
+		// NOTE: The `ModConfig.Loading` event is not being received. However, the
+		// config appears to be loaded by Forge. Load the values here on server
+		// start.
+		this.config.loadValues();
+
 		// Record the Minecraft server.
 		this.mc_server = event.getServer();
 
 		// Initialize HTTP server.
-		this.http_server = new HTTPServer(this.http_port);
+		this.initHttpServer();
 
 		// Initialize collectors.
 		this.initCollectors();
@@ -110,21 +159,13 @@ public class PrometheusExporterMod {
 	@SubscribeEvent
 	public void onServerTick(TickEvent.ServerTickEvent event) {
 		// Record server tick.
-		if (event.phase == TickEvent.Phase.START) {
-			this.mc_collector.startServerTick();
-		} else if (event.phase == TickEvent.Phase.END) {
-			this.mc_collector.stopServerTick();
+		if (this.mc_collector != null) {
+			if (event.phase == TickEvent.Phase.START) {
+				this.mc_collector.startServerTick();
+			} else if (event.phase == TickEvent.Phase.END) {
+				this.mc_collector.stopServerTick();
+			}
 		}
-	}
-
-	/**
-	 * Called before the server starts.
-	 *
-	 * @param event The event.
-	 */
-	@SubscribeEvent
-	public void onSetup(FMLCommonSetupEvent event) {
-		this.loadConfig();
 	}
 
 	/**
@@ -135,10 +176,12 @@ public class PrometheusExporterMod {
 	@SubscribeEvent
 	public void onWorldTick(TickEvent.WorldTickEvent event) {
 		// Record world tick.
-		if (event.phase == TickEvent.Phase.START) {
-			this.mc_collector.startWorldTick(event.world);
-		} else if (event.phase == TickEvent.Phase.END) {
-			this.mc_collector.stopWorldTick(event.world);
+		if (this.mc_collector != null) {
+			if (event.phase == TickEvent.Phase.START) {
+				this.mc_collector.startWorldTick(event.world);
+			} else if (event.phase == TickEvent.Phase.END) {
+				this.mc_collector.stopWorldTick(event.world);
+			}
 		}
 	}
 }
