@@ -226,7 +226,7 @@ curseforge {
 
 	project {
 		id = '351938'
-		changelog = 'CHANGES.rst'
+		changelog = 'CHANGES.md'
 		changelogType = 'markdown'
 		releaseType = 'beta'
 		
