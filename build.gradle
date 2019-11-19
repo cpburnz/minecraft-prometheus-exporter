@@ -31,8 +31,8 @@ plugins {
 	// Shadow Jar plugin: bundle dependencies.
 	id 'com.github.johnrengelman.shadow' version '4.0.4'
 
-	// TODO: Curse Gradle (publishing)
-	//id 'com.matthewprenger.cursegradle' version '1.4.0'
+	// Curse Gradle (publishing)
+	id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 // Forge Gradle plugin (required).
@@ -41,7 +41,7 @@ apply plugin: 'net.minecraftforge.gradle'
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
 group = 'com.github.cpburnz'
-version = '0.2.0'
+version = '0.3.0'
 
 // Extra project settings.
 ext {
@@ -178,13 +178,13 @@ jar {
 
 	manifest {
 		attributes([
-			"Specification-Title": "examplemod",
-			"Specification-Vendor": "examplemodsareus",
-			"Specification-Version": "1", // We are version 1 of ourselves
-			"Implementation-Title": project.modName,
-			"Implementation-Version": project.version,
-			"Implementation-Vendor": project.modAuthors,
-			"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+			'Specification-Title': 'examplemod',
+			'Specification-Vendor': 'examplemodsareus',
+			'Specification-Version': '1',
+			'Implementation-Title': project.modName,
+			'Implementation-Version': project.version,
+			'Implementation-Vendor': project.modAuthors,
+			'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 		])
 	}
 }
@@ -218,4 +218,20 @@ reobf {
 	shadowJar {}
 }
 
-tasks.build.dependsOn tasks.reobfShadowJar
+tasks.assemble.dependsOn tasks.reobfShadowJar
+
+// Configure Curse Gradle for publishing to Curse Forge.
+curseforge {
+	apiKey = project.properties.prometheusExporterCurseForgeApiKey
+
+	project {
+		id = '351938'
+		changelog = 'CHANGES.rst'
+		changelogType = 'markdown'
+		releaseType = 'beta'
+		
+		mainArtifact reobfShadowJar
+	}
+}
+
+tasks.curseforge.dependsOn tasks.build

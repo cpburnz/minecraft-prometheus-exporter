@@ -84,7 +84,7 @@ public class PrometheusExporterMod {
 	 */
 	private void initHttpServer() throws IOException {
 		// WARNING: Make sure the HTTP server thread is daemonized, otherwise the
-		// Minecraft server process will actually terminate.
+		// Minecraft server process will not properly terminate.
 		String address = this.config.web_listen_address;
 		int port = this.config.web_listen_port;
 		this.http_server = new HTTPServer(address, port, true);
