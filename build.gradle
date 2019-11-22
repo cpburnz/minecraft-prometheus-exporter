@@ -41,7 +41,7 @@ apply plugin: 'net.minecraftforge.gradle'
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
 group = 'com.github.cpburnz'
-version = '0.3.0'
+version = '0.3.1.dev1'
 
 // Extra project settings.
 ext {
@@ -215,7 +215,13 @@ tasks.shadowJar.dependsOn tasks.vendorShadowJarDeps
 // Reobfuscate the Shadow Jar because the Minecraft classes must be
 // obfuscated.
 reobf {
-	shadowJar {}
+	jar {
+		// Disable generation of unshadowed obfuscated JAR.
+		enabled = false
+	}
+	shadowJar {
+		enabled = true
+	}
 }
 
 tasks.assemble.dependsOn tasks.reobfShadowJar
@@ -230,7 +236,7 @@ curseforge {
 		changelogType = 'markdown'
 		releaseType = 'beta'
 		
-		mainArtifact reobfShadowJar
+		mainArtifact shadowJar
 	}
 }
 
