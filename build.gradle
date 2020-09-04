@@ -41,7 +41,7 @@ apply plugin: 'net.minecraftforge.gradle'
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
 group = 'com.github.cpburnz'
-version = '0.3.0'
+version = '0.3.1'
 
 // Extra project settings.
 ext {
