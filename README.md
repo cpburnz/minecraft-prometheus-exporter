@@ -2,7 +2,7 @@ This mod provides a Prometheus exporter for Minecraft. It exports metrics
 related to the Minecraft server and the JVM for consumption by the open-source
 systems monitoring toolkit, [Prometheus](https://prometheus.io/). The mod is
 intended for server-side use, and does not need to be installed client-side.
-This is currently made for Minecraft 1.15.2 with Forge 31.2.0.
+This is currently made for Minecraft 1.16.5 with Forge 36.2.0.
 
 
 Installation

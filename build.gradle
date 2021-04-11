@@ -41,7 +41,7 @@ apply plugin: 'net.minecraftforge.gradle'
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
 group = 'com.github.cpburnz'
-version = '0.3.1'
+version = '0.3.2'
 
 // Extra project settings.
 ext {
@@ -52,7 +52,7 @@ ext {
 	modTrackerUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter/issues'
 	modUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter'
 
-	forgeMinVersion = '31'
+	forgeMinVersion = '36'
 	minecraftMinVersion = '1.16.5'
 }
 
@@ -140,9 +140,9 @@ dependencies {
 	minecraft 'net.minecraftforge:forge:1.16.5-36.1.4'
 
 	// Prometheus dependencies.
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.9.0'
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.9.0'
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.9.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.10.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.10.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.10.0'
 }
 
 // Expand variables in resource files.
