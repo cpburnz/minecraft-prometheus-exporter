@@ -11,8 +11,9 @@ import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.Histogram;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 
 /**
@@ -140,11 +141,10 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 */
 	private GaugeMetricFamily collectWorldChunksLoaded() {
 		GaugeMetricFamily metric = newWorldChunksLoadedMetric();
-		for (ServerWorld world : this.mc_server.getWorlds()) {
-			DimensionType type = world.getDimension().getType();
-			String id = Integer.toString(type.getId());
-			String name = DimensionType.getKey(type).getPath();
-			int loaded = world.getChunkProvider().getLoadedChunkCount();
+		for (ServerWorld world : this.mc_server.getAllLevels()) {
+			String id = Integer.toString(getDimensionId(world.dimension()));
+			String name = world.dimension().location().getPath();
+			int loaded = world.getChunkSource().getLoadedChunksCount();
 			metric.addMetric(Arrays.asList(id, name), loaded);
 		}
 		return metric;
@@ -198,7 +198,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	}
 
 	/**
-	 * Recorc when a world tick begins.
+	 * Record when a world tick begins.
 	 *
 	 * @param world The world.
 	 */
@@ -206,9 +206,8 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		if (this.world_tick_timer != null) {
 			throw new IllegalStateException("World tick started before stopping previous tick.");
 		}
-		DimensionType type = world.getDimension().getType();
-		String id = Integer.toString(type.getId());
-		String name = DimensionType.getKey(type).getPath();
+		String id = Integer.toString(getDimensionId(world.dimension()));
+		String name = world.dimension().location().getPath();
 		this.world_tick_timer = this.world_tick_seconds.labels(id, name).startTimer();
 	}
 
@@ -223,5 +222,24 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		}
 		this.world_tick_timer.observeDuration();
 		this.world_tick_timer = null;
+	}
+
+	/**
+	 * With the new version of Minecraft Dimension no longer has an id.
+	 * However, to keep backward compatibility with older versions of Minecraft we need this method.
+	 * Vanilla dimensions use fixed ID values (-1,0,1),
+	 * and the id of custom dimensions is now calculated from the world name
+	 */
+	private static int getDimensionId(RegistryKey<World> dimension) {
+		if (dimension == World.OVERWORLD) {
+			return 0;
+		} else if (dimension == World.END) {
+			return 1;
+		} else if (dimension == World.NETHER) {
+			return -1;
+		} else {
+			String dimensionName = dimension.location().getPath();
+			return dimensionName.hashCode();
+		}
 	}
 }
