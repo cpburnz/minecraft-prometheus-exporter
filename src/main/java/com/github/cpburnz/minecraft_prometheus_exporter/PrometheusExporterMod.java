@@ -10,9 +10,9 @@ import io.prometheus.client.hotspot.DefaultExports;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 
 /**
  * This class is the Prometheus Exporter mod.
@@ -33,7 +33,7 @@ public class PrometheusExporterMod {
 	/**
 	 * The HTTP server.
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "FieldCanBeLocal"})
 	private HTTPServer http_server;
 
 	/**
@@ -49,6 +49,7 @@ public class PrometheusExporterMod {
 	/**
 	 * The server configuration.
 	 */
+	@SuppressWarnings("FieldMayBeFinal")
 	private ServerConfig config;
 
 	/**
@@ -91,8 +92,8 @@ public class PrometheusExporterMod {
 		LOG.info("Listening on {}:{}", address, port);
 	}
 
-	// NOTE: Does not receive event.
-	/**
+	// NOTE: Does not receive event (has not been reevaluated since 1.14.4).
+	/*
 	 * Called when the mod configuration is loaded. This occurs right before the
 	 * `FMLServerAboutToStartEvent` event.
 	 *
@@ -109,8 +110,8 @@ public class PrometheusExporterMod {
 	}
 	*/
 
-	// NOTE: Does not receive event.
-	/**
+	// NOTE: Does not receive event (has not been reevaluated since 1.14.4).
+	/*
 	 * Called when the server-side mod configuration is reloaded.
 	 *
 	 * @param event The event.
@@ -135,10 +136,10 @@ public class PrometheusExporterMod {
 	 * @throws IOException
 	 */
 	@SubscribeEvent
-	public void onServerStarted(FMLServerStartedEvent event) throws IOException {
+	public void onServerStarted(ServerStartedEvent event) throws IOException {
 		// NOTE: The `ModConfig.Loading` event is not being received. However, the
 		// config appears to be loaded by Forge. Load the values here on server
-		// start.
+		// start. This series of events has not been reevaluated since 1.14.4.
 		this.config.loadValues();
 
 		// Record the Minecraft server.

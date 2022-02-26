@@ -7,9 +7,6 @@ buildscript {
 			url = 'https://files.minecraftforge.net/maven'
 		}
 
-		// JCenter.
-		jcenter()
-
 		// Maven Central.
 		mavenCentral()
 	}
@@ -17,7 +14,7 @@ buildscript {
 	// Buildscript dependencies.
 	dependencies {
 		// Forge Gradle plugin.
-		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
 	}
 }
 
@@ -29,19 +26,23 @@ plugins {
 	id 'java'
 
 	// Shadow Jar plugin: bundle dependencies.
-	id 'com.github.johnrengelman.shadow' version '4.0.4'
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
 
 	// Curse Gradle (publishing)
-	id 'com.matthewprenger.cursegradle' version '1.4.0'
+	//id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 // Forge Gradle plugin (required).
 apply plugin: 'net.minecraftforge.gradle'
 
+// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+println 'Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch')
+
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
 group = 'com.github.cpburnz'
-version = '0.3.2'
+version = '0.3.3'
 
 // Extra project settings.
 ext {
@@ -52,11 +53,9 @@ ext {
 	modTrackerUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter/issues'
 	modUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter'
 
-	forgeMinVersion = '36'
-	minecraftMinVersion = '1.16.5'
+	forgeMinVersion = '39'
+	minecraftMinVersion = '1.18.1'
 }
-
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
 	// The mappings can be changed at any time, and must be in the following format.
@@ -64,7 +63,7 @@ minecraft {
 	// stable_#			Stables are built at the discretion of the MCP team.
 	// Use non-default mappings at your own risk. they may not always work.
 	// Simply re-run your setup task after changing the mappings to update your workspace.
-	mappings channel: 'official', version: '1.16.5'
+	mappings channel: 'official', version: '1.18.1'
 	// makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
 	// accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -76,10 +75,13 @@ minecraft {
 			workingDirectory project.file('run')
 
 			// Recommended logging data for a userdev environment
-			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+			property 'forge.logging.markers', 'REGISTRIES'
 
 			// Recommended logging level for the console
 			property 'forge.logging.console.level', 'debug'
+
+			// Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+			property 'forge.enabledGameTestNamespaces', 'prometheus_exporter'
 
 			mods {
 				prometheus_exporter {
@@ -92,10 +94,13 @@ minecraft {
 			workingDirectory project.file('run')
 
 			// Recommended logging data for a userdev environment
-			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+			property 'forge.logging.markers', 'REGISTRIES'
 
 			// Recommended logging level for the console
 			property 'forge.logging.console.level', 'debug'
+
+			// Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+			property 'forge.enabledGameTestNamespaces', 'prometheus_exporter'
 
 			mods {
 				prometheus_exporter {
@@ -108,12 +113,13 @@ minecraft {
 			workingDirectory project.file('run')
 
 			// Recommended logging data for a userdev environment
-			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+			property 'forge.logging.markers', 'REGISTRIES'
 
 			// Recommended logging level for the console
 			property 'forge.logging.console.level', 'debug'
 
-			args '--mod', project.modId, '--all', '--output', file('src/generated/resources/')
+			// Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+			args '--mod', project.modId, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
 			mods {
 				prometheus_exporter {
@@ -135,14 +141,14 @@ configurations {
 dependencies {
 	// Specify the version of Minecraft to use, If this is any group other then
 	// 'net.minecraft' it is assumed that the dep is a ForgeGradle 'patcher'
-	// dependency. And it's patches will be applied. The userdev artifact is a
+	// dependency. And its patches will be applied. The userdev artifact is a
 	// special name and will get all sorts of transformations applied to it.
-	minecraft 'net.minecraftforge:forge:1.16.5-36.1.4'
+	minecraft 'net.minecraftforge:forge:1.18.1-39.0.88'
 
 	// Prometheus dependencies.
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.10.0'
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.10.0'
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.10.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.15.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.15.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.15.0'
 }
 
 // Expand variables in resource files.
@@ -157,6 +163,10 @@ processResources {
 		'modUrl': project.modUrl,
 		'version': project.version,
 	]
+
+	// Configure duplicates strategy to warm about duplicates. This is new and
+	// required in Gradle 7. I have no idea why Gradle is reporting duplicates.
+	duplicatesStrategy = 'warn'
 
 	// Record the inputs so Gradle knows when to regenerate the resource files.
 	inputs.properties vars
@@ -174,7 +184,7 @@ processResources {
 // Project JAR settings.
 jar {
 	// Include the Minecraft version in the JAR name.
-	appendix = "${project.minecraftMinVersion}-forge"
+	archiveAppendix = "${project.minecraftMinVersion}-forge"
 
 	manifest {
 		attributes([
@@ -192,10 +202,10 @@ jar {
 // Configure Shadow Jar.
 shadowJar {
 	// Remove JAR suffix.
-	appendix = tasks.jar.appendix
-	classifier = tasks.jar.classifier
+	archiveAppendix = tasks.jar.archiveAppendix
+	archiveClassifier = tasks.jar.archiveClassifier
 
-	// Only bundle dependencies explicitly marked instead of every damn one.
+	// Only bundle dependencies explicitly marked to shadow.
 	configurations = [project.configurations.shadow]
 
 	// Exclude unused classes.
@@ -212,8 +222,7 @@ task vendorShadowJarDeps(type: ConfigureShadowRelocation) {
 
 tasks.shadowJar.dependsOn tasks.vendorShadowJarDeps
 
-// Reobfuscate the Shadow Jar because the Minecraft classes must be
-// obfuscated.
+// Reobfuscate the Shadow Jar because the Minecraft classes must be obfuscated.
 reobf {
 	jar {
 		// Disable generation of unshadowed obfuscated JAR.
@@ -224,9 +233,11 @@ reobf {
 	}
 }
 
+tasks.reobfShadowJar.dependsOn tasks.jar
 tasks.assemble.dependsOn tasks.reobfShadowJar
 
 // Configure Curse Gradle for publishing to Curse Forge.
+/*
 curseforge {
 	apiKey = "test"
 
@@ -241,3 +252,4 @@ curseforge {
 }
 
 tasks.curseforge.dependsOn tasks.build
+*/

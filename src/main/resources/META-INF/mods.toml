@@ -9,7 +9,7 @@ modLoader="javafml" #mandatory
 
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
-license="AS IS"
+license="MIT License"
 
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
 loaderVersion="[${forgeMinVersion},)" #mandatory (28 is current forge version)

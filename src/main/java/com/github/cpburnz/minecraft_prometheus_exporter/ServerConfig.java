@@ -66,6 +66,7 @@ public class ServerConfig {
 	/**
 	 * @return The Forge configuration specification.
 	 */
+	@SuppressWarnings("unused")
 	public ForgeConfigSpec getSpec() {
 		return this.forge_spec;
 	}
@@ -73,11 +74,13 @@ public class ServerConfig {
 	/**
 	 * @return Whether the configuration is loaded.
 	 */
+	@SuppressWarnings("unused")
 	public boolean isLoaded() {
 		return this.is_loaded;
 	}
 
-	/**
+	// NOTE: Does not receive event (has not been reevaluated since 1.14.4).
+	/*
 	 * Load the mod configuration.
 	 *
 	 * @param config The mod configuration.
@@ -100,10 +103,10 @@ public class ServerConfig {
 	 */
 	public void loadValues() {
 		// Get config values.
-		this.collector_jvm = this.internal_spec.collector_jvm.get().booleanValue();
-		this.collector_mc = this.internal_spec.collector_mc.get().booleanValue();
+		this.collector_jvm = this.internal_spec.collector_jvm.get();
+		this.collector_mc = this.internal_spec.collector_mc.get();
 		this.web_listen_address = this.internal_spec.web_listen_address.get();
-		this.web_listen_port = this.internal_spec.web_listen_port.get().intValue();
+		this.web_listen_port = this.internal_spec.web_listen_port.get();
 
 		// Record that the config is loaded.
 		this.is_loaded = true;
@@ -134,9 +137,9 @@ public class ServerConfig {
 		private static final String DEFAULT_ADDRESS = "0.0.0.0";
 
 		/**
-		 * The default TCP port ot use. This is completely arbitrary. It was
-		 * derived from the Minecraft port (25565) and the Prometheus exporter
-		 * ports (9100+).
+		 * The default TCP port ot use. This is completely arbitrary. It was derived
+		 * from the Minecraft port (25565) and the Prometheus exporter ports
+		 * (9100+).
 		 */
 		private static final int DEFAULT_PORT = 19565;
 
@@ -174,11 +177,18 @@ public class ServerConfig {
 				.push("web");
 
 			this.web_listen_address = builder
-				.comment("The IP address to listen on. To only allow connections from the local machine, use \"127.0.0.1\". To allow connections from remote machines, use \"0.0.0.0\".")
+				.comment(
+					"The IP address to listen on. To only allow connections from the "
+					+ "local machine, use \"127.0.0.1\". To allow connections from "
+					+ "remote machines, use \"0.0.0.0\"."
+				)
 				.define("listen_address", DEFAULT_ADDRESS);
 
 			this.web_listen_port = builder
-				.comment("The TCP port to listen on. Ports 1-1023 will not work unless Minecraft is run as root which is not recommended.")
+				.comment(
+					"The TCP port to listen on. Ports 1-1023 will not work unless "
+					+ "Minecraft is run as root which is not recommended."
+				)
 				.defineInRange("listen_port", DEFAULT_PORT, TCP_PORT_MIN, TCP_PORT_MAX);
 
 			builder.pop();

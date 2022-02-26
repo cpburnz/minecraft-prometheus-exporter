@@ -9,12 +9,11 @@ import com.mojang.authlib.GameProfile;
 import io.prometheus.client.Collector;
 import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.Histogram;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 
 /**
  * This class collects stats from the Minecraft server for export.
@@ -24,16 +23,26 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	/**
 	 * The histogram buckets to use for ticks.
 	 */
-	private static double[] TICK_BUCKETS = new double[] {0.01, 0.025, 0.05, 0.10, 0.25, 0.5, 1};
+	private static final double[] TICK_BUCKETS = new double[] {
+		0.01,
+		0.025,
+		0.05,
+		0.10,
+		0.25,
+		0.5,
+		1.0,
+	};
 
 	/**
 	 * The Minecraft server.
 	 */
+	@SuppressWarnings("FieldMayBeFinal")
 	private MinecraftServer mc_server;
 
 	/**
 	 * Histogram metrics for server tick timing.
 	 */
+	@SuppressWarnings("FieldMayBeFinal")
 	private Histogram server_tick_seconds;
 
 	/**
@@ -44,6 +53,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	/**
 	 * Histogram metrics for world tick timing.
 	 */
+	@SuppressWarnings("FieldMayBeFinal")
 	private Histogram world_tick_seconds;
 
 	/**
@@ -103,6 +113,38 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	}
 
 	/**
+	 * Get the active players.
+	 *
+	 * @return The player list metric.
+	 */
+	private GaugeMetricFamily collectPlayerList() {
+		GaugeMetricFamily metric = newPlayerListMetric();
+		for (ServerPlayer player : this.mc_server.getPlayerList().getPlayers()) {
+			GameProfile profile = player.getGameProfile();
+			String id = profile.getId().toString();
+			String name = profile.getName();
+			metric.addMetric(Arrays.asList(id, name), 1);
+		}
+		return metric;
+	}
+
+	/**
+	 * Get the number of loaded world chunks.
+	 *
+	 * @return The world chunks loaded metric.
+	 */
+	private GaugeMetricFamily collectWorldChunksLoaded() {
+		GaugeMetricFamily metric = newWorldChunksLoadedMetric();
+		for (ServerLevel world : this.mc_server.getAllLevels()) {
+			String id = Integer.toString(getDimensionId(world.dimension()));
+			String name = world.dimension().location().getPath();
+			int loaded = world.getChunkSource().getLoadedChunksCount();
+			metric.addMetric(Arrays.asList(id, name), loaded);
+		}
+		return metric;
+	}
+
+	/**
 	 * Return all metric descriptions for the collector.
 	 *
 	 * @return The collector metric descriptions.
@@ -119,37 +161,28 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	}
 
 	/**
-	 * Get the active players.
+	 * Get the dimension id.
 	 *
-	 * @return The player list metric.
-	 */
-	private GaugeMetricFamily collectPlayerList() {
-		GaugeMetricFamily metric = newPlayerListMetric();
-		for (ServerPlayerEntity player : this.mc_server.getPlayerList().getPlayers()) {
-			GameProfile profile = player.getGameProfile();
-			String id = profile.getId().toString();
-			String name = profile.getName();
-			metric.addMetric(Arrays.asList(id, name), 1);
-		}
-		return metric;
-	}
-
-	/**
-	 * Get the number of loaded world chunks.
+	 * With the new version of Minecraft, v16, a dimension no longer has an id.
+	 * However, to keep backward compatibility with older versions of the
+	 * exporter, we need this method. Vanilla dimensions use fixed id values (-1,
+	 * 0, 1), and the id of a custom dimension is now calculated from the world
+	 * name.
 	 *
-	 * @return The world chunks loaded metric.
+	 * @param dimension The dimension.
 	 */
-	private GaugeMetricFamily collectWorldChunksLoaded() {
-		GaugeMetricFamily metric = newWorldChunksLoadedMetric();
-		for (ServerWorld world : this.mc_server.getAllLevels()) {
-			String id = Integer.toString(getDimensionId(world.dimension()));
-			String name = world.dimension().location().getPath();
-			int loaded = world.getChunkSource().getLoadedChunksCount();
-			metric.addMetric(Arrays.asList(id, name), loaded);
+	private static int getDimensionId(ResourceKey<Level> dimension) {
+		if (dimension.equals(Level.OVERWORLD)) {
+			return 0;
+		} else if (dimension.equals(Level.END)) {
+			return 1;
+		} else if (dimension.equals(Level.NETHER)) {
+			return -1;
+		} else {
+			String dimensionName = dimension.location().getPath();
+			return dimensionName.hashCode();
 		}
-		return metric;
 	}
-
 	/**
 	 * Create a new metric for the player list.
 	 *
@@ -187,6 +220,20 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	}
 
 	/**
+	 * Record when a world tick begins.
+	 *
+	 * @param world The world.
+	 */
+	public void startWorldTick(Level world) {
+		if (this.world_tick_timer != null) {
+			throw new IllegalStateException("World tick started before stopping previous tick.");
+		}
+		String id = Integer.toString(getDimensionId(world.dimension()));
+		String name = world.dimension().location().getPath();
+		this.world_tick_timer = this.world_tick_seconds.labels(id, name).startTimer();
+	}
+
+	/**
 	 * Record when a server tick finishes.
 	 */
 	public void stopServerTick() {
@@ -198,48 +245,15 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	}
 
 	/**
-	 * Record when a world tick begins.
-	 *
-	 * @param world The world.
-	 */
-	public void startWorldTick(World world) {
-		if (this.world_tick_timer != null) {
-			throw new IllegalStateException("World tick started before stopping previous tick.");
-		}
-		String id = Integer.toString(getDimensionId(world.dimension()));
-		String name = world.dimension().location().getPath();
-		this.world_tick_timer = this.world_tick_seconds.labels(id, name).startTimer();
-	}
-
-	/**
 	 * Record when a world tick finishes.
 	 *
 	 * @param world The world.
 	 */
-	public void stopWorldTick(World world) {
+	public void stopWorldTick(Level world) {
 		if (this.world_tick_timer == null) {
 			throw new IllegalStateException("World tick stopped without an active tick.");
 		}
 		this.world_tick_timer.observeDuration();
 		this.world_tick_timer = null;
-	}
-
-	/**
-	 * With the new version of Minecraft Dimension no longer has an id.
-	 * However, to keep backward compatibility with older versions of Minecraft we need this method.
-	 * Vanilla dimensions use fixed ID values (-1,0,1),
-	 * and the id of custom dimensions is now calculated from the world name
-	 */
-	private static int getDimensionId(RegistryKey<World> dimension) {
-		if (dimension == World.OVERWORLD) {
-			return 0;
-		} else if (dimension == World.END) {
-			return 1;
-		} else if (dimension == World.NETHER) {
-			return -1;
-		} else {
-			String dimensionName = dimension.location().getPath();
-			return dimensionName.hashCode();
-		}
 	}
 }
