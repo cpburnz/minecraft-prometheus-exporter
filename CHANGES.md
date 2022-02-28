@@ -2,7 +2,7 @@
 Change History
 ==============
 
-0.3.3 (2022-02-26)
+0.3.3 (2022-02-28)
 ------------------
 
 - [Issue #4](https://github.com/cpburnz/minecraft-prometheus-exporter/issues/4): Update to MC 1.18.1.
