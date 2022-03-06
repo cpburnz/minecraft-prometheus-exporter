@@ -2,10 +2,13 @@
 Change History
 ==============
 
-0.3.4 (TDB)
+
+1.0.0 (TDB)
 ------------------
 
-- Support MC 1.12.2.8
+- Support MC 1.12.2.
+- Properly clean up on world shutdown to fix client crashes when starting a second world.
+- Breaking Change: The "mc_world_tick_seconds" metric has been renamed to "mc_dimension_tick_seconds".
 
 
 0.3.3 (2022-02-28)

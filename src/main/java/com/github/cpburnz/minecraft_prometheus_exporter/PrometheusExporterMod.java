@@ -2,26 +2,32 @@ package com.github.cpburnz.minecraft_prometheus_exporter;
 
 import java.io.IOException;
 
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
-import net.minecraft.server.MinecraftServer;
+
 
 /**
  * This class is the Prometheus Exporter mod.
  */
 @Mod(
 	modid=PrometheusExporterMod.MOD_ID,
-	useMetadata=true
+	useMetadata=true,
+	// Allow the client to not have this mod installed.
+	acceptableRemoteVersions="*"
 )
 public class PrometheusExporterMod {
 
@@ -38,7 +44,6 @@ public class PrometheusExporterMod {
 	/**
 	 * The HTTP server.
 	 */
-	@SuppressWarnings({"unused", "FieldCanBeLocal"})
 	private HTTPServer http_server;
 
 	/**
@@ -69,7 +74,25 @@ public class PrometheusExporterMod {
 	}
 
 	/**
-	 * Initialize the metrics collectors.
+	 * Unregister the metrics collectors.
+	 */
+	private void closeCollectors() {
+		// Unregister all collectors.
+		CollectorRegistry.defaultRegistry.clear();
+	}
+
+	/**
+	 * Stop the HTTP server.
+	 */
+	private void closeHttpServer() {
+		// WARNING: Remember to stop the HTTP server. Otherwise, the Minecraft
+		// client will crash because the TCP port will already be in use when trying
+		// to load a second saved world.
+		this.http_server.close();
+	}
+
+	/**
+	 * Register the metrics collectors.
 	 */
 	private void initCollectors() {
 		// Collect JVM stats.
@@ -85,7 +108,7 @@ public class PrometheusExporterMod {
 	}
 
 	/**
-	 * Initialize the HTTP server.
+	 * Start the HTTP server.
 	 */
 	private void initHttpServer() throws IOException {
 		// WARNING: Make sure the HTTP server thread is daemonized, otherwise the
@@ -94,6 +117,24 @@ public class PrometheusExporterMod {
 		int port = this.config.web_listen_port;
 		this.http_server = new HTTPServer(address, port, true);
 		LOG.info("Listening on {}:{}", address, port);
+	}
+
+	/**
+	 * Called on a dimension tick.
+	 *
+	 * @param event The event.
+	 */
+	@SubscribeEvent
+	public void onDimensionTick(TickEvent.WorldTickEvent event) {
+		// Record dimension tick.
+		if (this.mc_collector != null) {
+			DimensionType dim = event.world.provider.getDimensionType();
+			if (event.phase == TickEvent.Phase.START) {
+				this.mc_collector.startDimensionTick(dim);
+			} else if (event.phase == TickEvent.Phase.END) {
+				this.mc_collector.stopDimensionTick(dim);
+			}
+		}
 	}
 
 	/**
@@ -133,39 +174,32 @@ public class PrometheusExporterMod {
 	}
 
 	/**
+	 * Called when the server has stopped.
+	 *
+	 * @param event The event.
+	 */
+	@Mod.EventHandler
+	public void onServerStopped(FMLServerStoppedEvent event) {
+		// Close collectors.
+		this.closeCollectors();
+
+		// Stop HTTP server.
+		this.closeHttpServer();
+	}
+
+	/**
 	 * Called on the server tick.
 	 *
 	 * @param event The event.
 	 */
 	@SubscribeEvent
 	public void onServerTick(TickEvent.ServerTickEvent event) {
-		// TODO: Event is not triggering. ~Caleb, 2022-03-06
-
 		// Record server tick.
 		if (this.mc_collector != null) {
 			if (event.phase == TickEvent.Phase.START) {
 				this.mc_collector.startServerTick();
 			} else if (event.phase == TickEvent.Phase.END) {
 				this.mc_collector.stopServerTick();
-			}
-		}
-	}
-
-	/**
-	 * Called on a world tick.
-	 *
-	 * @param event The event.
-	 */
-	@SubscribeEvent
-	public void onWorldTick(TickEvent.WorldTickEvent event) {
-		// TODO: Event is not triggering. ~Caleb, 2022-03-06
-
-		// Record world tick.
-		if (this.mc_collector != null) {
-			if (event.phase == TickEvent.Phase.START) {
-				this.mc_collector.startWorldTick(event.world);
-			} else if (event.phase == TickEvent.Phase.END) {
-				this.mc_collector.stopWorldTick(event.world);
 			}
 		}
 	}

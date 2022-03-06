@@ -162,7 +162,7 @@ public class Config {
 			this.web_listen_port.setComment(
 				"The TCP port to listen on. Ports 1-1023 will not work unless "
 				+ "Minecraft is run as root which is not recommended. Range is "
-				+ TCP_PORT_MIN + " - " + TCP_PORT_MAX
+				+ TCP_PORT_MIN + "-" + TCP_PORT_MAX
 			);
 
 			if (config.hasChanged()) {

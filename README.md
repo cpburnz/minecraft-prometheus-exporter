@@ -18,26 +18,28 @@ The Prometheus Exporter mod only needs to be installed on the server. It can be
 downloaded from [GitHub] and [Curse Forge]. To install it, copy the JAR
 (*Prometheus-Exporter-{MC Version}-forge-{Mod Version}.jar*) to the server
 *mods/* directory. Since this mod does not add anything to the Minecraft world,
-it can be safely upgraded by simply replacing an older version with a newer version.
+it can be safely upgraded by simply replacing an older version with a newer
+version.
 
 
 Configuration
 -------------
 
-The mod configuration is located at *world/serverconfig/prometheus_exporter-server.toml*.
-It will be automatically generated upon server start if it does not already
-exist. The default configuration can be seen in the example [prometheus_exporter-server.toml].
+The mod configuration is located at *config/prometheus_exporter.cfg*. It will be
+automatically generated upon server start if it does not already exist. The
+default configuration can be seen in the example [prometheus_exporter.cfg].
 
 
 Exporter Output
 ---------------
 
-A sample output from the exporter can be seen in the example
-[output.txt].
+A sample output from the exporter can be seen in the example [output.txt].
+Please note as of version 1.0.0 the "mc_world_tick_seconds" metric has been
+renamed to "mc_dimension_tick_seconds".
 
 
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
 [Prometheus]: https://prometheus.io/
-[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/master/examples/output.txt
-[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/master/examples/prometheus_exporter-server.toml
+[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.12.2/examples/output.txt
+[prometheus_exporter.cfg]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.12.2/examples/prometheus_exporter.cfg
