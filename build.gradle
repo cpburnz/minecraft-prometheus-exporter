@@ -42,7 +42,7 @@ println 'Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
 group = 'com.github.cpburnz'
-version = '0.3.3'
+version = '1.0.0'
 
 // Extra project settings.
 ext {
@@ -53,7 +53,7 @@ ext {
 	modTrackerUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter/issues'
 	modUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter'
 
-	forgeMinVersion = '39'
+	forgeMinVersion = '39.0'
 	minecraftMinVersion = '1.18.1'
 }
 

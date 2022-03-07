@@ -2,17 +2,23 @@ package com.github.cpburnz.minecraft_prometheus_exporter;
 
 import java.io.IOException;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+
 
 /**
  * This class is the Prometheus Exporter mod.
@@ -21,19 +27,18 @@ import net.minecraftforge.fml.common.Mod;
 public class PrometheusExporterMod {
 
 	/**
-	 * The mod id.
-	 */
-	public static final String MOD_ID = "prometheus_exporter";
-
-	/**
 	 * The logger to use.
 	 */
 	private static final Logger LOG = LogManager.getLogger();
 
 	/**
+	 * The mod id.
+	 */
+	public static final String MOD_ID = "prometheus_exporter";
+
+	/**
 	 * The HTTP server.
 	 */
-	@SuppressWarnings({"unused", "FieldCanBeLocal"})
 	private HTTPServer http_server;
 
 	/**
@@ -65,6 +70,24 @@ public class PrometheusExporterMod {
 	}
 
 	/**
+	 * Unregister the metrics collectors.
+	 */
+	private void closeCollectors() {
+		// Unregister all collectors.
+		CollectorRegistry.defaultRegistry.clear();
+	}
+
+	/**
+	 * Stop the HTTP server.
+	 */
+	private void closeHttpServer() {
+		// WARNING: Remember to stop the HTTP server. Otherwise, the Minecraft
+		// client will crash because the TCP port will already be in use when trying
+		// to load a second saved world.
+		this.http_server.close();
+	}
+
+	/**
 	 * Initialize the metrics collectors.
 	 */
 	private void initCollectors() {
@@ -92,42 +115,35 @@ public class PrometheusExporterMod {
 		LOG.info("Listening on {}:{}", address, port);
 	}
 
-	// NOTE: Does not receive event (has not been reevaluated since 1.14.4).
-	/*
-	 * Called when the mod configuration is loaded. This occurs right before the
-	 * `FMLServerAboutToStartEvent` event.
+	/**
+	 * Called on a dimension tick.
 	 *
 	 * @param event The event.
 	 */
-	/*
 	@SubscribeEvent
-	public void onConfigLoad(ModConfig.Loading event) {
-		LOG.info("CONFIG LOAD");
-		ModConfig config = event.getConfig();
-		if (config.getType() == ModConfig.Type.SERVER) {
-			this.config.loadConfig(config);
+	public void onDimensionTick(TickEvent.WorldTickEvent event) {
+		// Record dimension tick.
+		if (this.mc_collector != null) {
+			ResourceKey<Level> dim = event.world.dimension();
+			if (event.phase == TickEvent.Phase.START) {
+				this.mc_collector.startDimensionTick(dim);
+			} else if (event.phase == TickEvent.Phase.END) {
+				this.mc_collector.stopDimensionTick(dim);
+			}
 		}
 	}
-	*/
 
-	// NOTE: Does not receive event (has not been reevaluated since 1.14.4).
-	/*
-	 * Called when the server-side mod configuration is reloaded.
+	/**
+	 * Called before the server begins loading anything.
 	 *
 	 * @param event The event.
 	 */
-	/*
 	@SubscribeEvent
-	public void onConfigReload(ModConfig.ConfigReloading event) {
-		LOG.info("CONFIG RELOAD");
-		// TODO: Restart HTTP server when config is reloaded.
-		// TODO: Reinitialize the collectors.
-		ModConfig config = event.getConfig();
-		if (config.getType() == ModConfig.Type.SERVER) {
-			this.config.loadConfig(config);
-		}
+	public void onServerAboutToStart(ServerAboutToStartEvent event) {
+		// NOTE: This appears to be the earliest event where Forge has loaded the
+		// server-side config.
+		this.config.loadValues();
 	}
-	*/
 
 	/**
 	 * Called when the server has started.
@@ -137,11 +153,6 @@ public class PrometheusExporterMod {
 	 */
 	@SubscribeEvent
 	public void onServerStarted(ServerStartedEvent event) throws IOException {
-		// NOTE: The `ModConfig.Loading` event is not being received. However, the
-		// config appears to be loaded by Forge. Load the values here on server
-		// start. This series of events has not been reevaluated since 1.14.4.
-		this.config.loadValues();
-
 		// Record the Minecraft server.
 		this.mc_server = event.getServer();
 
@@ -150,6 +161,20 @@ public class PrometheusExporterMod {
 
 		// Initialize collectors.
 		this.initCollectors();
+	}
+
+	/**
+	 * Called when the server has stopped.
+	 *
+	 * @param event The event.
+	 */
+	@SubscribeEvent
+	public void onServerStopped(ServerStoppedEvent event) {
+		// Unregister collectors.
+		this.closeCollectors();
+
+		// Stop HTTP server.
+		this.closeHttpServer();
 	}
 
 	/**
@@ -165,23 +190,6 @@ public class PrometheusExporterMod {
 				this.mc_collector.startServerTick();
 			} else if (event.phase == TickEvent.Phase.END) {
 				this.mc_collector.stopServerTick();
-			}
-		}
-	}
-
-	/**
-	 * Called on a world tick.
-	 *
-	 * @param event The event.
-	 */
-	@SubscribeEvent
-	public void onWorldTick(TickEvent.WorldTickEvent event) {
-		// Record world tick.
-		if (this.mc_collector != null) {
-			if (event.phase == TickEvent.Phase.START) {
-				this.mc_collector.startWorldTick(event.world);
-			} else if (event.phase == TickEvent.Phase.END) {
-				this.mc_collector.stopWorldTick(event.world);
 			}
 		}
 	}

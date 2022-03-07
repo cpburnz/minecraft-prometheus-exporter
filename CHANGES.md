@@ -2,6 +2,15 @@
 Change History
 ==============
 
+
+1.0.0 (2022-03-06)
+------------------
+
+- Support MC 1.12.2.
+- Properly clean up on world shutdown to fix client crashes when starting a second world.
+- Breaking Change: The "mc_world_tick_seconds" metric has been renamed to "mc_dimension_tick_seconds".
+
+
 0.3.3 (2022-02-28)
 ------------------
 

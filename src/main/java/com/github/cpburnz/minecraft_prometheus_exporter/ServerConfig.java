@@ -1,15 +1,14 @@
 package com.github.cpburnz.minecraft_prometheus_exporter;
 
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.config.ModConfig;
-
 /**
- * This class defines the server-side mod configuration.
+ * This class defines the server-side mod config.
  */
 public class ServerConfig {
 
@@ -29,17 +28,17 @@ public class ServerConfig {
 	public boolean collector_mc;
 
 	/**
-	 * The Forge configuration specification.
+	 * The Forge config specification.
 	 */
 	private final ForgeConfigSpec forge_spec;
 
 	/**
-	 * The server-side configuration specifications.
+	 * The server-side config specifications.
 	 */
-	private final InteralSpec internal_spec;
+	private final InternalSpec internal_spec;
 
 	/**
-	 * Whether the configuration has been loaded.
+	 * Whether the config has been loaded.
 	 */
 	private boolean is_loaded;
 
@@ -58,45 +57,18 @@ public class ServerConfig {
 	 */
 	public ServerConfig() {
 		// Setup config specs.
-		Pair<InteralSpec, ForgeConfigSpec> result = new ForgeConfigSpec.Builder().configure(InteralSpec::new);
+		Pair<InternalSpec, ForgeConfigSpec> result = new ForgeConfigSpec.Builder().configure(InternalSpec::new);
 		this.internal_spec = result.getLeft();
 		this.forge_spec = result.getRight();
 	}
 
 	/**
-	 * @return The Forge configuration specification.
-	 */
-	@SuppressWarnings("unused")
-	public ForgeConfigSpec getSpec() {
-		return this.forge_spec;
-	}
-
-	/**
-	 * @return Whether the configuration is loaded.
+	 * @return Whether the config is loaded.
 	 */
 	@SuppressWarnings("unused")
 	public boolean isLoaded() {
 		return this.is_loaded;
 	}
-
-	// NOTE: Does not receive event (has not been reevaluated since 1.14.4).
-	/*
-	 * Load the mod configuration.
-	 *
-	 * @param config The mod configuration.
-	 */
-	/*
-	public void loadConfig(ModConfig config) {
-		if (config.getType() != ModConfig.Type.SERVER) {
-			throw new IllegalArgumentException("Config type must be SERVER: " + config.getType().name());
-		} else if (config.getSpec() != this.forge_spec) {
-			throw new IllegalArgumentException("Config spec must be " + this.forge_spec.toString() + ": " + config.getSpec().toString());
-		}
-
-		// The config has been loaded, get the values.
-		this.loadValues();
-	}
-	*/
 
 	/**
 	 * Load the values from the server-side specification.
@@ -118,17 +90,16 @@ public class ServerConfig {
 	}
 
 	/**
-	 * Register the server-side configuration with Forge.
+	 * Register the server-side config with Forge.
 	 */
 	public void register() {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, this.forge_spec);
 	}
 
 	/**
-	 * This class is used to define the server-side Forge configuration
-	 * specifications.
+	 * This class is used to define the server-side Forge config specifications.
 	 */
-	private static class InteralSpec {
+	private static class InternalSpec {
 
 		/**
 		 * The default address to listen on. This defaults to listening everywhere
@@ -158,7 +129,12 @@ public class ServerConfig {
 		public final ForgeConfigSpec.ConfigValue<String> web_listen_address;
 		public final ForgeConfigSpec.IntValue web_listen_port;
 
-		public InteralSpec(ForgeConfigSpec.Builder builder) {
+		/**
+		 * Construct the instance.
+		 *
+		 * @param builder The Forge config builder.
+		 */
+		public InternalSpec(ForgeConfigSpec.Builder builder) {
 			builder
 				.comment("Collector settings.")
 				.push("collector");
