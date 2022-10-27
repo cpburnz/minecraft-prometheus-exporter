@@ -121,10 +121,10 @@ public class PrometheusExporterMod {
 	 * @param event The event.
 	 */
 	@SubscribeEvent
-	public void onDimensionTick(TickEvent.WorldTickEvent event) {
+	public void onDimensionTick(TickEvent.LevelTickEvent event) {
 		// Record dimension tick.
 		if (this.mc_collector != null) {
-			ResourceKey<Level> dim = event.world.dimension();
+			ResourceKey<Level> dim = event.level.dimension();
 			if (event.phase == TickEvent.Phase.START) {
 				this.mc_collector.startDimensionTick(dim);
 			} else if (event.phase == TickEvent.Phase.END) {
