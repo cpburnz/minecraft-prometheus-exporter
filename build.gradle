@@ -14,7 +14,7 @@ buildscript {
 	// Buildscript dependencies.
 	dependencies {
 		// Forge Gradle plugin.
-		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.56', changing: true
+		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
 	}
 }
 
@@ -154,14 +154,14 @@ dependencies {
 // Expand variables in resource files.
 processResources {
 	def vars = [
-			'forgeMinVersion': project.forgeMinVersion,
-			'minecraftMinVersion': project.minecraftMinVersion,
-			'modAuthors': project.modAuthors,
-			'modName': project.modName,
-			'modId': project.modId,
-			'modTrackerUrl': project.modTrackerUrl,
-			'modUrl': project.modUrl,
-			'version': project.version,
+		'forgeMinVersion': project.forgeMinVersion,
+		'minecraftMinVersion': project.minecraftMinVersion,
+		'modAuthors': project.modAuthors,
+		'modName': project.modName,
+		'modId': project.modId,
+		'modTrackerUrl': project.modTrackerUrl,
+		'modUrl': project.modUrl,
+		'version': project.version,
 	]
 
 	// Configure duplicates strategy to warm about duplicates. This is new and
@@ -188,13 +188,13 @@ jar {
 
 	manifest {
 		attributes([
-				'Specification-Title': 'examplemod',
-				'Specification-Vendor': 'examplemodsareus',
-				'Specification-Version': '1',
-				'Implementation-Title': project.modName,
-				'Implementation-Version': project.version,
-				'Implementation-Vendor': project.modAuthors,
-				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+			'Specification-Title': 'examplemod',
+			'Specification-Vendor': 'examplemodsareus',
+			'Specification-Version': '1',
+			'Implementation-Title': project.modName,
+			'Implementation-Version': project.version,
+			'Implementation-Vendor': project.modAuthors,
+			'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 		])
 	}
 }
