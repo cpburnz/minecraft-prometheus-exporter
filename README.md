@@ -4,6 +4,7 @@ systems monitoring toolkit, [Prometheus]. The mod is intended for server-side
 use, and does not need to be installed client-side. This currently has builds
 for the following versions:
 
+- Minecraft 1.19.2 with Forge 43.0.0.
 - Minecraft 1.18.1 with Forge 39.0.0.
 - Minecraft 1.16.5 with Forge 36.2.0.
 - Minecraft 1.15.2 with Forge 21.2.0.
@@ -41,5 +42,5 @@ renamed to "mc_dimension_tick_seconds".
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
 [Prometheus]: https://prometheus.io/
-[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.18.1/examples/output.txt
-[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.18.1/examples/prometheus_exporter-server.toml
+[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.19.2/examples/output.txt
+[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.19.2/examples/prometheus_exporter-server.toml
