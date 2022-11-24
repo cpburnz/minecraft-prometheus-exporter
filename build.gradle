@@ -32,7 +32,7 @@ plugins {
 	id 'com.github.johnrengelman.shadow' version '4.0.4'
 
 	// Curse Gradle (publishing)
-	id 'com.matthewprenger.cursegradle' version '1.4.0'
+	//id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 // Forge Gradle plugin (required).
@@ -41,7 +41,7 @@ apply plugin: 'net.minecraftforge.gradle'
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
 group = 'com.github.cpburnz'
-version = '0.3.2'
+version = '1.0.0'
 
 // Extra project settings.
 ext {
@@ -227,6 +227,7 @@ reobf {
 tasks.assemble.dependsOn tasks.reobfShadowJar
 
 // Configure Curse Gradle for publishing to Curse Forge.
+/*
 curseforge {
 	apiKey = "test"
 
@@ -241,3 +242,4 @@ curseforge {
 }
 
 tasks.curseforge.dependsOn tasks.build
+*/

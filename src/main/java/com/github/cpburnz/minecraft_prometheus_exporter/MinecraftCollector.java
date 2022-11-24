@@ -68,7 +68,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 
 		this.world_tick_seconds = Histogram.build()
 			.buckets(TICK_BUCKETS)
-			.name("mc_world_tick_seconds")
+			.name("mc_dimension_tick_seconds")
 			.labelNames("id", "name")
 			.help("Stats on world tick times.")
 			.create();
