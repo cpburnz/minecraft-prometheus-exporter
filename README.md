@@ -12,6 +12,9 @@ for the following versions:
 - Minecraft 1.14.4 with Forge 28.1.0.
 - Minecraft 1.12.2 with Forge 14.23.0.
 
+Is there a newer version of Minecraft not listed? Let me know by opening an
+[issue on GitHub].
+
 
 Installation
 ------------
@@ -40,8 +43,19 @@ Please note as of version 1.0.0 the "mc_world_tick_seconds" metric has been
 renamed to "mc_dimension_tick_seconds".
 
 
+Dashboards
+----------
+
+Known compatible Grafana dashboards:
+
+- [Minecraft Server Stats] built by [randombk].
+
+
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
+[Minecraft Server Stats]: https://grafana.com/grafana/dashboards/16508-minecraft-server-stats/
 [Prometheus]: https://prometheus.io/
+[issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
 [output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.19.3/examples/output.txt
 [prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.19.3/examples/prometheus_exporter-server.toml
+[randombk]: https://github.com/randombk
