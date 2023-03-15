@@ -53,8 +53,10 @@ ext {
 	modTrackerUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter/issues'
 	modUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter'
 
+	fmlMinVersion = '44'
 	forgeMinVersion = '44.1'
 	minecraftMinVersion = '1.19.3'
+	minecraftNextVersion = '1.20'
 }
 
 minecraft {
@@ -154,8 +156,10 @@ dependencies {
 // Expand variables in resource files.
 processResources {
 	def vars = [
+		'fmlMinVersion': project.fmlMinVersion,
 		'forgeMinVersion': project.forgeMinVersion,
 		'minecraftMinVersion': project.minecraftMinVersion,
+		'minecraftNextVersion': project.minecraftNextVersion,
 		'modAuthors': project.modAuthors,
 		'modName': project.modName,
 		'modId': project.modId,
