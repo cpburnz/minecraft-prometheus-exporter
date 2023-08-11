@@ -3,6 +3,12 @@ Change History
 ==============
 
 
+1.0.0 for MC 1.20.1 (2023-08-10)
+--------------------------------
+
+- [Issue #12](https://github.com/cpburnz/minecraft-prometheus-exporter/issues/12): Support MC 1.20.1.
+
+
 1.0.0 for MC 1.19.3 (2023-03-14)
 --------------------------------
 
