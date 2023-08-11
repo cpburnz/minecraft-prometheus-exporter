@@ -4,6 +4,7 @@ systems monitoring toolkit, [Prometheus]. The mod is intended for server-side
 use, and does not need to be installed client-side. This currently has builds
 for the following versions:
 
+- Minecraft 1.20.1 with Forge 47.1.0.
 - Minecraft 1.19.3 with Forge 44.1.0.
 - Minecraft 1.19.2 with Forge 43.0.0.
 - Minecraft 1.18.1 with Forge 39.0.0.
@@ -56,6 +57,6 @@ Known compatible Grafana dashboards:
 [Minecraft Server Stats]: https://grafana.com/grafana/dashboards/16508-minecraft-server-stats/
 [Prometheus]: https://prometheus.io/
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
-[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.19.3/examples/output.txt
-[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.19.3/examples/prometheus_exporter-server.toml
+[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1/examples/output.txt
+[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1/examples/prometheus_exporter-server.toml
 [randombk]: https://github.com/randombk
