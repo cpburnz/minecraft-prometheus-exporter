@@ -58,6 +58,6 @@ Known compatible Grafana dashboards:
 [Minecraft Server Stats]: https://grafana.com/grafana/dashboards/16508-minecraft-server-stats/
 [Prometheus]: https://prometheus.io/
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
-[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1/examples/output.txt
-[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1/examples/prometheus_exporter-server.toml
+[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.7.10/examples/output.txt
+[prometheus_exporter.cfg]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.7.10/examples/prometheus_exporter.cfg
 [randombk]: https://github.com/randombk
