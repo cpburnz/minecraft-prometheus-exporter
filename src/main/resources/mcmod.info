@@ -1,0 +1,21 @@
+{
+	"modListVersion": 2,
+	"modList": [{
+		"modid": "${modId}",
+		"name": "${modName}",
+		"description": "This mod provides a Prometheus exporter for Minecraft. It exports metrics related to the Minecraft server and the JVM for consumption by the open-source systems monitoring toolkit, Prometheus. The mod is intended for server-side use, and does not need to be installed client-side.",
+		"version": "${modVersion}",
+		"mcversion": "${minecraftVersion}",
+		"url": "https://github.com/cpburnz/minecraft-prometheus-exporter",
+		"updateUrl": "",
+		"authorList": ["cpburnz"],
+		"credits": "",
+		"logoFile": "assets/prometheus_exporter/Prometheus_Exporter.png",
+		"screenshots": [],
+		"parent": "",
+		"requiredMods": [],
+		"dependencies": [],
+		"dependants": [],
+		"useDependencyInformation": true
+	}]
+}

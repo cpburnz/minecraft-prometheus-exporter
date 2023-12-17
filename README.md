@@ -12,6 +12,7 @@ for the following versions:
 - Minecraft 1.15.2 with Forge 21.2.0.
 - Minecraft 1.14.4 with Forge 28.1.0.
 - Minecraft 1.12.2 with Forge 14.23.0.
+- Minecraft 1.7.10 with Forge 10.13.4.
 
 Is there a newer version of Minecraft not listed? Let me know by opening an
 [issue on GitHub].
@@ -31,9 +32,9 @@ version.
 Configuration
 -------------
 
-The mod configuration is located at *world/serverconfig/prometheus_exporter-server.toml*.
+The mod configuration is located at *config/prometheus_exporter.cfg*.
 It will be automatically generated upon server start if it does not already
-exist. The default configuration can be seen in the example [prometheus_exporter-server.toml].
+exist. The default configuration can be seen in the example [prometheus_exporter.cfg].
 
 
 Exporter Output
