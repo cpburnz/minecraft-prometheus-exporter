@@ -1,11 +1,13 @@
 package com.github.cpburnz.minecraft_prometheus_exporter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
+import gnu.trove.map.hash.TObjectIntHashMap;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
@@ -14,6 +16,10 @@ import net.minecraftforge.common.DimensionManager;
 import io.prometheus.client.Collector;
 import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.Histogram;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class collects stats from the Minecraft server for export.
@@ -90,6 +96,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
     public List<MetricFamilySamples> collect() {
         // Collect metrics.
         MetricFamilySamples player_list = this.collectPlayerList();
+        MetricFamilySamples entity_list = this.collectEntityList();
         List<MetricFamilySamples> server_ticks = this.server_tick_seconds.collect();
         MetricFamilySamples dim_chunks_loaded = this.collectDimensionChunksLoaded();
         List<MetricFamilySamples> dim_ticks = this.dim_tick_seconds.collect();
@@ -100,12 +107,15 @@ public class MinecraftCollector extends Collector implements Collector.Describab
                 + 1 /* dimension_chunks_loaded */
                 + dim_ticks.size());
         metrics.add(player_list);
+        metrics.add(entity_list);
         metrics.addAll(server_ticks);
         metrics.add(dim_chunks_loaded);
         metrics.addAll(dim_ticks);
 
         return metrics;
     }
+
+
 
     /**
      * Get the number of loaded dimension chunks.
@@ -141,6 +151,40 @@ public class MinecraftCollector extends Collector implements Collector.Describab
     }
 
     /**
+     * Get the loaded entities.
+     * @return The entity list metric.
+     */
+    private GaugeMetricFamily collectEntityList() {
+        GaugeMetricFamily metric = newEntityListMetric();
+
+        TObjectIntHashMap<String> entities = new TObjectIntHashMap<>();
+
+        for (WorldServer ws : mc_server.worldServers) {
+            List list = ws.loadedEntityList;
+            for (int i = list.size(); i-- > 0; ) {
+                if (list.get(i) instanceof Entity) {
+                    Entity entity = (Entity) list.get(i);
+                    if (entity != null && !(entity instanceof EntityPlayer)) {
+                        String currentName = EntityList.getEntityString(entity);
+                        if (currentName != null) {
+                            currentName += "|" + EntityList.getEntityID(entity);
+                            entities.adjustOrPutValue(currentName, 1, 1);
+                        } else if (entity instanceof IMob) {
+                            currentName = entity.getClass().getName();
+                            entities.adjustOrPutValue(currentName, 1, 1);
+                        }
+                    }
+                }
+            }
+        }
+        for (String key : entities.keySet()) {
+            double value = entities.get(key);
+            metric.addMetric(Arrays.asList(key.split("\\|")), value);
+        }
+        return metric;
+    }
+
+    /**
      * Return all metric descriptions for the collector.
      *
      * @return The collector metric descriptions.
@@ -150,6 +194,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
         // Aggregate metric descriptions.
         ArrayList<MetricFamilySamples> descs = new ArrayList<>();
         descs.add(newPlayerListMetric());
+        descs.add(newEntityListMetric());
         descs.addAll(this.server_tick_seconds.describe());
         descs.add(newDimensionChunksLoadedMetric());
         descs.addAll(this.dim_tick_seconds.describe());
@@ -178,6 +223,17 @@ public class MinecraftCollector extends Collector implements Collector.Describab
             "mc_player_list",
             "The players connected to the server.",
             Arrays.asList("id", "name"));
+    }
+
+    /**
+     * Create a new metric for the entity list.
+     * @return The entity list metric.
+     */
+    private static GaugeMetricFamily newEntityListMetric() {
+        return new GaugeMetricFamily(
+            "mc_entity_list",
+            "All entities on the server by type and amount.",
+            Arrays.asList("type", "id"));
     }
 
     /**
