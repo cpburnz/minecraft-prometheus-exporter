@@ -1,7 +1,10 @@
 
 Change History
 ==============
+1.1.0 for MC 1.7.10 (2023-12-29)
+--------------------------------
 
+- Add Entity Tracking with [mc_entity_list(type, id): value]
 
 1.0.0 for MC 1.7.10 (2023-12-17)
 --------------------------------

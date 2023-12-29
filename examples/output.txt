@@ -1,609 +1,133 @@
-# HELP jvm_memory_pool_allocated_bytes_total Total bytes allocated in a given JVM memory pool. Only updated after GC, not continuously.
-# TYPE jvm_memory_pool_allocated_bytes_total counter
-jvm_memory_pool_allocated_bytes_total{pool="Code Cache",} 1.08784576E8
-jvm_memory_pool_allocated_bytes_total{pool="PS Eden Space",} 4.976541696E10
-jvm_memory_pool_allocated_bytes_total{pool="PS Old Gen",} 1.287163712E9
-jvm_memory_pool_allocated_bytes_total{pool="PS Survivor Space",} 1.482029392E9
-jvm_memory_pool_allocated_bytes_total{pool="Compressed Class Space",} 3.5744192E7
-jvm_memory_pool_allocated_bytes_total{pool="Metaspace",} 2.53070568E8
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 725.27
+process_cpu_seconds_total 58.296875
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.702426071121E9
-# HELP process_open_fds Number of open file descriptors.
-# TYPE process_open_fds gauge
-process_open_fds 636.0
-# HELP process_max_fds Maximum number of open file descriptors.
-# TYPE process_max_fds gauge
-process_max_fds 1048576.0
-# HELP process_virtual_memory_bytes Virtual memory size in bytes.
-# TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 6.1543800832E10
-# HELP process_resident_memory_bytes Resident memory size in bytes.
-# TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.8778476544E10
-# HELP jvm_gc_collection_seconds Time spent in a given JVM garbage collector in seconds.
-# TYPE jvm_gc_collection_seconds summary
-jvm_gc_collection_seconds_count{gc="PS Scavenge",} 29.0
-jvm_gc_collection_seconds_sum{gc="PS Scavenge",} 2.07
-jvm_gc_collection_seconds_count{gc="PS MarkSweep",} 5.0
-jvm_gc_collection_seconds_sum{gc="PS MarkSweep",} 0.607
-# HELP jvm_info VM version info
-# TYPE jvm_info gauge
-jvm_info{runtime="Java(TM) SE Runtime Environment",vendor="Oracle Corporation",version="1.8.0_361-09",} 1.0
+process_start_time_seconds 1.703865219094E9
 # HELP jvm_memory_objects_pending_finalization The number of objects waiting in the finalizer queue.
 # TYPE jvm_memory_objects_pending_finalization gauge
 jvm_memory_objects_pending_finalization 0.0
 # HELP jvm_memory_bytes_used Used bytes of a given JVM memory area.
 # TYPE jvm_memory_bytes_used gauge
-jvm_memory_bytes_used{area="heap",} 2.71564624E9
-jvm_memory_bytes_used{area="nonheap",} 3.97391008E8
+jvm_memory_bytes_used{area="heap",} 2.15331392E8
+jvm_memory_bytes_used{area="nonheap",} 7.9769112E7
 # HELP jvm_memory_bytes_committed Committed (bytes) of a given JVM memory area.
 # TYPE jvm_memory_bytes_committed gauge
-jvm_memory_bytes_committed{area="heap",} 1.4896070656E10
-jvm_memory_bytes_committed{area="nonheap",} 4.0431616E8
+jvm_memory_bytes_committed{area="heap",} 1.073741824E9
+jvm_memory_bytes_committed{area="nonheap",} 8.1395712E7
 # HELP jvm_memory_bytes_max Max (bytes) of a given JVM memory area.
 # TYPE jvm_memory_bytes_max gauge
-jvm_memory_bytes_max{area="heap",} 1.5271460864E10
+jvm_memory_bytes_max{area="heap",} 4.294967296E9
 jvm_memory_bytes_max{area="nonheap",} -1.0
 # HELP jvm_memory_bytes_init Initial bytes of a given JVM memory area.
 # TYPE jvm_memory_bytes_init gauge
-jvm_memory_bytes_init{area="heap",} 1.7179869184E10
-jvm_memory_bytes_init{area="nonheap",} 2555904.0
+jvm_memory_bytes_init{area="heap",} 1.073741824E9
+jvm_memory_bytes_init{area="nonheap",} 7667712.0
 # HELP jvm_memory_pool_bytes_used Used bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_bytes_used gauge
-jvm_memory_pool_bytes_used{pool="Code Cache",} 1.08572672E8
-jvm_memory_pool_bytes_used{pool="Metaspace",} 2.53074144E8
-jvm_memory_pool_bytes_used{pool="Compressed Class Space",} 3.5744192E7
-jvm_memory_pool_bytes_used{pool="PS Eden Space",} 3.32281344E8
-jvm_memory_pool_bytes_used{pool="PS Survivor Space",} 1.096201184E9
-jvm_memory_pool_bytes_used{pool="PS Old Gen",} 1.287163712E9
+jvm_memory_pool_bytes_used{pool="CodeHeap 'non-nmethods'",} 1410816.0
+jvm_memory_pool_bytes_used{pool="Metaspace",} 5.2117736E7
+jvm_memory_pool_bytes_used{pool="CodeHeap 'profiled nmethods'",} 1.3674496E7
+jvm_memory_pool_bytes_used{pool="Compressed Class Space",} 6137648.0
+jvm_memory_pool_bytes_used{pool="G1 Eden Space",} 1.06954752E8
+jvm_memory_pool_bytes_used{pool="G1 Old Gen",} 2.95044E7
+jvm_memory_pool_bytes_used{pool="G1 Survivor Space",} 7.887224E7
+jvm_memory_pool_bytes_used{pool="CodeHeap 'non-profiled nmethods'",} 6428416.0
 # HELP jvm_memory_pool_bytes_committed Committed bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_bytes_committed gauge
-jvm_memory_pool_bytes_committed{pool="Code Cache",} 1.10231552E8
-jvm_memory_pool_bytes_committed{pool="Metaspace",} 2.57646592E8
-jvm_memory_pool_bytes_committed{pool="Compressed Class Space",} 3.6438016E7
-jvm_memory_pool_bytes_committed{pool="PS Eden Space",} 2.3461888E9
-jvm_memory_pool_bytes_committed{pool="PS Survivor Space",} 1.096286208E9
-jvm_memory_pool_bytes_committed{pool="PS Old Gen",} 1.1453595648E10
+jvm_memory_pool_bytes_committed{pool="CodeHeap 'non-nmethods'",} 2555904.0
+jvm_memory_pool_bytes_committed{pool="Metaspace",} 5.2363264E7
+jvm_memory_pool_bytes_committed{pool="CodeHeap 'profiled nmethods'",} 1.3697024E7
+jvm_memory_pool_bytes_committed{pool="Compressed Class Space",} 6291456.0
+jvm_memory_pool_bytes_committed{pool="G1 Eden Space",} 5.9768832E8
+jvm_memory_pool_bytes_committed{pool="G1 Old Gen",} 3.96361728E8
+jvm_memory_pool_bytes_committed{pool="G1 Survivor Space",} 7.9691776E7
+jvm_memory_pool_bytes_committed{pool="CodeHeap 'non-profiled nmethods'",} 6488064.0
 # HELP jvm_memory_pool_bytes_max Max bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_bytes_max gauge
-jvm_memory_pool_bytes_max{pool="Code Cache",} 3.670016E8
+jvm_memory_pool_bytes_max{pool="CodeHeap 'non-nmethods'",} 5898240.0
 jvm_memory_pool_bytes_max{pool="Metaspace",} -1.0
+jvm_memory_pool_bytes_max{pool="CodeHeap 'profiled nmethods'",} 1.2288E8
 jvm_memory_pool_bytes_max{pool="Compressed Class Space",} 1.073741824E9
-jvm_memory_pool_bytes_max{pool="PS Eden Space",} 2.919235584E9
-jvm_memory_pool_bytes_max{pool="PS Survivor Space",} 1.096286208E9
-jvm_memory_pool_bytes_max{pool="PS Old Gen",} 1.1453595648E10
+jvm_memory_pool_bytes_max{pool="G1 Eden Space",} -1.0
+jvm_memory_pool_bytes_max{pool="G1 Old Gen",} 4.294967296E9
+jvm_memory_pool_bytes_max{pool="G1 Survivor Space",} -1.0
+jvm_memory_pool_bytes_max{pool="CodeHeap 'non-profiled nmethods'",} 1.2288E8
 # HELP jvm_memory_pool_bytes_init Initial bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_bytes_init gauge
-jvm_memory_pool_bytes_init{pool="Code Cache",} 2555904.0
+jvm_memory_pool_bytes_init{pool="CodeHeap 'non-nmethods'",} 2555904.0
 jvm_memory_pool_bytes_init{pool="Metaspace",} 0.0
+jvm_memory_pool_bytes_init{pool="CodeHeap 'profiled nmethods'",} 2555904.0
 jvm_memory_pool_bytes_init{pool="Compressed Class Space",} 0.0
-jvm_memory_pool_bytes_init{pool="PS Eden Space",} 4.294967296E9
-jvm_memory_pool_bytes_init{pool="PS Survivor Space",} 7.1565312E8
-jvm_memory_pool_bytes_init{pool="PS Old Gen",} 1.1453595648E10
+jvm_memory_pool_bytes_init{pool="G1 Eden Space",} 5.6623104E7
+jvm_memory_pool_bytes_init{pool="G1 Old Gen",} 1.01711872E9
+jvm_memory_pool_bytes_init{pool="G1 Survivor Space",} 0.0
+jvm_memory_pool_bytes_init{pool="CodeHeap 'non-profiled nmethods'",} 2555904.0
 # HELP jvm_memory_pool_collection_used_bytes Used bytes after last collection of a given JVM memory pool.
 # TYPE jvm_memory_pool_collection_used_bytes gauge
-jvm_memory_pool_collection_used_bytes{pool="PS Eden Space",} 0.0
-jvm_memory_pool_collection_used_bytes{pool="PS Survivor Space",} 1.096201184E9
-jvm_memory_pool_collection_used_bytes{pool="PS Old Gen",} 5.7847512E8
+jvm_memory_pool_collection_used_bytes{pool="G1 Eden Space",} 0.0
+jvm_memory_pool_collection_used_bytes{pool="G1 Old Gen",} 2.7407248E7
+jvm_memory_pool_collection_used_bytes{pool="G1 Survivor Space",} 7.887224E7
 # HELP jvm_memory_pool_collection_committed_bytes Committed after last collection bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_collection_committed_bytes gauge
-jvm_memory_pool_collection_committed_bytes{pool="PS Eden Space",} 2.3461888E9
-jvm_memory_pool_collection_committed_bytes{pool="PS Survivor Space",} 1.096286208E9
-jvm_memory_pool_collection_committed_bytes{pool="PS Old Gen",} 1.1453595648E10
+jvm_memory_pool_collection_committed_bytes{pool="G1 Eden Space",} 5.9768832E8
+jvm_memory_pool_collection_committed_bytes{pool="G1 Old Gen",} 5.15899392E8
+jvm_memory_pool_collection_committed_bytes{pool="G1 Survivor Space",} 7.9691776E7
 # HELP jvm_memory_pool_collection_max_bytes Max bytes after last collection of a given JVM memory pool.
 # TYPE jvm_memory_pool_collection_max_bytes gauge
-jvm_memory_pool_collection_max_bytes{pool="PS Eden Space",} 2.919235584E9
-jvm_memory_pool_collection_max_bytes{pool="PS Survivor Space",} 1.096286208E9
-jvm_memory_pool_collection_max_bytes{pool="PS Old Gen",} 1.1453595648E10
+jvm_memory_pool_collection_max_bytes{pool="G1 Eden Space",} -1.0
+jvm_memory_pool_collection_max_bytes{pool="G1 Old Gen",} 4.294967296E9
+jvm_memory_pool_collection_max_bytes{pool="G1 Survivor Space",} -1.0
 # HELP jvm_memory_pool_collection_init_bytes Initial after last collection bytes of a given JVM memory pool.
 # TYPE jvm_memory_pool_collection_init_bytes gauge
-jvm_memory_pool_collection_init_bytes{pool="PS Eden Space",} 4.294967296E9
-jvm_memory_pool_collection_init_bytes{pool="PS Survivor Space",} 7.1565312E8
-jvm_memory_pool_collection_init_bytes{pool="PS Old Gen",} 1.1453595648E10
+jvm_memory_pool_collection_init_bytes{pool="G1 Eden Space",} 5.6623104E7
+jvm_memory_pool_collection_init_bytes{pool="G1 Old Gen",} 1.01711872E9
+jvm_memory_pool_collection_init_bytes{pool="G1 Survivor Space",} 0.0
 # HELP jvm_classes_currently_loaded The number of classes that are currently loaded in the JVM
 # TYPE jvm_classes_currently_loaded gauge
-jvm_classes_currently_loaded 41675.0
+jvm_classes_currently_loaded 8183.0
 # HELP jvm_classes_loaded_total The total number of classes that have been loaded since the JVM has started execution
 # TYPE jvm_classes_loaded_total counter
-jvm_classes_loaded_total 41675.0
+jvm_classes_loaded_total 8183.0
 # HELP jvm_classes_unloaded_total The total number of classes that have been unloaded since the JVM has started execution
 # TYPE jvm_classes_unloaded_total counter
 jvm_classes_unloaded_total 0.0
-# HELP mc_player_list The players connected to the server.
-# TYPE mc_player_list gauge
-mc_player_list{id="",name="MalTeeez",} 1.0
-# HELP mc_server_tick_seconds Stats on server tick times.
-# TYPE mc_server_tick_seconds histogram
-mc_server_tick_seconds_bucket{le="0.01",} 38431.0
-mc_server_tick_seconds_bucket{le="0.025",} 40609.0
-mc_server_tick_seconds_bucket{le="0.05",} 40870.0
-mc_server_tick_seconds_bucket{le="0.1",} 41019.0
-mc_server_tick_seconds_bucket{le="0.25",} 41060.0
-mc_server_tick_seconds_bucket{le="0.5",} 41066.0
-mc_server_tick_seconds_bucket{le="1.0",} 41068.0
-mc_server_tick_seconds_bucket{le="+Inf",} 41070.0
-mc_server_tick_seconds_count 41070.0
-mc_server_tick_seconds_sum 214.6165175190002
-# HELP mc_dimension_chunks_loaded The number of loaded dimension chunks.
-# TYPE mc_dimension_chunks_loaded gauge
-mc_dimension_chunks_loaded{id="-100",name="Underdark",} 0.0
-mc_dimension_chunks_loaded{id="-92821",name="Venus",} 0.0
-mc_dimension_chunks_loaded{id="-103",name="Helheim",} 0.0
-mc_dimension_chunks_loaded{id="-104",name="Domains",} 0.0
-mc_dimension_chunks_loaded{id="-105",name="Alfheim",} 1.0
-mc_dimension_chunks_loaded{id="-21474855",name="The Outer Lands",} 0.0
-mc_dimension_chunks_loaded{id="-106",name="Niflheim",} 0.0
-mc_dimension_chunks_loaded{id="-112",name="The Last Millenium",} 0.0
-mc_dimension_chunks_loaded{id="-687",name="Mars",} 0.0
-mc_dimension_chunks_loaded{id="-693",name="Asteroids",} 0.0
-mc_dimension_chunks_loaded{id="69",name="Pocket Plane",} 0.0
-mc_dimension_chunks_loaded{id="-3355",name="Moon",} 0.0
-mc_dimension_chunks_loaded{id="-37",name="Spirit World",} 0.0
-mc_dimension_chunks_loaded{id="60",name="Proxima",} 0.0
-mc_dimension_chunks_loaded{id="-39",name="Mirror",} 0.0
-mc_dimension_chunks_loaded{id="-92780",name="Callisto",} 0.0
-mc_dimension_chunks_loaded{id="-92781",name="Ceres",} 0.0
-mc_dimension_chunks_loaded{id="-92784",name="Deimos",} 0.0
-mc_dimension_chunks_loaded{id="-92785",name="Eris",} 0.0
-mc_dimension_chunks_loaded{id="-92788",name="Europa",} 0.0
-mc_dimension_chunks_loaded{id="-92789",name="Ganymede",} 0.0
-mc_dimension_chunks_loaded{id="-92790",name="Iapetus",} 0.0
-mc_dimension_chunks_loaded{id="-92791",name="Io",} 0.0
-mc_dimension_chunks_loaded{id="-92792",name="Jupiter",} 0.0
-mc_dimension_chunks_loaded{id="-92795",name="Kepler 22b",} 0.0
-mc_dimension_chunks_loaded{id="-92800",name="Mercury",} 0.0
-mc_dimension_chunks_loaded{id="-92803",name="Neptune",} 0.0
-mc_dimension_chunks_loaded{id="-92806",name="Oberon",} 0.0
-mc_dimension_chunks_loaded{id="-561",name="Outer Lands",} 0.0
-mc_dimension_chunks_loaded{id="-92807",name="Phobos",} 0.0
-mc_dimension_chunks_loaded{id="-92808",name="Pluto",} 0.0
-mc_dimension_chunks_loaded{id="-92811",name="Rhea",} 0.0
-mc_dimension_chunks_loaded{id="-92812",name="Saturn",} 0.0
-mc_dimension_chunks_loaded{id="-92815",name="Titan",} 0.0
-mc_dimension_chunks_loaded{id="-92816",name="Titania",} 0.0
-mc_dimension_chunks_loaded{id="-1",name="Nether",} 0.0
-mc_dimension_chunks_loaded{id="-92817",name="Triton",} 0.0
-mc_dimension_chunks_loaded{id="1",name="The End",} 448.0
-mc_dimension_chunks_loaded{id="0",name="Overworld",} 0.0
-mc_dimension_chunks_loaded{id="-92818",name="Uranus",} 0.0
-# HELP mc_dimension_tick_seconds Stats on dimension tick times.
-# TYPE mc_dimension_tick_seconds histogram
-mc_dimension_tick_seconds_bucket{id="-38",name="Torment",le="0.01",} 21410.0
-mc_dimension_tick_seconds_bucket{id="-38",name="Torment",le="0.025",} 21413.0
-mc_dimension_tick_seconds_bucket{id="-38",name="Torment",le="0.05",} 21414.0
-mc_dimension_tick_seconds_bucket{id="-38",name="Torment",le="0.1",} 21414.0
-mc_dimension_tick_seconds_bucket{id="-38",name="Torment",le="0.25",} 21415.0
-mc_dimension_tick_seconds_bucket{id="-38",name="Torment",le="0.5",} 21415.0
-mc_dimension_tick_seconds_bucket{id="-38",name="Torment",le="1.0",} 21415.0
-mc_dimension_tick_seconds_bucket{id="-38",name="Torment",le="+Inf",} 21415.0
-mc_dimension_tick_seconds_count{id="-38",name="Torment",} 21415.0
-mc_dimension_tick_seconds_sum{id="-38",name="Torment",} 4.221305828999995
-mc_dimension_tick_seconds_bucket{id="-3355",name="Moon",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-3355",name="Moon",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-3355",name="Moon",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-3355",name="Moon",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-3355",name="Moon",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-3355",name="Moon",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-3355",name="Moon",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-3355",name="Moon",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-3355",name="Moon",} 41070.0
-mc_dimension_tick_seconds_sum{id="-3355",name="Moon",} 0.5142167829999978
-mc_dimension_tick_seconds_bucket{id="-100",name="Underdark",le="0.01",} 41069.0
-mc_dimension_tick_seconds_bucket{id="-100",name="Underdark",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-100",name="Underdark",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-100",name="Underdark",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-100",name="Underdark",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-100",name="Underdark",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-100",name="Underdark",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-100",name="Underdark",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-100",name="Underdark",} 41070.0
-mc_dimension_tick_seconds_sum{id="-100",name="Underdark",} 3.0814611709999733
-mc_dimension_tick_seconds_bucket{id="-92781",name="Ceres",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92781",name="Ceres",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92781",name="Ceres",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92781",name="Ceres",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92781",name="Ceres",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92781",name="Ceres",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92781",name="Ceres",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92781",name="Ceres",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92781",name="Ceres",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92781",name="Ceres",} 0.477498682
-mc_dimension_tick_seconds_bucket{id="-103",name="Helheim",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-103",name="Helheim",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-103",name="Helheim",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-103",name="Helheim",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-103",name="Helheim",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-103",name="Helheim",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-103",name="Helheim",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-103",name="Helheim",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-103",name="Helheim",} 41070.0
-mc_dimension_tick_seconds_sum{id="-103",name="Helheim",} 0.6024426760000006
-mc_dimension_tick_seconds_bucket{id="-92818",name="Uranus",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92818",name="Uranus",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92818",name="Uranus",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92818",name="Uranus",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92818",name="Uranus",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92818",name="Uranus",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92818",name="Uranus",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92818",name="Uranus",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92818",name="Uranus",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92818",name="Uranus",} 0.7313728929999932
-mc_dimension_tick_seconds_bucket{id="60",name="Proxima",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="60",name="Proxima",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="60",name="Proxima",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="60",name="Proxima",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="60",name="Proxima",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="60",name="Proxima",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="60",name="Proxima",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="60",name="Proxima",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="60",name="Proxima",} 41070.0
-mc_dimension_tick_seconds_sum{id="60",name="Proxima",} 0.5443948320000018
-mc_dimension_tick_seconds_bucket{id="-92791",name="Io",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92791",name="Io",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92791",name="Io",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92791",name="Io",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92791",name="Io",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92791",name="Io",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92791",name="Io",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92791",name="Io",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92791",name="Io",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92791",name="Io",} 0.4654889319999941
-mc_dimension_tick_seconds_bucket{id="-105",name="Alfheim",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-105",name="Alfheim",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-105",name="Alfheim",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-105",name="Alfheim",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-105",name="Alfheim",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-105",name="Alfheim",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-105",name="Alfheim",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-105",name="Alfheim",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-105",name="Alfheim",} 41070.0
-mc_dimension_tick_seconds_sum{id="-105",name="Alfheim",} 0.6822164200000049
-mc_dimension_tick_seconds_bucket{id="-92821",name="Venus",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92821",name="Venus",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92821",name="Venus",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92821",name="Venus",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92821",name="Venus",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92821",name="Venus",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92821",name="Venus",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92821",name="Venus",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92821",name="Venus",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92821",name="Venus",} 0.9009840450000085
-mc_dimension_tick_seconds_bucket{id="-561",name="Outer Lands",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-561",name="Outer Lands",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-561",name="Outer Lands",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-561",name="Outer Lands",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-561",name="Outer Lands",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-561",name="Outer Lands",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-561",name="Outer Lands",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-561",name="Outer Lands",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-561",name="Outer Lands",} 41070.0
-mc_dimension_tick_seconds_sum{id="-561",name="Outer Lands",} 0.43898056100000005
-mc_dimension_tick_seconds_bucket{id="-19",name="Bedrock",le="0.01",} 8097.0
-mc_dimension_tick_seconds_bucket{id="-19",name="Bedrock",le="0.025",} 8138.0
-mc_dimension_tick_seconds_bucket{id="-19",name="Bedrock",le="0.05",} 8145.0
-mc_dimension_tick_seconds_bucket{id="-19",name="Bedrock",le="0.1",} 8148.0
-mc_dimension_tick_seconds_bucket{id="-19",name="Bedrock",le="0.25",} 8149.0
-mc_dimension_tick_seconds_bucket{id="-19",name="Bedrock",le="0.5",} 8149.0
-mc_dimension_tick_seconds_bucket{id="-19",name="Bedrock",le="1.0",} 8149.0
-mc_dimension_tick_seconds_bucket{id="-19",name="Bedrock",le="+Inf",} 8149.0
-mc_dimension_tick_seconds_count{id="-19",name="Bedrock",} 8149.0
-mc_dimension_tick_seconds_sum{id="-19",name="Bedrock",} 4.419366518000011
-mc_dimension_tick_seconds_bucket{id="-92792",name="Jupiter",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92792",name="Jupiter",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92792",name="Jupiter",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92792",name="Jupiter",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92792",name="Jupiter",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92792",name="Jupiter",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92792",name="Jupiter",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92792",name="Jupiter",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92792",name="Jupiter",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92792",name="Jupiter",} 0.4620072090000069
-mc_dimension_tick_seconds_bucket{id="-92788",name="Europa",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92788",name="Europa",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92788",name="Europa",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92788",name="Europa",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92788",name="Europa",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92788",name="Europa",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92788",name="Europa",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92788",name="Europa",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92788",name="Europa",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92788",name="Europa",} 0.4503192560000022
-mc_dimension_tick_seconds_bucket{id="-106",name="Niflheim",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-106",name="Niflheim",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-106",name="Niflheim",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-106",name="Niflheim",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-106",name="Niflheim",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-106",name="Niflheim",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-106",name="Niflheim",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-106",name="Niflheim",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-106",name="Niflheim",} 41070.0
-mc_dimension_tick_seconds_sum{id="-106",name="Niflheim",} 0.5664233609999971
-mc_dimension_tick_seconds_bucket{id="-693",name="Asteroids",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-693",name="Asteroids",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-693",name="Asteroids",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-693",name="Asteroids",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-693",name="Asteroids",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-693",name="Asteroids",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-693",name="Asteroids",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-693",name="Asteroids",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-693",name="Asteroids",} 41070.0
-mc_dimension_tick_seconds_sum{id="-693",name="Asteroids",} 0.5203811600000017
-mc_dimension_tick_seconds_bucket{id="-92795",name="Kepler 22b",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92795",name="Kepler 22b",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92795",name="Kepler 22b",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92795",name="Kepler 22b",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92795",name="Kepler 22b",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92795",name="Kepler 22b",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92795",name="Kepler 22b",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92795",name="Kepler 22b",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92795",name="Kepler 22b",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92795",name="Kepler 22b",} 0.5134935210000009
-mc_dimension_tick_seconds_bucket{id="-39",name="Mirror",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-39",name="Mirror",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-39",name="Mirror",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-39",name="Mirror",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-39",name="Mirror",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-39",name="Mirror",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-39",name="Mirror",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-39",name="Mirror",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-39",name="Mirror",} 41070.0
-mc_dimension_tick_seconds_sum{id="-39",name="Mirror",} 0.5437054269999982
-mc_dimension_tick_seconds_bucket{id="-92811",name="Rhea",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92811",name="Rhea",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92811",name="Rhea",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92811",name="Rhea",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92811",name="Rhea",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92811",name="Rhea",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92811",name="Rhea",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92811",name="Rhea",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92811",name="Rhea",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92811",name="Rhea",} 0.4476948930000035
-mc_dimension_tick_seconds_bucket{id="-92790",name="Iapetus",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92790",name="Iapetus",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92790",name="Iapetus",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92790",name="Iapetus",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92790",name="Iapetus",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92790",name="Iapetus",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92790",name="Iapetus",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92790",name="Iapetus",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92790",name="Iapetus",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92790",name="Iapetus",} 0.45932084199999984
-mc_dimension_tick_seconds_bucket{id="-92800",name="Mercury",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92800",name="Mercury",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92800",name="Mercury",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92800",name="Mercury",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92800",name="Mercury",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92800",name="Mercury",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92800",name="Mercury",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92800",name="Mercury",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92800",name="Mercury",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92800",name="Mercury",} 0.4502807740000012
-mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.01",} 41048.0
-mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.025",} 41067.0
-mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.05",} 41069.0
-mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.1",} 41069.0
-mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="0",name="Overworld",} 41070.0
-mc_dimension_tick_seconds_sum{id="0",name="Overworld",} 22.238718832000167
-mc_dimension_tick_seconds_bucket{id="-92780",name="Callisto",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92780",name="Callisto",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92780",name="Callisto",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92780",name="Callisto",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92780",name="Callisto",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92780",name="Callisto",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92780",name="Callisto",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92780",name="Callisto",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92780",name="Callisto",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92780",name="Callisto",} 0.4889140879999996
-mc_dimension_tick_seconds_bucket{id="-92803",name="Neptune",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92803",name="Neptune",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92803",name="Neptune",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92803",name="Neptune",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92803",name="Neptune",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92803",name="Neptune",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92803",name="Neptune",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92803",name="Neptune",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92803",name="Neptune",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92803",name="Neptune",} 0.47375725699999927
-mc_dimension_tick_seconds_bucket{id="-92808",name="Pluto",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92808",name="Pluto",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92808",name="Pluto",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92808",name="Pluto",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92808",name="Pluto",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92808",name="Pluto",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92808",name="Pluto",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92808",name="Pluto",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92808",name="Pluto",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92808",name="Pluto",} 0.433053354000001
-mc_dimension_tick_seconds_bucket{id="-21474855",name="The Outer Lands",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-21474855",name="The Outer Lands",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-21474855",name="The Outer Lands",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-21474855",name="The Outer Lands",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-21474855",name="The Outer Lands",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-21474855",name="The Outer Lands",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-21474855",name="The Outer Lands",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-21474855",name="The Outer Lands",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-21474855",name="The Outer Lands",} 41070.0
-mc_dimension_tick_seconds_sum{id="-21474855",name="The Outer Lands",} 0.48359743000000355
-mc_dimension_tick_seconds_bucket{id="-92816",name="Titania",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92816",name="Titania",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92816",name="Titania",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92816",name="Titania",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92816",name="Titania",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92816",name="Titania",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92816",name="Titania",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92816",name="Titania",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92816",name="Titania",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92816",name="Titania",} 0.4300726519999982
-mc_dimension_tick_seconds_bucket{id="-37",name="Spirit World",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-37",name="Spirit World",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-37",name="Spirit World",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-37",name="Spirit World",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-37",name="Spirit World",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-37",name="Spirit World",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-37",name="Spirit World",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-37",name="Spirit World",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-37",name="Spirit World",} 41070.0
-mc_dimension_tick_seconds_sum{id="-37",name="Spirit World",} 0.4897063890000017
-mc_dimension_tick_seconds_bucket{id="-92785",name="Eris",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92785",name="Eris",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92785",name="Eris",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92785",name="Eris",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92785",name="Eris",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92785",name="Eris",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92785",name="Eris",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92785",name="Eris",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92785",name="Eris",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92785",name="Eris",} 0.4571567330000036
-mc_dimension_tick_seconds_bucket{id="-92806",name="Oberon",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92806",name="Oberon",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92806",name="Oberon",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92806",name="Oberon",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92806",name="Oberon",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92806",name="Oberon",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92806",name="Oberon",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92806",name="Oberon",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92806",name="Oberon",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92806",name="Oberon",} 0.4591944090000007
-mc_dimension_tick_seconds_bucket{id="-92789",name="Ganymede",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92789",name="Ganymede",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92789",name="Ganymede",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92789",name="Ganymede",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92789",name="Ganymede",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92789",name="Ganymede",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92789",name="Ganymede",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92789",name="Ganymede",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92789",name="Ganymede",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92789",name="Ganymede",} 0.4833668900000005
-mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.01",} 39654.0
-mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.025",} 40990.0
-mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.05",} 41036.0
-mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.1",} 41059.0
-mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.25",} 41069.0
-mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-1",name="Nether",} 41070.0
-mc_dimension_tick_seconds_sum{id="-1",name="Nether",} 46.49280241800002
-mc_dimension_tick_seconds_bucket{id="-687",name="Mars",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-687",name="Mars",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-687",name="Mars",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-687",name="Mars",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-687",name="Mars",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-687",name="Mars",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-687",name="Mars",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-687",name="Mars",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-687",name="Mars",} 41070.0
-mc_dimension_tick_seconds_sum{id="-687",name="Mars",} 0.5450125070000007
-mc_dimension_tick_seconds_bucket{id="-92817",name="Triton",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92817",name="Triton",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92817",name="Triton",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92817",name="Triton",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92817",name="Triton",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92817",name="Triton",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92817",name="Triton",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92817",name="Triton",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92817",name="Triton",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92817",name="Triton",} 0.5287539629999974
-mc_dimension_tick_seconds_bucket{id="-104",name="Domains",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-104",name="Domains",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-104",name="Domains",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-104",name="Domains",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-104",name="Domains",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-104",name="Domains",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-104",name="Domains",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-104",name="Domains",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-104",name="Domains",} 41070.0
-mc_dimension_tick_seconds_sum{id="-104",name="Domains",} 0.5262177950000034
-mc_dimension_tick_seconds_bucket{id="-112",name="The Last Millenium",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-112",name="The Last Millenium",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-112",name="The Last Millenium",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-112",name="The Last Millenium",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-112",name="The Last Millenium",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-112",name="The Last Millenium",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-112",name="The Last Millenium",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-112",name="The Last Millenium",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-112",name="The Last Millenium",} 41070.0
-mc_dimension_tick_seconds_sum{id="-112",name="The Last Millenium",} 0.47004660300000023
-mc_dimension_tick_seconds_bucket{id="-92784",name="Deimos",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92784",name="Deimos",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92784",name="Deimos",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92784",name="Deimos",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92784",name="Deimos",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92784",name="Deimos",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92784",name="Deimos",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92784",name="Deimos",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92784",name="Deimos",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92784",name="Deimos",} 0.5260837830000011
-mc_dimension_tick_seconds_bucket{id="69",name="Pocket Plane",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="69",name="Pocket Plane",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="69",name="Pocket Plane",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="69",name="Pocket Plane",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="69",name="Pocket Plane",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="69",name="Pocket Plane",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="69",name="Pocket Plane",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="69",name="Pocket Plane",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="69",name="Pocket Plane",} 41070.0
-mc_dimension_tick_seconds_sum{id="69",name="Pocket Plane",} 0.46198550900000496
-mc_dimension_tick_seconds_bucket{id="-92812",name="Saturn",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92812",name="Saturn",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92812",name="Saturn",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92812",name="Saturn",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92812",name="Saturn",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92812",name="Saturn",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92812",name="Saturn",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92812",name="Saturn",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92812",name="Saturn",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92812",name="Saturn",} 0.45236282499999875
-mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.01",} 40882.0
-mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.025",} 41015.0
-mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.05",} 41063.0
-mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.1",} 41064.0
-mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.25",} 41068.0
-mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.5",} 41068.0
-mc_dimension_tick_seconds_bucket{id="1",name="The End",le="1.0",} 41068.0
-mc_dimension_tick_seconds_bucket{id="1",name="The End",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="1",name="The End",} 41070.0
-mc_dimension_tick_seconds_sum{id="1",name="The End",} 35.89419560600007
-mc_dimension_tick_seconds_bucket{id="-92807",name="Phobos",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92807",name="Phobos",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92807",name="Phobos",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92807",name="Phobos",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92807",name="Phobos",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92807",name="Phobos",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92807",name="Phobos",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92807",name="Phobos",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92807",name="Phobos",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92807",name="Phobos",} 0.45177012600000105
-mc_dimension_tick_seconds_bucket{id="-92815",name="Titan",le="0.01",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92815",name="Titan",le="0.025",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92815",name="Titan",le="0.05",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92815",name="Titan",le="0.1",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92815",name="Titan",le="0.25",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92815",name="Titan",le="0.5",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92815",name="Titan",le="1.0",} 41070.0
-mc_dimension_tick_seconds_bucket{id="-92815",name="Titan",le="+Inf",} 41070.0
-mc_dimension_tick_seconds_count{id="-92815",name="Titan",} 41070.0
-mc_dimension_tick_seconds_sum{id="-92815",name="Titan",} 0.4662745059999998
+# HELP jvm_info VM version info
+# TYPE jvm_info gauge
+jvm_info{runtime="OpenJDK Runtime Environment",vendor="JetBrains s.r.o.",version="17.0.9+7-b1000.46",} 1.0
+# HELP jvm_buffer_pool_used_bytes Used bytes of a given JVM buffer pool.
+# TYPE jvm_buffer_pool_used_bytes gauge
+jvm_buffer_pool_used_bytes{pool="mapped",} 0.0
+jvm_buffer_pool_used_bytes{pool="direct",} 8209.0
+jvm_buffer_pool_used_bytes{pool="mapped - 'non-volatile memory'",} 0.0
+# HELP jvm_buffer_pool_capacity_bytes Bytes capacity of a given JVM buffer pool.
+# TYPE jvm_buffer_pool_capacity_bytes gauge
+jvm_buffer_pool_capacity_bytes{pool="mapped",} 0.0
+jvm_buffer_pool_capacity_bytes{pool="direct",} 8208.0
+jvm_buffer_pool_capacity_bytes{pool="mapped - 'non-volatile memory'",} 0.0
+# HELP jvm_buffer_pool_used_buffers Used buffers of a given JVM buffer pool.
+# TYPE jvm_buffer_pool_used_buffers gauge
+jvm_buffer_pool_used_buffers{pool="mapped",} 0.0
+jvm_buffer_pool_used_buffers{pool="direct",} 3.0
+jvm_buffer_pool_used_buffers{pool="mapped - 'non-volatile memory'",} 0.0
+# HELP jvm_gc_collection_seconds Time spent in a given JVM garbage collector in seconds.
+# TYPE jvm_gc_collection_seconds summary
+jvm_gc_collection_seconds_count{gc="G1 Young Generation",} 9.0
+jvm_gc_collection_seconds_sum{gc="G1 Young Generation",} 0.069
+jvm_gc_collection_seconds_count{gc="G1 Old Generation",} 1.0
+jvm_gc_collection_seconds_sum{gc="G1 Old Generation",} 0.01
 # HELP jvm_threads_current Current thread count of a JVM
 # TYPE jvm_threads_current gauge
-jvm_threads_current 65.0
+jvm_threads_current 17.0
 # HELP jvm_threads_daemon Daemon thread count of a JVM
 # TYPE jvm_threads_daemon gauge
-jvm_threads_daemon 49.0
+jvm_threads_daemon 14.0
 # HELP jvm_threads_peak Peak thread count of a JVM
 # TYPE jvm_threads_peak gauge
-jvm_threads_peak 81.0
+jvm_threads_peak 17.0
 # HELP jvm_threads_started_total Started thread count of a JVM
 # TYPE jvm_threads_started_total counter
-jvm_threads_started_total 161.0
+jvm_threads_started_total 25.0
 # HELP jvm_threads_deadlocked Cycles of JVM-threads that are in deadlock waiting to acquire object monitors or ownable synchronizers
 # TYPE jvm_threads_deadlocked gauge
 jvm_threads_deadlocked 0.0
@@ -614,75 +138,103 @@ jvm_threads_deadlocked_monitor 0.0
 # TYPE jvm_threads_state gauge
 jvm_threads_state{state="NEW",} 0.0
 jvm_threads_state{state="TERMINATED",} 0.0
-jvm_threads_state{state="RUNNABLE",} 15.0
+jvm_threads_state{state="RUNNABLE",} 9.0
 jvm_threads_state{state="BLOCKED",} 0.0
-jvm_threads_state{state="WAITING",} 39.0
-jvm_threads_state{state="TIMED_WAITING",} 11.0
+jvm_threads_state{state="WAITING",} 1.0
+jvm_threads_state{state="TIMED_WAITING",} 7.0
 jvm_threads_state{state="UNKNOWN",} 0.0
-# HELP jvm_buffer_pool_used_bytes Used bytes of a given JVM buffer pool.
-# TYPE jvm_buffer_pool_used_bytes gauge
-jvm_buffer_pool_used_bytes{pool="direct",} 3.3579393E7
-jvm_buffer_pool_used_bytes{pool="mapped",} 0.0
-# HELP jvm_buffer_pool_capacity_bytes Bytes capacity of a given JVM buffer pool.
-# TYPE jvm_buffer_pool_capacity_bytes gauge
-jvm_buffer_pool_capacity_bytes{pool="direct",} 3.3579392E7
-jvm_buffer_pool_capacity_bytes{pool="mapped",} 0.0
-# HELP jvm_buffer_pool_used_buffers Used buffers of a given JVM buffer pool.
-# TYPE jvm_buffer_pool_used_buffers gauge
-jvm_buffer_pool_used_buffers{pool="direct",} 11.0
-jvm_buffer_pool_used_buffers{pool="mapped",} 0.0
+# HELP jvm_memory_pool_allocated_bytes_total Total bytes allocated in a given JVM memory pool. Only updated after GC, not continuously.
+# TYPE jvm_memory_pool_allocated_bytes_total counter
+jvm_memory_pool_allocated_bytes_total{pool="CodeHeap 'profiled nmethods'",} 1.2861824E7
+jvm_memory_pool_allocated_bytes_total{pool="G1 Old Gen",} 2.7407248E7
+jvm_memory_pool_allocated_bytes_total{pool="G1 Eden Space",} 6.0817408E8
+jvm_memory_pool_allocated_bytes_total{pool="CodeHeap 'non-profiled nmethods'",} 6066688.0
+jvm_memory_pool_allocated_bytes_total{pool="G1 Survivor Space",} 7.887224E7
+jvm_memory_pool_allocated_bytes_total{pool="Compressed Class Space",} 6048872.0
+jvm_memory_pool_allocated_bytes_total{pool="Metaspace",} 5.12742E7
+jvm_memory_pool_allocated_bytes_total{pool="CodeHeap 'non-nmethods'",} 1409280.0
+# HELP mc_player_list The players connected to the server.
+# TYPE mc_player_list gauge
+# HELP mc_entity_list All entities on the server by type and amount.
+# TYPE mc_entity_list gauge
+mc_entity_list{type="Zombie",id="54",} 20.0
+mc_entity_list{type="Skeleton",id="51",} 22.0
+mc_entity_list{type="Creeper",id="50",} 26.0
+mc_entity_list{type="Enderman",id="58",} 3.0
+mc_entity_list{type="Bat",id="65",} 13.0
+mc_entity_list{type="Sheep",id="91",} 73.0
+mc_entity_list{type="Squid",id="94",} 29.0
+mc_entity_list{type="Slime",id="55",} 3.0
+mc_entity_list{type="Spider",id="52",} 3.0
+mc_entity_list{type="Cow",id="92",} 7.0
+mc_entity_list{type="Chicken",id="93",} 8.0
+mc_entity_list{type="Pig",id="90",} 1.0
+mc_entity_list{type="Witch",id="66",} 4.0
+mc_entity_list{type="MinecartChest",id="43",} 2.0
+# HELP mc_server_tick_seconds Stats on server tick times.
+# TYPE mc_server_tick_seconds histogram
+mc_server_tick_seconds_bucket{le="0.01",} 933.0
+mc_server_tick_seconds_bucket{le="0.025",} 956.0
+mc_server_tick_seconds_bucket{le="0.05",} 961.0
+mc_server_tick_seconds_bucket{le="0.1",} 964.0
+mc_server_tick_seconds_bucket{le="0.25",} 966.0
+mc_server_tick_seconds_bucket{le="0.5",} 966.0
+mc_server_tick_seconds_bucket{le="1.0",} 966.0
+mc_server_tick_seconds_bucket{le="+Inf",} 966.0
+mc_server_tick_seconds_count 966.0
+mc_server_tick_seconds_sum 3.645116600000003
+# HELP mc_dimension_chunks_loaded The number of loaded dimension chunks.
+# TYPE mc_dimension_chunks_loaded gauge
+mc_dimension_chunks_loaded{id="-1",name="Nether",} 0.0
+mc_dimension_chunks_loaded{id="1",name="The End",} 0.0
+mc_dimension_chunks_loaded{id="0",name="Overworld",} 256.0
+# HELP mc_dimension_tick_seconds Stats on dimension tick times.
+# TYPE mc_dimension_tick_seconds histogram
+mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.01",} 965.0
+mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.025",} 965.0
+mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.05",} 966.0
+mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.1",} 966.0
+mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.25",} 966.0
+mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="0.5",} 966.0
+mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="1.0",} 966.0
+mc_dimension_tick_seconds_bucket{id="-1",name="Nether",le="+Inf",} 966.0
+mc_dimension_tick_seconds_count{id="-1",name="Nether",} 966.0
+mc_dimension_tick_seconds_sum{id="-1",name="Nether",} 0.08708770000000005
+mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.01",} 938.0
+mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.025",} 958.0
+mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.05",} 962.0
+mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.1",} 966.0
+mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.25",} 966.0
+mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="0.5",} 966.0
+mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="1.0",} 966.0
+mc_dimension_tick_seconds_bucket{id="0",name="Overworld",le="+Inf",} 966.0
+mc_dimension_tick_seconds_count{id="0",name="Overworld",} 966.0
+mc_dimension_tick_seconds_sum{id="0",name="Overworld",} 3.2036404
+mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.01",} 966.0
+mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.025",} 966.0
+mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.05",} 966.0
+mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.1",} 966.0
+mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.25",} 966.0
+mc_dimension_tick_seconds_bucket{id="1",name="The End",le="0.5",} 966.0
+mc_dimension_tick_seconds_bucket{id="1",name="The End",le="1.0",} 966.0
+mc_dimension_tick_seconds_bucket{id="1",name="The End",le="+Inf",} 966.0
+mc_dimension_tick_seconds_count{id="1",name="The End",} 966.0
+mc_dimension_tick_seconds_sum{id="1",name="The End",} 0.013395099999999958
 # HELP jvm_memory_pool_allocated_bytes_created Total bytes allocated in a given JVM memory pool. Only updated after GC, not continuously.
 # TYPE jvm_memory_pool_allocated_bytes_created gauge
-jvm_memory_pool_allocated_bytes_created{pool="Code Cache",} 1.702426304985E9
-jvm_memory_pool_allocated_bytes_created{pool="PS Eden Space",} 1.702426304985E9
-jvm_memory_pool_allocated_bytes_created{pool="PS Old Gen",} 1.702426304985E9
-jvm_memory_pool_allocated_bytes_created{pool="PS Survivor Space",} 1.702426304985E9
-jvm_memory_pool_allocated_bytes_created{pool="Compressed Class Space",} 1.702426304985E9
-jvm_memory_pool_allocated_bytes_created{pool="Metaspace",} 1.702426304985E9
+jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'profiled nmethods'",} 1.703865274356E9
+jvm_memory_pool_allocated_bytes_created{pool="G1 Old Gen",} 1.703865274356E9
+jvm_memory_pool_allocated_bytes_created{pool="G1 Eden Space",} 1.703865274356E9
+jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-profiled nmethods'",} 1.703865274356E9
+jvm_memory_pool_allocated_bytes_created{pool="G1 Survivor Space",} 1.703865274356E9
+jvm_memory_pool_allocated_bytes_created{pool="Compressed Class Space",} 1.703865274356E9
+jvm_memory_pool_allocated_bytes_created{pool="Metaspace",} 1.703865274356E9
+jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-nmethods'",} 1.703865274356E9
 # HELP mc_dimension_tick_seconds_created Stats on dimension tick times.
 # TYPE mc_dimension_tick_seconds_created gauge
-mc_dimension_tick_seconds_created{id="-38",name="Torment",} 1.702426137204E9
-mc_dimension_tick_seconds_created{id="-3355",name="Moon",} 1.702426137202E9
-mc_dimension_tick_seconds_created{id="-100",name="Underdark",} 1.702426137151E9
-mc_dimension_tick_seconds_created{id="-92781",name="Ceres",} 1.702426137204E9
-mc_dimension_tick_seconds_created{id="-103",name="Helheim",} 1.702426137196E9
-mc_dimension_tick_seconds_created{id="-92818",name="Uranus",} 1.702426137403E9
-mc_dimension_tick_seconds_created{id="60",name="Proxima",} 1.702426137203E9
-mc_dimension_tick_seconds_created{id="-92791",name="Io",} 1.702426137206E9
-mc_dimension_tick_seconds_created{id="-105",name="Alfheim",} 1.702426137197E9
-mc_dimension_tick_seconds_created{id="-92821",name="Venus",} 1.702426137193E9
-mc_dimension_tick_seconds_created{id="-561",name="Outer Lands",} 1.702426137207E9
-mc_dimension_tick_seconds_created{id="-19",name="Bedrock",} 1.702426137201E9
-mc_dimension_tick_seconds_created{id="-92792",name="Jupiter",} 1.702426137206E9
-mc_dimension_tick_seconds_created{id="-92788",name="Europa",} 1.702426137205E9
-mc_dimension_tick_seconds_created{id="-106",name="Niflheim",} 1.7024261372E9
-mc_dimension_tick_seconds_created{id="-693",name="Asteroids",} 1.702426137202E9
-mc_dimension_tick_seconds_created{id="-92795",name="Kepler 22b",} 1.702426137206E9
-mc_dimension_tick_seconds_created{id="-39",name="Mirror",} 1.702426137204E9
-mc_dimension_tick_seconds_created{id="-92811",name="Rhea",} 1.702426137207E9
-mc_dimension_tick_seconds_created{id="-92790",name="Iapetus",} 1.702426137205E9
-mc_dimension_tick_seconds_created{id="-92800",name="Mercury",} 1.702426137206E9
-mc_dimension_tick_seconds_created{id="0",name="Overworld",} 1.702426137209E9
-mc_dimension_tick_seconds_created{id="-92780",name="Callisto",} 1.702426137204E9
-mc_dimension_tick_seconds_created{id="-92803",name="Neptune",} 1.702426137206E9
-mc_dimension_tick_seconds_created{id="-92808",name="Pluto",} 1.702426137207E9
-mc_dimension_tick_seconds_created{id="-21474855",name="The Outer Lands",} 1.702426137199E9
-mc_dimension_tick_seconds_created{id="-92816",name="Titania",} 1.702426137208E9
-mc_dimension_tick_seconds_created{id="-37",name="Spirit World",} 1.702426137203E9
-mc_dimension_tick_seconds_created{id="-92785",name="Eris",} 1.702426137205E9
-mc_dimension_tick_seconds_created{id="-92806",name="Oberon",} 1.702426137207E9
-mc_dimension_tick_seconds_created{id="-92789",name="Ganymede",} 1.702426137205E9
-mc_dimension_tick_seconds_created{id="-1",name="Nether",} 1.702426137208E9
-mc_dimension_tick_seconds_created{id="-687",name="Mars",} 1.702426137201E9
-mc_dimension_tick_seconds_created{id="-92817",name="Triton",} 1.702426137208E9
-mc_dimension_tick_seconds_created{id="-104",name="Domains",} 1.702426137196E9
-mc_dimension_tick_seconds_created{id="-112",name="The Last Millenium",} 1.7024261372E9
-mc_dimension_tick_seconds_created{id="-92784",name="Deimos",} 1.702426137204E9
-mc_dimension_tick_seconds_created{id="69",name="Pocket Plane",} 1.702426137202E9
-mc_dimension_tick_seconds_created{id="-92812",name="Saturn",} 1.702426137207E9
-mc_dimension_tick_seconds_created{id="1",name="The End",} 1.702426137208E9
-mc_dimension_tick_seconds_created{id="-92807",name="Phobos",} 1.702426137207E9
-mc_dimension_tick_seconds_created{id="-92815",name="Titan",} 1.702426137208E9
+mc_dimension_tick_seconds_created{id="-1",name="Nether",} 1.70386523913E9
+mc_dimension_tick_seconds_created{id="0",name="Overworld",} 1.70386523914E9
+mc_dimension_tick_seconds_created{id="1",name="The End",} 1.70386523914E9
 # HELP mc_server_tick_seconds_created Stats on server tick times.
 # TYPE mc_server_tick_seconds_created gauge
-mc_server_tick_seconds_created 1.702426136542E9
+mc_server_tick_seconds_created 1.703865239069E9
