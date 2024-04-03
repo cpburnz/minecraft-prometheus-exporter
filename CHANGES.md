@@ -2,6 +2,13 @@
 Change History
 ==============
 
+1.1.0 for MC 1.7.10 (TBD)
+--------------------------------
+
+New features:
+
+- Add entity tracking with the "mc_entity_list{type, id}" metric.
+
 
 1.0.0 for MC 1.7.10 (2023-12-17)
 --------------------------------
