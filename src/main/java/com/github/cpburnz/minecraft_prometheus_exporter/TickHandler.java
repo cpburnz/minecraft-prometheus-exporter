@@ -7,38 +7,38 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 
 public class TickHandler {
 
-    /**
-     * Called on the server tick.
-     *
-     * @param event The event.
-     */
-    @SubscribeEvent
-    public void onServerTick(TickEvent.ServerTickEvent event) {
-        // Record server tick.
-        if (Prometheus_Exporter.mc_collector != null) {
-            if (event.phase == TickEvent.Phase.START) {
-                Prometheus_Exporter.mc_collector.startServerTick();
-            } else if (event.phase == TickEvent.Phase.END) {
-                Prometheus_Exporter.mc_collector.stopServerTick();
-            }
-        }
-    }
+	/**
+	 * Called on the server tick.
+	 *
+	 * @param event The event.
+	 */
+	@SubscribeEvent
+	public void onServerTick(TickEvent.ServerTickEvent event) {
+		// Record server tick.
+		if (PrometheusExporterMod.mc_collector != null) {
+			if (event.phase == TickEvent.Phase.START) {
+				PrometheusExporterMod.mc_collector.startServerTick();
+			} else if (event.phase == TickEvent.Phase.END) {
+				PrometheusExporterMod.mc_collector.stopServerTick();
+			}
+		}
+	}
 
-    /**
-     * Called on a dimension tick.
-     *
-     * @param event The event.
-     */
-    @SubscribeEvent
-    public void onDimensionTick(TickEvent.WorldTickEvent event) {
-        // Record dimension tick.
-        if (Prometheus_Exporter.mc_collector != null) {
-            WorldProvider dim = event.world.provider;
-            if (event.phase == TickEvent.Phase.START) {
-                Prometheus_Exporter.mc_collector.startDimensionTick(dim);
-            } else if (event.phase == TickEvent.Phase.END) {
-                Prometheus_Exporter.mc_collector.stopDimensionTick(dim);
-            }
-        }
-    }
+	/**
+	 * Called on a dimension tick.
+	 *
+	 * @param event The event.
+	 */
+	@SubscribeEvent
+	public void onDimensionTick(TickEvent.WorldTickEvent event) {
+		// Record dimension tick.
+		if (PrometheusExporterMod.mc_collector != null) {
+			WorldProvider dim = event.world.provider;
+			if (event.phase == TickEvent.Phase.START) {
+				PrometheusExporterMod.mc_collector.startDimensionTick(dim);
+			} else if (event.phase == TickEvent.Phase.END) {
+				PrometheusExporterMod.mc_collector.stopDimensionTick(dim);
+			}
+		}
+	}
 }

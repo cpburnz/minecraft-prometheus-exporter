@@ -2,12 +2,12 @@
 Change History
 ==============
 
-1.1.0 for MC 1.7.10 (TBD)
+1.1.0 for MC 1.7.10 (2024-04-03)
 --------------------------------
 
 New features:
 
-- Add entity tracking with the "mc_entity_list{type, id}" metric.
+- [Pull #17](https://github.com/cpburnz/minecraft-prometheus-exporter/pull/17): Add entity tracking with the "mc_entity_list{type, id}" metric. This can be disabled using by setting "collector.mc_entity_list" to "false" in the config.
 
 
 1.0.0 for MC 1.7.10 (2023-12-17)
