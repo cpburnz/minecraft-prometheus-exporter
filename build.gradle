@@ -95,6 +95,7 @@ final String CHECKSTYLE_CONFIG = """
 checkPropertyExists("modName")
 checkPropertyExists("modId")
 checkPropertyExists("modGroup")
+checkPropertyExists("modVersion")  // MODIFIED: Require mod version in "gradle.properties".
 checkPropertyExists("autoUpdateBuildScript")
 checkPropertyExists("minecraftVersion")
 checkPropertyExists("forgeVersion")
@@ -368,6 +369,11 @@ catch (Exception ignored) {
     out.style(Style.Failure).println("git isn't installed at all")
 }
 
+// MODIFIED: Use version from "gradle.properties".
+String versionOverride = minecraftVersion + "-forge-" + modVersion
+String identifiedVersion = versionOverride
+version = versionOverride
+/*
 // Pulls version first from the VERSION env and then git tag
 String identifiedVersion
 String versionOverride = System.getenv("VERSION") ?: null
@@ -407,6 +413,7 @@ version = identifiedVersion
 ext {
     modVersion = identifiedVersion
 }
+*/
 
 if (identifiedVersion == versionOverride) {
     out.style(Style.Failure).text('Override version to ').style(Style.Identifier).text(modVersion).style(Style.Failure).println('!\7')
@@ -749,13 +756,15 @@ if (usesMixins.toBoolean()) {
 
 tasks.named("processResources", ProcessResources).configure {
     // this will ensure that this task is redone when the versions change.
+    // MODIFIED: Fix Minecraft version because it is not properly pulled from
+    // "gradle.properties".
     inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.mcVersion
+    inputs.property "mcversion", minecraftVersion
     exclude("spotless.gradle")
 
     // replace stuff in mcmod.info, nothing else. replaces ${key} with value in text
     filesMatching("mcmod.info")  {
-        expand "minecraftVersion": project.minecraft.mcVersion,
+        expand "minecraftVersion": minecraftVersion,
             "modVersion": modVersion,
             "modId": modId,
             "modName": modName
