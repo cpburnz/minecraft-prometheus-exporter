@@ -3,11 +3,10 @@ package com.github.cpburnz.minecraft_prometheus_exporter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.mojang.authlib.GameProfile;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.monster.IMob;
@@ -18,9 +17,11 @@ import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
+import gnu.trove.map.hash.TObjectIntHashMap;
 import io.prometheus.client.Collector;
 import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.Histogram;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * This class collects stats from the Minecraft server for export.
@@ -200,10 +201,19 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	private GaugeMetricFamily collectPlayerList() {
 		GaugeMetricFamily metric = newPlayerListMetric();
 		for (Object playerObj : this.mc_server.getConfigurationManager().playerEntityList) {
+			// Get player profile.
 			EntityPlayerMP player = (EntityPlayerMP)playerObj;
 			GameProfile profile = player.getGameProfile();
-			String id_str = profile.getId().toString();
-			String name = profile.getName();
+
+			// Get player info.
+			String id_str = "";
+			UUID id = profile.getId();
+			if (id != null) {
+				id_str = id.toString();
+			}
+
+			String name = ObjectUtils.defaultIfNull(profile.getName(), "");
+
 			metric.addMetric(Arrays.asList(id_str, name), 1);
 		}
 		return metric;
