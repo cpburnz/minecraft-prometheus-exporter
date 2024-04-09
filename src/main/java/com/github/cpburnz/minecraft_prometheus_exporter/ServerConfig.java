@@ -28,6 +28,12 @@ public class ServerConfig {
 	public boolean collector_mc;
 
 	/**
+	 * Whether collecting metrics about the entities in each dimension (world) is
+	 * enabled.
+	 */
+	public boolean collector_mc_entities;
+
+	/**
 	 * The Forge config specification.
 	 */
 	private final ForgeConfigSpec forge_spec;
@@ -77,6 +83,7 @@ public class ServerConfig {
 		// Get config values.
 		this.collector_jvm = this.internal_spec.collector_jvm.get();
 		this.collector_mc = this.internal_spec.collector_mc.get();
+		this.collector_mc_entities = this.internal_spec.collector_mc_entities.get();
 		this.web_listen_address = this.internal_spec.web_listen_address.get();
 		this.web_listen_port = this.internal_spec.web_listen_port.get();
 
@@ -85,6 +92,7 @@ public class ServerConfig {
 
 		LOG.debug("collector.jvm: {}", this.collector_jvm);
 		LOG.debug("collector.mc: {}", this.collector_mc);
+		LOG.debug("collector.mc_entities: {}", this.collector_mc_entities);
 		LOG.debug("web.listen_address: {}", this.web_listen_address);
 		LOG.debug("web.listen_port: {}", this.web_listen_port);
 	}
@@ -126,6 +134,7 @@ public class ServerConfig {
 
 		public final ForgeConfigSpec.BooleanValue collector_jvm;
 		public final ForgeConfigSpec.BooleanValue collector_mc;
+		public final ForgeConfigSpec.BooleanValue collector_mc_entities;
 		public final ForgeConfigSpec.ConfigValue<String> web_listen_address;
 		public final ForgeConfigSpec.IntValue web_listen_port;
 
@@ -146,6 +155,13 @@ public class ServerConfig {
 			this.collector_mc = builder
 				.comment("Enable collecting metrics about the Minecraft server.")
 				.define("mc", true);
+
+			this.collector_mc_entities = builder
+				.comment(
+					"Enable collecting metrics about the entities in each dimension "
+					+ "(world)."
+				)
+				.define("mc_entities", true);
 
 			builder.pop();
 			builder

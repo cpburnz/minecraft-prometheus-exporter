@@ -12,7 +12,7 @@ modLoader="javafml" #mandatory
 license="MIT License"
 
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[${forgeMinVersion},)" #mandatory (28 is current forge version)
+loaderVersion="[${fmlMinVersion},)" #mandatory (28 is current forge version)
 
 # A URL to refer people to when problems occur with this mod
 issueTrackerURL="${modTrackerUrl}" #optional

@@ -98,7 +98,7 @@ public class PrometheusExporterMod {
 
 		// Collect Minecraft stats.
 		if (this.config.collector_mc) {
-			this.mc_collector = new MinecraftCollector(this.mc_server);
+			this.mc_collector = new MinecraftCollector(this.config, this.mc_server);
 			this.mc_collector.register();
 		}
 	}

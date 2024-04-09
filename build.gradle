@@ -22,14 +22,14 @@ plugins {
 	// Eclipse plugin (makes life easier using Eclipse).
 	id 'eclipse'
 
+	// IDEA plugin (makes life easier using IntelliJ IDEA).
+	id 'idea'
+
 	// Java plugin (required).
 	id 'java'
 
 	// Shadow Jar plugin: bundle dependencies.
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
-
-	// Curse Gradle (publishing)
-	//id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 // Forge Gradle plugin (required).
@@ -42,7 +42,7 @@ println 'Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
 group = 'com.github.cpburnz'
-version = '1.0.0'
+version = '1.1.0'
 
 // Extra project settings.
 ext {
@@ -53,20 +53,28 @@ ext {
 	modTrackerUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter/issues'
 	modUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter'
 
-	forgeMinVersion = '39.0'
-	minecraftMinVersion = '1.18.1'
+	fmlMinVersion = '40'
+	forgeMinVersion = '40.2'
+	minecraftMinVersion = '1.18.2'
 }
 
 minecraft {
-	// The mappings can be changed at any time, and must be in the following format.
-	// snapshot_YYYYMMDD   Snapshot are built nightly.
-	// stable_#			Stables are built at the discretion of the MCP team.
-	// Use non-default mappings at your own risk. they may not always work.
+	// The mappings can be changed at any time and must be in the following format.
+	// Channel:   Version:
+	// official   MCVersion             Official field/method names from Mojang mapping files
+	// parchment  YYYY.MM.DD-MCVersion  Open community-sourced parameter names and javadocs layered on top of official
+	//
+	// You must be aware of the Mojang license when using the 'official' or 'parchment' mappings.
+	// See more information here: https://github.com/MinecraftForge/MCPConfig/blob/master/Mojang.md
+	//
+	// Parchment is an unofficial project maintained by ParchmentMC, separate from MinecraftForge
+	// Additional setup is needed to use their mappings: https://github.com/ParchmentMC/Parchment/wiki/Getting-Started
+	//
+	// Use non-default mappings at your own risk. They may not always work.
 	// Simply re-run your setup task after changing the mappings to update your workspace.
-	mappings channel: 'official', version: '1.18.1'
-	// makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+	mappings channel: 'official', version: '1.18.2'
 
-	// accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+	// accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
 
 	// Default run configurations.
 	// These can be tweaked, removed, or duplicated as needed.
@@ -136,6 +144,7 @@ configurations {
 	compileAndShadow
 	compile.extendsFrom compileAndShadow
 	shadow.extendsFrom compileAndShadow
+	minecraftLibrary.extendsFrom compileAndShadow
 }
 
 dependencies {
@@ -143,17 +152,23 @@ dependencies {
 	// 'net.minecraft' it is assumed that the dep is a ForgeGradle 'patcher'
 	// dependency. And its patches will be applied. The userdev artifact is a
 	// special name and will get all sorts of transformations applied to it.
-	minecraft 'net.minecraftforge:forge:1.18.1-39.0.88'
+	minecraft 'net.minecraftforge:forge:1.18.2-40.2.0'
 
 	// Prometheus dependencies.
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.15.0'
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.15.0'
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.15.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.16.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.16.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.16.0'
+
+	// Data structure dependencies.
+	// - TODO: Replace TObjectIntHashMap with an alternative implementation that
+	//   does not require embedding such as large dependency.
+	compileAndShadow group: 'net.sf.trove4j', name: 'core', version: '3.1.0'
 }
 
 // Expand variables in resource files.
 processResources {
 	def vars = [
+		'fmlMinVersion': project.fmlMinVersion,
 		'forgeMinVersion': project.forgeMinVersion,
 		'minecraftMinVersion': project.minecraftMinVersion,
 		'modAuthors': project.modAuthors,
@@ -163,6 +178,7 @@ processResources {
 		'modUrl': project.modUrl,
 		'version': project.version,
 	]
+
 
 	// Configure duplicates strategy to warm about duplicates. This is new and
 	// required in Gradle 7. I have no idea why Gradle is reporting duplicates.
@@ -235,21 +251,4 @@ reobf {
 
 tasks.reobfShadowJar.dependsOn tasks.jar
 tasks.assemble.dependsOn tasks.reobfShadowJar
-
-// Configure Curse Gradle for publishing to Curse Forge.
-/*
-curseforge {
-	apiKey = "test"
-
-	project {
-		id = '351938'
-		changelog = 'CHANGES.md'
-		changelogType = 'markdown'
-		releaseType = 'beta'
-
-		mainArtifact shadowJar
-	}
-}
-
-tasks.curseforge.dependsOn tasks.build
-*/
+//tasks.runClient.dependsOn tasks.reobfShadowJar
