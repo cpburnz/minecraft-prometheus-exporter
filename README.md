@@ -7,6 +7,7 @@ for the following versions:
 - Minecraft 1.20.1 with Forge 47.1.0.
 - Minecraft 1.19.3 with Forge 44.1.0.
 - Minecraft 1.19.2 with Forge 43.0.0.
+- Minecraft 1.18.2 with Forge 40.2.0.
 - Minecraft 1.18.1 with Forge 39.0.0.
 - Minecraft 1.16.5 with Forge 36.2.0.
 - Minecraft 1.15.2 with Forge 21.2.0.
@@ -48,7 +49,7 @@ renamed to "mc_dimension_tick_seconds".
 Dashboards
 ----------
 
-Known compatible Grafana dashboards:
+Known compatible Grafana (v9) dashboards:
 
 - [Minecraft Server Stats] built by [randombk].
 

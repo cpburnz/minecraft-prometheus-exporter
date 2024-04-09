@@ -30,10 +30,10 @@ public class Config {
 	public boolean collector_mc;
 
 	/**
-	 * Whether collecting metrics about the entity list in each dimension (world)
-	 * is enabled.
+	 * Whether collecting metrics about the entities in each dimension (world) is
+	 * enabled.
 	 */
-	public boolean collector_mc_entity_list;
+	public boolean collector_mc_entities;
 
 	/**
 	 * The Forge config file specification.
@@ -90,7 +90,7 @@ public class Config {
 		// Get config values.
 		this.collector_jvm = this.internal_spec.collector_jvm.getBoolean();
 		this.collector_mc = this.internal_spec.collector_mc.getBoolean();
-		this.collector_mc_entity_list = this.internal_spec.collector_mc_entity_list.getBoolean();
+		this.collector_mc_entities = this.internal_spec.collector_mc_entities.getBoolean();
 		this.web_listen_address = this.internal_spec.web_listen_address.getString();
 		this.web_listen_port = this.internal_spec.web_listen_port.getInt();
 
@@ -99,7 +99,7 @@ public class Config {
 
 		LOG.debug("collector.jvm: {}", this.collector_jvm);
 		LOG.debug("collector.mc: {}", this.collector_mc);
-		LOG.debug("collector.mc_entity_list: {}", this.collector_mc_entity_list);
+		LOG.debug("collector.mc_entities: {}", this.collector_mc_entities);
 		LOG.debug("web.listen_address: {}", this.web_listen_address);
 		LOG.debug("web.listen_port: {}", this.web_listen_port);
 	}
@@ -134,7 +134,7 @@ public class Config {
 
 		public final Property collector_jvm;
 		public final Property collector_mc;
-		public final Property collector_mc_entity_list;
+		public final Property collector_mc_entities;
 		public final Property web_listen_address;
 		public final Property web_listen_port;
 
@@ -157,9 +157,9 @@ public class Config {
 				"Enable collecting metrics about the Minecraft server."
 			);
 
-			this.collector_mc_entity_list = config.get("collector", "mc_entity_list", true);
-			this.collector_mc_entity_list.comment = (
-				"Enable collecting metrics about the entity list in each dimension "
+			this.collector_mc_entities = config.get("collector", "mc_entities", true);
+			this.collector_mc_entities.comment = (
+				"Enable collecting metrics about the entities in each dimension "
 				+ "(world)."
 			);
 
