@@ -158,11 +158,6 @@ dependencies {
 	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.16.0'
 	compileAndShadow group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.16.0'
 	compileAndShadow group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.16.0'
-
-	// Data structure dependencies.
-	// - TODO: Replace TObjectIntHashMap with an alternative implementation that
-	//   does not require embedding such as large dependency.
-	compileAndShadow group: 'net.sf.trove4j', name: 'core', version: '3.1.0'
 }
 
 // Expand variables in resource files.
@@ -251,4 +246,3 @@ reobf {
 
 tasks.reobfShadowJar.dependsOn tasks.jar
 tasks.assemble.dependsOn tasks.reobfShadowJar
-//tasks.runClient.dependsOn tasks.reobfShadowJar

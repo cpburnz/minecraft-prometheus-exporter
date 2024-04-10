@@ -2,6 +2,8 @@ package com.github.cpburnz.minecraft_prometheus_exporter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -19,7 +21,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
 import io.prometheus.client.Collector;
 import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.Histogram;
@@ -162,9 +163,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	private GaugeMetricFamily collectDimensionChunksLoaded() {
 		GaugeMetricFamily metric = newDimensionChunksLoadedMetric();
 		for (ServerLevel world : this.mc_server.getAllLevels()) {
-			ResourceKey<Level> dim = world.dimension();
-			String id_str = Integer.toString(getDimensionId(dim));
-			String name = dim.location().getPath();
+			ResourceKey<Level> dim_resource = world.dimension();
+			String id_str = Integer.toString(getDimensionId(dim_resource));
+			String name = dim_resource.location().getPath();
 			int loaded = world.getChunkSource().getLoadedChunksCount();
 			metric.addMetric(List.of(id_str, name), loaded);
 		}
@@ -178,9 +179,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 */
 	private GaugeMetricFamily collectEntitiesTotal() {
 		// Aggregate stats.
-		// - TODO: Replace TObjectIntHashMap with an alternative implementation that
-		//   does not require embedding such as large dependency.
-		TObjectIntHashMap<EntityKey> entity_totals = new TObjectIntHashMap<>();
+		HashMap<EntityKey, Integer> entity_totals = new HashMap<>();
 		for (ServerLevel world : this.mc_server.getAllLevels()) {
 			// Get dimension info.
 			ResourceKey<Level> dim_resource = world.dimension();
@@ -200,19 +199,19 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 					}
 
 					EntityKey entity_key = new EntityKey(dim, dim_id, entity_type);
-					entity_totals.adjustOrPutValue(entity_key, 1, 1);
+					entity_totals.merge(entity_key, 1, Integer::sum);
 				}
 			}
 		}
 
 		// Record metrics.
 		GaugeMetricFamily metric = newEntitiesTotalMetric();
-		for (EntityKey entity_key : entity_totals.keySet()) {
-			double total = entity_totals.get(entity_key);
+		for (Map.Entry<EntityKey, Integer> entry : entity_totals.entrySet()) {
+			EntityKey entity_key = entry.getKey();
+			double total = entry.getValue();
 			String dim_id_str = Integer.toString(entity_key.dim_id);
 			metric.addMetric(
-				List.of(entity_key.dim, dim_id_str, entity_key.type),
-				total
+				List.of(entity_key.dim, dim_id_str, entity_key.type), total
 			);
 		}
 		return metric;
