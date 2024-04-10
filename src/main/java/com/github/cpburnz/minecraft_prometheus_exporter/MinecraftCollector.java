@@ -3,7 +3,6 @@ package com.github.cpburnz.minecraft_prometheus_exporter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -26,7 +25,8 @@ import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.Histogram;
 
 /**
- * This class collects stats from the Minecraft server for export.
+ * The MinecraftCollector class collects stats from the Minecraft server for
+ * export.
  */
 public class MinecraftCollector extends Collector implements Collector.Describable {
 
@@ -206,7 +206,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 
 		// Record metrics.
 		GaugeMetricFamily metric = newEntitiesTotalMetric();
-		for (Map.Entry<EntityKey, Integer> entry : entity_totals.entrySet()) {
+		for (var entry : entity_totals.entrySet()) {
 			EntityKey entity_key = entry.getKey();
 			double total = entry.getValue();
 			String dim_id_str = Integer.toString(entity_key.dim_id);

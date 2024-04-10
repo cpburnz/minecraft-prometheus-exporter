@@ -8,7 +8,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * This class defines the server-side mod config.
+ * The ServerConfig class defines the server-side mod config. This is used to
+ * load and generate the "prometheus_exporter-server.toml" config file.
  */
 public class ServerConfig {
 

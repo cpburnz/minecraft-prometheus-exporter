@@ -14,3 +14,8 @@ New features:
 Bug fixes:
 
 - The "mc_player_list" metric sets the "id" attribute with the profile UUID only when it is available.
+
+Miscellaneous:
+
+- Added "DEV.md".
+- Added "DOCS.md".

@@ -21,7 +21,7 @@ import io.prometheus.client.hotspot.DefaultExports;
 
 
 /**
- * This class is the Prometheus Exporter mod.
+ * The PrometheusExporterMod class defines the mod.
  */
 @Mod(PrometheusExporterMod.MOD_ID)
 public class PrometheusExporterMod {
