@@ -107,6 +107,6 @@ The UNIX timestamp when the metric was created (in seconds).
 The sum of the duration of the server ticks (in seconds).
 
 
-[^1]: Starting in Minecraft 16, dimensions no longer have ids. To maintain compatibility between multiple versions, the overworld keeps id 0, the nether keeps id -1, and the end keeps id 1. Custom dimensions will have an id computed as `dim.hashCode()`.
+[^1]: Starting in Minecraft 1.16, dimensions no longer have ids. To maintain compatibility between multiple versions, the overworld keeps id 0, the nether keeps id -1, and the end keeps id 1. Custom dimensions will have an id computed as `dim.hashCode()`.
 
-[^2]: Only Minecraft 1.17.10 will have the entity "id" label.
+[^2]: Only Minecraft 1.7.10 will have the "id" label set on the "mc_entities_total" metric.
