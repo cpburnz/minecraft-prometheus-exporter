@@ -30,18 +30,18 @@ it can be safely upgraded by simply replacing an older version with a newer
 version.
 
 
-Metrics
--------
-
-The exported metrics are documented at [DOCS.md].
-
-
 Configuration
 -------------
 
 The mod configuration is located at *world/serverconfig/prometheus_exporter-server.toml*.
 It will be automatically generated upon server start if it does not already
 exist. The default configuration can be seen in the example [prometheus_exporter-server.toml].
+
+
+Exporter Metrics
+----------------
+
+The metrics are documented in [metrics.md].
 
 
 Exporter Output
@@ -61,11 +61,11 @@ Known compatible Grafana (v9) dashboards:
 
 
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
-[DOCS.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.18.2/DOCS.md
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
 [Minecraft Server Stats]: https://grafana.com/grafana/dashboards/16508-minecraft-server-stats/
 [Prometheus]: https://prometheus.io/
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
+[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.18.2/metrics.md
 [output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.18.2/examples/output.txt
 [prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.18.2/examples/prometheus_exporter-server.toml
 [randombk]: https://github.com/randombk

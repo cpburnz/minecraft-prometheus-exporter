@@ -1,7 +1,4 @@
-Development Notes
-=================
-
-These instructions are written with Linux in mind as that is my development environment.
+These instructions are written with Linux in mind because that is my development environment.
 
 
 Java Environment

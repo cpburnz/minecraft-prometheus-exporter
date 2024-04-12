@@ -163,9 +163,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	private GaugeMetricFamily collectDimensionChunksLoaded() {
 		GaugeMetricFamily metric = newDimensionChunksLoadedMetric();
 		for (ServerLevel world : this.mc_server.getAllLevels()) {
-			ResourceKey<Level> dim_resource = world.dimension();
-			String id_str = Integer.toString(getDimensionId(dim_resource));
-			String name = dim_resource.location().getPath();
+			ResourceKey<Level> dim = world.dimension();
+			String id_str = Integer.toString(getDimensionId(dim));
+			String name = dim.location().getPath();
 			int loaded = world.getChunkSource().getLoadedChunksCount();
 			metric.addMetric(List.of(id_str, name), loaded);
 		}
