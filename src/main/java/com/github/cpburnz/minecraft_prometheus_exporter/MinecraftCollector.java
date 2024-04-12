@@ -28,7 +28,8 @@ import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.Histogram;
 
 /**
- * This class collects stats from the Minecraft server for export.
+ * The MinecraftCollector class collects stats from the Minecraft server for
+ * export.
  */
 public class MinecraftCollector extends Collector implements Collector.Describable {
 
@@ -217,8 +218,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			String dim_id_str = Integer.toString(entity_key.dim_id);
 			String id_str = Integer.toString(entity_key.id);
 			metric.addMetric(
-				Arrays.asList(entity_key.dim, dim_id_str, id_str, entity_key.type),
-				total
+				Arrays.asList(entity_key.dim, dim_id_str, id_str, entity_key.type), total
 			);
 		}
 		return metric;

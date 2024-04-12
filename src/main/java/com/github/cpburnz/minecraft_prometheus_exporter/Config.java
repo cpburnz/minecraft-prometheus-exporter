@@ -9,8 +9,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * This class defines the mod config. This is used to load and generate the
- * "prometheus_exporter.cfg" config file.
+ * The Config class defines the mod config. This is used to load and generate
+ * the "prometheus_exporter.cfg" config file.
  */
 public class Config {
 

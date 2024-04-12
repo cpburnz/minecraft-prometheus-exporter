@@ -21,7 +21,7 @@ import io.prometheus.client.hotspot.DefaultExports;
 import com.github.cpburnz.minecraft_prometheus_exporter.prometheus_exporter.Tags;
 
 /**
- * This class is the Prometheus Exporter mod.
+ * The PrometheusExporterMod class defines the mod.
  */
 @Mod(
 	modid = Tags.MODID,
