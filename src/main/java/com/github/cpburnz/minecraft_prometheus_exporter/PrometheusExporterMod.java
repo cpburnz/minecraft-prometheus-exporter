@@ -11,6 +11,7 @@ import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -116,14 +117,14 @@ public class PrometheusExporterMod {
 	}
 
 	/**
-	 * Called on a dimension tick.
+	 * Called on a dimension (world) tick.
 	 *
 	 * @param event The event.
 	 */
 	@SubscribeEvent
 	public void onDimensionTick(TickEvent.WorldTickEvent event) {
 		// Record dimension tick.
-		if (this.mc_collector != null) {
+		if (this.mc_collector != null && event.side == LogicalSide.SERVER) {
 			ResourceKey<Level> dim = event.world.dimension();
 			if (event.phase == TickEvent.Phase.START) {
 				this.mc_collector.startDimensionTick(dim);
@@ -185,7 +186,7 @@ public class PrometheusExporterMod {
 	@SubscribeEvent
 	public void onServerTick(TickEvent.ServerTickEvent event) {
 		// Record server tick.
-		if (this.mc_collector != null) {
+		if (this.mc_collector != null && event.side == LogicalSide.SERVER) {
 			if (event.phase == TickEvent.Phase.START) {
 				this.mc_collector.startServerTick();
 			} else if (event.phase == TickEvent.Phase.END) {
