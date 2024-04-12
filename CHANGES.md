@@ -13,6 +13,7 @@ New features:
 Bug fixes:
 
 - The "mc_player_list" metric sets the "id" label with the profile UUID only when it is available.
+- Client-side server and world ticks no longer crash Minecraft.
 
 Miscellaneous:
 
