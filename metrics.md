@@ -16,20 +16,20 @@ Minecraft Metrics: mc
 
 The number of loaded dimension chunks.
 
-| Label | Meaning               |
-|-------|-----------------------|
-| id    | The dimension id[^1]. |
-| name  | The dimension name.   |
+| Label | Meaning                |
+|-------|------------------------|
+| id    | The dimension id [^1]. |
+| name  | The dimension name.    |
 
 
 ### mc_dimension_tick_seconds {id, name}
 
 A histogram of the dimension tick times (in seconds).
 
-| Label | Meaning               |
-|-------|-----------------------|
-| id    | The dimension id[^1]. |
-| name  | The dimension name.   |
+| Label | Meaning                |
+|-------|------------------------|
+| id    | The dimension id [^1]. |
+| name  | The dimension name.    |
 
 
 #### mc_dimension_tick_seconds_bucket {id, name, le}
@@ -63,7 +63,7 @@ The number of entities in each dimension by type.
 | Label  | Meaning                                                         |
 |--------|-----------------------------------------------------------------|
 | dim    | The dimension name.                                             |
-| dim_id | The dimension id[^1].                                           |
+| dim_id | The dimension id [^1].                                          |
 | type   | The entity type: the mob or creature name; or "Item" for items. |
 
 
