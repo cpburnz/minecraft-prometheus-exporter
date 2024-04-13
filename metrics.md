@@ -31,6 +31,8 @@ A histogram of the dimension tick times (in seconds).
 | id    | The dimension id [^1]. |
 | name  | The dimension name.    |
 
+_Changed in version 1.0_: Renamed metric "mc_world_tick_seconds" to "mc_dimension_tick_seconds".
+
 
 #### mc_dimension_tick_seconds_bucket {id, name, le}
 
@@ -106,4 +108,4 @@ The UNIX timestamp when the metric was created (in seconds).
 The sum of the duration of the server ticks (in seconds).
 
 
-[^1]: Starting in Minecraft 1.16, dimensions no longer have ids. To maintain compatibility between multiple versions, the overworld keeps id 0, the nether keeps id -1, and the end keeps id 1. Custom dimensions will have an id computed as `dim.hashCode()`.
+[^1]: Starting in Minecraft 1.16, dimensions no longer have ids. In order to maintain compatibility with older versions, in Minecraft 1.16+ the ids for the overworld, the nether, and the end will be hardcoded as 0, -1, and 1, respectively. Custom dimensions will have an id computed as `dim.hashCode()`.

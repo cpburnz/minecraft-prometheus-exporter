@@ -18,4 +18,18 @@ Bug fixes:
 Miscellaneous:
 
 - Added "HACKING.md".
+- Added "dashboards.md".
 - Added "metrics.md".
+
+
+1.0.0 for MC 1.18.1 (2022-03-06)
+--------------------------------
+
+- Properly clean up on world shutdown to fix client crashes when starting a second world.
+- Breaking Change: The "mc_world_tick_seconds" metric has been renamed to "mc_dimension_tick_seconds".
+
+
+0.3.3 for MC 1.18.1 (2022-02-28)
+--------------------------------
+
+- [Issue #4](https://github.com/cpburnz/minecraft-prometheus-exporter/issues/4): Update to MC 1.18.1.
