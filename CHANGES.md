@@ -1,6 +1,13 @@
 Change History
 ==============
 
+
+1.1.0.post1 for MC 1.7.10 (Unreleased)
+--------------------------------------
+
+- Minor documentation.
+
+
 1.1.0 for MC 1.7.10 (2024-04-11)
 --------------------------------
 
@@ -15,7 +22,6 @@ Bug fixes:
 Miscellaneous:
 
 - Added "HACKING.md".
-- Added "dashboards.md".
 - Added "metrics.md".
 
 
