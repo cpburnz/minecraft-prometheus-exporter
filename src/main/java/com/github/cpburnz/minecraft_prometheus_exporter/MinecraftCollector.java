@@ -229,6 +229,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			GameProfile profile = player.getGameProfile();
 
 			// Get player info.
+			// - WARNING: Either "id" or "name" can be null.
 			String id_str = "";
 			UUID id = profile.getId();
 			if (id != null) {
@@ -262,8 +263,8 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	/**
 	 * Get the dimension id.
 	 *
-	 * <p>With the new version of Minecraft, v16, a dimension no longer has an id.
-	 * However, to keep backward compatibility with older versions of the
+	 * <p>With the new version of Minecraft, 1.16, a dimension no longer has an
+	 * id. However, to keep backward compatibility with older versions of the
 	 * exporter, we need this method. Vanilla dimensions use fixed id values (-1,
 	 * 0, 1), and the id of a custom dimension is now calculated from the
 	 * dimension name.</p>
