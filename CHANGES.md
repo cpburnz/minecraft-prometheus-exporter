@@ -15,6 +15,7 @@ Bug fixes:
 Miscellaneous:
 
 - Added "HACKING.md".
+- Added "dashboards.md".
 - Added "metrics.md".
 
 
