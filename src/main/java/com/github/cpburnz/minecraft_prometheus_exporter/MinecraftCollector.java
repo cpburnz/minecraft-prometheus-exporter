@@ -237,6 +237,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			GameProfile profile = player.getGameProfile();
 
 			// Get player info.
+			// - WARNING: Either "id" or "name" can be null.
 			String id_str = "";
 			UUID id = profile.getId();
 			if (id != null) {
