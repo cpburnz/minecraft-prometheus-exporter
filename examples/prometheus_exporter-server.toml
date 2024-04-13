@@ -8,6 +8,8 @@
         jvm = true
         #Enable collecting metrics about the Minecraft server.
         mc = true
+        #Enable collecting metrics about the entities in each dimension (world).
+        mc_entities=true
 
 #Web server settings.
 [web]

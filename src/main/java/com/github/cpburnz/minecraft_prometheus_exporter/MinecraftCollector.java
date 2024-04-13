@@ -1,8 +1,10 @@
 package com.github.cpburnz.minecraft_prometheus_exporter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
 
 import com.mojang.authlib.GameProfile;
@@ -10,17 +12,28 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.Histogram;
 
-
 /**
- * This class collects stats from the Minecraft server for export.
+ * The MinecraftCollector class collects stats from the Minecraft server for
+ * export.
  */
 public class MinecraftCollector extends Collector implements Collector.Describable {
+
+	/**
+	 * The logger to use.
+	 */
+	private static final Logger LOG = LogManager.getLogger();
 
 	/**
 	 * The histogram buckets to use for ticks.
@@ -34,6 +47,11 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		0.5,
 		1.0,
 	};
+
+	/**
+	 * The server configuration.
+	 */
+	private final ServerConfig config;
 
 	/**
 	 * The active dimension being timed.
@@ -71,9 +89,11 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	/**
 	 * Constructs the instance.
 	 *
+	 * @param config The mod configuration.
 	 * @param mc_server The Minecraft server.
 	 */
-	public MinecraftCollector(MinecraftServer mc_server) {
+	public MinecraftCollector(ServerConfig config, MinecraftServer mc_server) {
+		this.config = config;
 		this.mc_server = mc_server;
 
 		// Setup server metrics.
@@ -98,25 +118,41 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 */
 	@Override
 	public List<MetricFamilySamples> collect() {
-		// Collect metrics.
-		MetricFamilySamples player_list = this.collectPlayerList();
-		List<MetricFamilySamples> server_ticks = this.server_tick_seconds.collect();
-		MetricFamilySamples dim_chunks_loaded = this.collectDimensionChunksLoaded();
-		List<MetricFamilySamples> dim_ticks = this.dim_tick_seconds.collect();
+		try {
+			// Collect metrics.
+			MetricFamilySamples player_list = this.collectPlayerList();
+			List<MetricFamilySamples> server_ticks = this.server_tick_seconds.collect();
+			MetricFamilySamples dim_chunks_loaded = this.collectDimensionChunksLoaded();
+			List<MetricFamilySamples> dim_ticks = this.dim_tick_seconds.collect();
 
-		// Aggregate metrics.
-		ArrayList<MetricFamilySamples> metrics = new ArrayList<>(
-			1 /* player_list */
-			+ server_ticks.size()
-			+ 1 /* dim_chunks_loaded */
-			+ dim_ticks.size()
-		);
-		metrics.add(player_list);
-		metrics.addAll(server_ticks);
-		metrics.add(dim_chunks_loaded);
-		metrics.addAll(dim_ticks);
+			MetricFamilySamples entities = null;
+			int entities_init = 0;
+			if (this.config.collector_mc_entities) {
+				entities = collectEntitiesTotal();
+				entities_init = 1;
+			}
 
-		return metrics;
+			// Aggregate metrics.
+			ArrayList<MetricFamilySamples> metrics = new ArrayList<>(
+				1 /* player_list */
+				+ entities_init
+				+ server_ticks.size()
+				+ 1 /* dim_chunks_loaded */
+				+ dim_ticks.size()
+			);
+			metrics.add(player_list);
+			if (entities != null) {
+				metrics.add(entities);
+			}
+			metrics.addAll(server_ticks);
+			metrics.add(dim_chunks_loaded);
+			metrics.addAll(dim_ticks);
+
+			return metrics;
+		} catch (Exception e) {
+			LOG.error("Failed to collect metrics.", e);
+			return Collections.emptyList();
+		}
 	}
 
 	/**
@@ -131,7 +167,52 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			String id_str = Integer.toString(getDimensionId(dim));
 			String name = dim.location().getPath();
 			int loaded = world.getChunkSource().getLoadedChunksCount();
-			metric.addMetric(Arrays.asList(id_str, name), loaded);
+			metric.addMetric(List.of(id_str, name), loaded);
+		}
+		return metric;
+	}
+
+	/**
+	 * Get the entities per dimension.
+	 *
+	 * @return The entities total metric.
+	 */
+	private GaugeMetricFamily collectEntitiesTotal() {
+		// Aggregate stats.
+		HashMap<EntityKey, Integer> entity_totals = new HashMap<>();
+		for (ServerLevel world : this.mc_server.getAllLevels()) {
+			// Get dimension info.
+			ResourceKey<Level> dim_resource = world.dimension();
+			int dim_id = getDimensionId(dim_resource);
+			String dim = dim_resource.location().getPath();
+
+			// Get entity info.
+			for (Entity entity : world.getAllEntities()) {
+				if (!(entity instanceof Player)) {
+					// Get entity type.
+					String entity_type;
+					if (entity instanceof ItemEntity) {
+						// Merge items. Do not count items individually by type.
+						entity_type = "Item";
+					} else {
+						entity_type = entity.getName().getString();
+					}
+
+					EntityKey entity_key = new EntityKey(dim, dim_id, entity_type);
+					entity_totals.merge(entity_key, 1, Integer::sum);
+				}
+			}
+		}
+
+		// Record metrics.
+		GaugeMetricFamily metric = newEntitiesTotalMetric();
+		for (var entry : entity_totals.entrySet()) {
+			EntityKey entity_key = entry.getKey();
+			double total = entry.getValue();
+			String dim_id_str = Integer.toString(entity_key.dim_id);
+			metric.addMetric(
+				List.of(entity_key.dim, dim_id_str, entity_key.type), total
+			);
 		}
 		return metric;
 	}
@@ -144,10 +225,15 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	private GaugeMetricFamily collectPlayerList() {
 		GaugeMetricFamily metric = newPlayerListMetric();
 		for (ServerPlayer player : this.mc_server.getPlayerList().getPlayers()) {
+			// Get player profile.
 			GameProfile profile = player.getGameProfile();
-			String id_str = profile.getId().toString();
-			String name = profile.getName();
-			metric.addMetric(Arrays.asList(id_str, name), 1);
+
+			// Get player info.
+			// - WARNING: Either "id" or "name" can be null.
+			String id_str = Objects.toString(profile.getId(), "");
+			String name = ObjectUtils.defaultIfNull(profile.getName(), "");
+
+			metric.addMetric(List.of(id_str, name), 1);
 		}
 		return metric;
 	}
@@ -162,6 +248,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		// Aggregate metric descriptions.
 		ArrayList<MetricFamilySamples> descs = new ArrayList<>();
 		descs.add(newPlayerListMetric());
+		descs.add(newEntitiesTotalMetric());
 		descs.addAll(this.server_tick_seconds.describe());
 		descs.add(newDimensionChunksLoadedMetric());
 		descs.addAll(this.dim_tick_seconds.describe());
@@ -171,11 +258,11 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	/**
 	 * Get the dimension id.
 	 *
-	 * With the new version of Minecraft, v16, a dimension no longer has an id.
-	 * However, to keep backward compatibility with older versions of the
+	 * <p>With the new version of Minecraft, 1.16, a dimension no longer has an
+	 * id. However, to keep backward compatibility with older versions of the
 	 * exporter, we need this method. Vanilla dimensions use fixed id values (-1,
 	 * 0, 1), and the id of a custom dimension is now calculated from the
-	 * dimension name.
+	 * dimension name.</p>
 	 *
 	 * @param dim The dimension.
 	 */
@@ -201,7 +288,20 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		return new GaugeMetricFamily(
 			"mc_dimension_chunks_loaded",
 			"The number of loaded dimension chunks.",
-			Arrays.asList("id", "name")
+			List.of("id", "name")
+		);
+	}
+
+	/**
+	 * Create a new metric for the total entities.
+	 *
+	 * @return The entities total metric.
+	 */
+	private static GaugeMetricFamily newEntitiesTotalMetric() {
+		return new GaugeMetricFamily(
+			"mc_entities_total",
+			"The number of entities in each dimension by type.",
+			List.of("dim", "dim_id", "type")
 		);
 	}
 
@@ -214,7 +314,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		return new GaugeMetricFamily(
 			"mc_player_list",
 			"The players connected to the server.",
-			Arrays.asList("id", "name")
+			List.of("id", "name")
 		);
 	}
 
@@ -285,5 +385,16 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 
 		this.server_tick_timer.observeDuration();
 		this.server_tick_timer = null;
+	}
+
+	/**
+	 * The EntityKey class is used to count entities per dimension.
+	 *
+	 * @param dim The dimension name.
+	 * @param dim_id The dimension id.
+	 * @param type The entity type.
+	 */
+	private record EntityKey(String dim, int dim_id, String type) {
+		// Empty.
 	}
 }
