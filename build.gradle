@@ -42,7 +42,7 @@ println 'Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
 group = 'com.github.cpburnz'
-version = '1.1.0'
+version = '1.1.0-2'
 
 // Extra project settings.
 ext {
@@ -173,7 +173,6 @@ processResources {
 		'modUrl': project.modUrl,
 		'version': project.version,
 	]
-
 
 	// Configure duplicates strategy to warm about duplicates. This is new and
 	// required in Gradle 7. I have no idea why Gradle is reporting duplicates.

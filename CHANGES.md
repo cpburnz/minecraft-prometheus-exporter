@@ -2,8 +2,14 @@ Change History
 ==============
 
 
-1.1.0.post1 for MC 1.18.2 (Unreleased)
---------------------------------------
+1.1.1 for MC 1.18.2 (TBD)
+--------------------------------
+
+Bug fixes:
+
+- Support overlapping dimension ticks.
+
+Miscellaneous:
 
 - Minor documentation.
 
