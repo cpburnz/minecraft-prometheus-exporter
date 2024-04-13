@@ -1,15 +1,15 @@
 plugins {
-	// IntelliJ IDEA plugin (makes life easier).
+	// Eclipse plugin (makes life easier using Eclipse).
+	id 'eclipse'
+
+	// IDEA plugin (makes life easier using IntelliJ IDEA).
 	id 'idea'
 
 	// Forge Gradle plugin (required).
-	id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+	id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
 
 	// Shadow Jar plugin: bundle dependencies.
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
-
-	// Curse Gradle (publishing)
-	//id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 // Project settings.
@@ -125,6 +125,7 @@ configurations {
 	compileAndShadow
 	compile.extendsFrom compileAndShadow
 	shadow.extendsFrom compileAndShadow
+	minecraftLibrary.extendsFrom compileAndShadow
 }
 
 repositories {
@@ -213,6 +214,9 @@ tasks.named('jar', Jar).configure {
 			'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 		])
 	}
+
+	// This is the preferred method to reobfuscate your jar file
+	finalizedBy 'reobfShadowJar'
 }
 
 // Configure Shadow Jar.
@@ -251,24 +255,6 @@ reobf {
 
 tasks.reobfShadowJar.dependsOn tasks.jar
 tasks.assemble.dependsOn tasks.reobfShadowJar
-
-// Configure Curse Gradle for publishing to Curse Forge.
-/*
-curseforge {
-	apiKey = "test"
-
-	project {
-		id = '351938'
-		changelog = 'CHANGES.md'
-		changelogType = 'markdown'
-		releaseType = 'beta'
-
-		mainArtifact shadowJar
-	}
-}
-
-tasks.curseforge.dependsOn tasks.build
-*/
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation

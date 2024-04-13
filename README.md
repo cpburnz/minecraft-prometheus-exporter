@@ -4,9 +4,11 @@ systems monitoring toolkit, [Prometheus]. The mod is intended for server-side
 use, and does not need to be installed client-side. This currently has builds
 for the following versions:
 
+- Minecraft 1.20.2 with Forge 48.1.0.
 - Minecraft 1.20.1 with Forge 47.1.0.
 - Minecraft 1.19.3 with Forge 44.1.0.
 - Minecraft 1.19.2 with Forge 43.0.0.
+- Minecraft 1.18.2 with Forge 40.2.0.
 - Minecraft 1.18.1 with Forge 39.0.0.
 - Minecraft 1.16.5 with Forge 36.2.0.
 - Minecraft 1.15.2 with Forge 21.2.0.
@@ -37,27 +39,25 @@ It will be automatically generated upon server start if it does not already
 exist. The default configuration can be seen in the example [prometheus_exporter-server.toml].
 
 
-Exporter Output
----------------
+Exporter
+--------
+
+The metrics are documented in [metrics.md].
 
 A sample output from the exporter can be seen in the example [output.txt].
-Please note as of version 1.0.0 the "mc_world_tick_seconds" metric has been
-renamed to "mc_dimension_tick_seconds".
 
 
 Dashboards
 ----------
 
-Known compatible Grafana dashboards:
-
-- [Minecraft Server Stats] built by [randombk].
+Known compatible Grafana dashboards are listed in [dashboards.md].
 
 
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
-[Minecraft Server Stats]: https://grafana.com/grafana/dashboards/16508-minecraft-server-stats/
 [Prometheus]: https://prometheus.io/
+[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.2/dashboards.md
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
-[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1/examples/output.txt
-[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1/examples/prometheus_exporter-server.toml
-[randombk]: https://github.com/randombk
+[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.2/metrics.md
+[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.2/examples/output.txt
+[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.2/examples/prometheus_exporter-server.toml
