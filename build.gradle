@@ -42,7 +42,7 @@ println 'Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
 group = 'com.github.cpburnz'
-version = '1.1.0-2'
+version = '1.1.0-3'
 
 // Extra project settings.
 ext {

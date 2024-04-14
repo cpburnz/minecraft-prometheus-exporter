@@ -324,7 +324,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		// Check for active timer.
 		Histogram.Timer timer = this.dim_tick_timers.get(dim);
 		if (timer != null) {
-			LOG.warn("Dimension {} tick started before stopping previous tick.", name);
+			LOG.debug("Dimension {} tick started before stopping previous tick.", name);
 			timer.close();
 			timer = null;
 		}
@@ -360,7 +360,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		// Get active timer.
 		Histogram.Timer timer = this.dim_tick_timers.replace(dim, null);
 		if (timer == null) {
-			LOG.warn("Dimension {} tick stopped without an active tick.", name);
+			LOG.debug("Dimension {} tick stopped without an active tick.", name);
 			return;
 		}
 
