@@ -55,8 +55,7 @@ public class PrometheusExporterMod {
 	/**
 	 * The server configuration.
 	 */
-	@SuppressWarnings("FieldMayBeFinal")
-	private ServerConfig config;
+	private final ServerConfig config;
 
 	/**
 	 * Construct the instance.

@@ -7,7 +7,7 @@ Change History
 
 Bug fixes:
 
-- Support overlapping dimension ticks.
+- Support inconsistent dimension ticks.
 
 Miscellaneous:
 
