@@ -2,12 +2,17 @@ Change History
 ==============
 
 
-1.1.1 for MC 1.18.2 (TBD)
+1.2.0 for MC 1.18.2 (TBD)
 --------------------------------
+
+New features:
+
+- Added the "collector.mc_dimension_tick_errors" setting to control how to handle inconsistent dimension ticks from misbehaved mods. The new default behavior is to log a debug message rather than crash.
 
 Bug fixes:
 
-- Support inconsistent dimension ticks.
+- Support inconsistent dimension ticks from misbehaved mods.
+- Support multithreaded dimension ticks.
 
 Miscellaneous:
 
