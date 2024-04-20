@@ -11,6 +11,7 @@ New features:
 
 Bug fixes:
 
+- Do not warn when the mod is not installed on the client.
 - Support inconsistent dimension ticks from misbehaved mods.
 - Support multithreaded dimension ticks.
 
