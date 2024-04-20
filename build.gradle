@@ -18,25 +18,8 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
-group = 'com.github.cpburnz'
-version = '1.1.0'
-
-// Extra project settings.
-ext {
-	modAuthors = 'cpburnz'
-	modId = 'prometheus_exporter'
-	modLicense = "MIT License"
-	modLogoFile = "Prometheus_Exporter.png"
-	modName = 'Prometheus Exporter'
-	modPackage = "${project.group}.minecraft_prometheus_exporter"
-	modTrackerUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter/issues'
-	modUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter'
-
-	fmlMinVersion = '44'
-	forgeMinVersion = '44.1'
-	minecraftMinVersion = '1.19.3'
-	minecraftNextVersion = '1.20'
-}
+group = mod_group_id
+version = mod_version
 
 minecraft {
 	// The mappings can be changed at any time and must be in the following format.
@@ -52,7 +35,7 @@ minecraft {
 	//
 	// Use non-default mappings at your own risk. They may not always work.
 	// Simply re-run your setup task after changing the mappings to update your workspace.
-	mappings channel: 'official', version: '1.19.3'
+	mappings channel: mapping_channel, version: mapping_version
 
 	// accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -75,7 +58,7 @@ minecraft {
 			property 'forge.logging.console.level', 'debug'
 
 			// Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-			property 'forge.enabledGameTestNamespaces', 'prometheus_exporter'
+			property 'forge.enabledGameTestNamespaces', mod_id
 
 			mods {
 				prometheus_exporter {
@@ -94,7 +77,7 @@ minecraft {
 			property 'forge.logging.console.level', 'debug'
 
 			// Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-			property 'forge.enabledGameTestNamespaces', 'prometheus_exporter'
+			property 'forge.enabledGameTestNamespaces', mod_id
 
 			mods {
 				prometheus_exporter {
@@ -113,7 +96,7 @@ minecraft {
 
 			property 'forge.logging.console.level', 'debug'
 
-			property 'forge.enabledGameTestNamespaces', 'prometheus_exporter'
+			property 'forge.enabledGameTestNamespaces', mod_id
 
 			mods {
 				prometheus_exporter {
@@ -132,7 +115,7 @@ minecraft {
 			property 'forge.logging.console.level', 'debug'
 
 			// Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-			args '--mod', project.modId, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+			args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
 			mods {
 				prometheus_exporter {
@@ -166,7 +149,7 @@ dependencies {
 	// Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
 	// that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
 	// The userdev artifact is a special name and will get all sorts of transformations applied to it.
-	minecraft 'net.minecraftforge:forge:1.19.3-44.1.0'
+	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
 	// Prometheus dependencies.
 	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.16.0'
@@ -177,18 +160,18 @@ dependencies {
 // Expand variables in resource files.
 processResources {
 	def vars = [
-		'fmlMinVersion': project.fmlMinVersion,
-		'forgeMinVersion': project.forgeMinVersion,
-		'minecraftMinVersion': project.minecraftMinVersion,
-		'minecraftNextVersion': project.minecraftNextVersion,
-		'modAuthors': project.modAuthors,
-		'modId': project.modId,
-		'modLicense': project.modLicense,
-		'modLogoFile': project.modLogoFile,
-		'modName': project.modName,
-		'modTrackerUrl': project.modTrackerUrl,
-		'modUrl': project.modUrl,
-		'version': project.version,
+		'forge_version_range': forge_version_range,
+		'loader_version_range': loader_version_range,
+		'minecraft_version_range': minecraft_version_range,
+		'mod_authors': mod_authors,
+		'mod_description': mod_description,
+		'mod_id': mod_id,
+		'mod_license': mod_license,
+		'mod_logo_file': mod_logo_file,
+		'mod_name': mod_name,
+		'mod_tracker_url': mod_tracker_url,
+		'mod_url': mod_url,
+		'mod_version': mod_version,
 	]
 
 	// Configure duplicates strategy to warm about duplicates. This is new and
@@ -211,16 +194,16 @@ processResources {
 // Project JAR settings.
 jar {
 	// Include the Minecraft version in the JAR name.
-	archiveAppendix = "${project.minecraftMinVersion}-forge"
+	archiveAppendix = "${minecraft_version}-forge"
 
 	manifest {
 		attributes([
-			'Specification-Title': 'examplemod',
-			'Specification-Vendor': 'examplemodsareus',
-			'Specification-Version': '1',
-			'Implementation-Title': project.modName,
-			'Implementation-Version': project.version,
-			'Implementation-Vendor': project.modAuthors,
+			'Specification-Title': mod_name,
+			'Specification-Vendor': mod_authors,
+			'Specification-Version': mod_version,
+			'Implementation-Title': mod_name,
+			'Implementation-Version': mod_version,
+			'Implementation-Vendor': mod_authors,
 			'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 		])
 	}
@@ -247,7 +230,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocatio
 
 task vendorShadowJarDeps(type: ConfigureShadowRelocation) {
 	target = tasks.shadowJar
-	prefix = "${project.modPackage}.vendors"
+	prefix = "${mod_package}.vendors"
 }
 
 tasks.shadowJar.dependsOn tasks.vendorShadowJarDeps
