@@ -41,22 +41,8 @@ println 'Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
-group = 'com.github.cpburnz'
-version = '1.1.0-3'
-
-// Extra project settings.
-ext {
-	modAuthors = 'cpburnz'
-	modId = 'prometheus_exporter'
-	modName = 'Prometheus Exporter'
-	modPackage = "${project.group}.minecraft_prometheus_exporter"
-	modTrackerUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter/issues'
-	modUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter'
-
-	fmlMinVersion = '40'
-	forgeMinVersion = '40.2'
-	minecraftMinVersion = '1.18.2'
-}
+group = mod_group_id
+version = mod_version
 
 minecraft {
 	// The mappings can be changed at any time and must be in the following format.
@@ -72,7 +58,7 @@ minecraft {
 	//
 	// Use non-default mappings at your own risk. They may not always work.
 	// Simply re-run your setup task after changing the mappings to update your workspace.
-	mappings channel: 'official', version: '1.18.2'
+	mappings channel: mapping_channel, version: mapping_version
 
 	// accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
 
@@ -89,7 +75,7 @@ minecraft {
 			property 'forge.logging.console.level', 'debug'
 
 			// Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-			property 'forge.enabledGameTestNamespaces', 'prometheus_exporter'
+			property 'forge.enabledGameTestNamespaces', mod_id
 
 			mods {
 				prometheus_exporter {
@@ -108,7 +94,7 @@ minecraft {
 			property 'forge.logging.console.level', 'debug'
 
 			// Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-			property 'forge.enabledGameTestNamespaces', 'prometheus_exporter'
+			property 'forge.enabledGameTestNamespaces', mod_id
 
 			mods {
 				prometheus_exporter {
@@ -127,7 +113,7 @@ minecraft {
 			property 'forge.logging.console.level', 'debug'
 
 			// Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-			args '--mod', project.modId, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+			args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
 			mods {
 				prometheus_exporter {
@@ -152,7 +138,7 @@ dependencies {
 	// 'net.minecraft' it is assumed that the dep is a ForgeGradle 'patcher'
 	// dependency. And its patches will be applied. The userdev artifact is a
 	// special name and will get all sorts of transformations applied to it.
-	minecraft 'net.minecraftforge:forge:1.18.2-40.2.0'
+	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
 	// Prometheus dependencies.
 	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.16.0'
@@ -163,15 +149,18 @@ dependencies {
 // Expand variables in resource files.
 processResources {
 	def vars = [
-		'fmlMinVersion': project.fmlMinVersion,
-		'forgeMinVersion': project.forgeMinVersion,
-		'minecraftMinVersion': project.minecraftMinVersion,
-		'modAuthors': project.modAuthors,
-		'modName': project.modName,
-		'modId': project.modId,
-		'modTrackerUrl': project.modTrackerUrl,
-		'modUrl': project.modUrl,
-		'version': project.version,
+		'forge_version_range': forge_version_range,
+		'loader_version_range': loader_version_range,
+		'minecraft_version_range': minecraft_version_range,
+		'mod_authors': mod_authors,
+		'mod_description': mod_description,
+		'mod_id': mod_id,
+		'mod_license': mod_license,
+		'mod_logo_file': mod_logo_file,
+		'mod_name': mod_name,
+		'mod_tracker_url': mod_tracker_url,
+		'mod_url': mod_url,
+		'mod_version': mod_version,
 	]
 
 	// Configure duplicates strategy to warm about duplicates. This is new and
@@ -194,16 +183,16 @@ processResources {
 // Project JAR settings.
 jar {
 	// Include the Minecraft version in the JAR name.
-	archiveAppendix = "${project.minecraftMinVersion}-forge"
+	archiveAppendix = "${minecraft_version}-forge"
 
 	manifest {
 		attributes([
-			'Specification-Title': 'examplemod',
-			'Specification-Vendor': 'examplemodsareus',
-			'Specification-Version': '1',
-			'Implementation-Title': project.modName,
+			'Specification-Title': mod_name,
+			'Specification-Vendor': mod_authors,
+			'Specification-Version': mod_version,
+			'Implementation-Title': mod_name,
 			'Implementation-Version': project.version,
-			'Implementation-Vendor': project.modAuthors,
+			'Implementation-Vendor': mod_authors,
 			'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 		])
 	}
@@ -227,7 +216,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocatio
 
 task vendorShadowJarDeps(type: ConfigureShadowRelocation) {
 	target = tasks.shadowJar
-	prefix = "${project.modPackage}.vendors"
+	prefix = "${mod_package}.vendors"
 }
 
 tasks.shadowJar.dependsOn tasks.vendorShadowJarDeps

@@ -249,7 +249,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		// Aggregate metric descriptions.
 		ArrayList<MetricFamilySamples> descs = new ArrayList<>();
 		descs.add(newPlayerListMetric());
-		descs.add(newEntitiesTotalMetric());
+		if (this.config.collector_mc_entities) {
+			descs.add(newEntitiesTotalMetric());
+		}
 		descs.addAll(this.server_tick_seconds.describe());
 		descs.add(newDimensionChunksLoadedMetric());
 		descs.addAll(this.dim_tick_seconds.describe());

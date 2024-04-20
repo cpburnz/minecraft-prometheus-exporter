@@ -7,65 +7,63 @@
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml" #mandatory
 
+# A version range to match for said mod loader - for regular FML @Mod it will be the forge version
+loaderVersion="${loader_version_range}" #mandatory (28 is current forge version)
+
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
-license="MIT License"
-
-# A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[${fmlMinVersion},)" #mandatory (28 is current forge version)
+license="${mod_license}"
 
 # A URL to refer people to when problems occur with this mod
-issueTrackerURL="${modTrackerUrl}" #optional
+issueTrackerURL="${mod_tracker_url}" #optional
 
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
 
 # The modid of the mod
-modId="${modId}" #mandatory
+modId="${mod_id}" #mandatory
 
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="${version}" #mandatory
+version="${mod_version}" #mandatory
 
 # A display name for the mod
-displayName="${modName}" #mandatory
+displayName="${mod_name}" #mandatory
 
 # A URL to query for updates for this mod. See the JSON update specification <here>
 #updateJSONURL="http://myurl.me/" #optional
 
 # A URL for the "homepage" for this mod, displayed in the mod UI
-displayURL="${modUrl}" #optional
+displayURL="${mod_url}" #optional
 
 # A file name (in the root of the mod JAR) containing a logo for display
-logoFile="Prometheus_Exporter.png" #optional
+logoFile="${mod_logo_file}" #optional
 
 # A text field displayed in the mod UI
 #credits="Thanks for this example mod goes to Java" #optional
 
 # A text field displayed in the mod UI
-authors="${modAuthors}" #optional
+authors="${mod_authors}" #optional
 
 # The description text for the mod (multi line!) (#mandatory)
-description='''
-This mod provides a Prometheus exporter for Minecraft. It exports metrics related to the Minecraft server and the JVM for consumption by the open-source systems monitoring toolkit, Prometheus. The mod is intended for server-side use, and does not need to be installed client-side.
-'''
+description='''${mod_description}'''
 
 # Forge dependency.
-[[dependencies.${modId}]] #optional
+[[dependencies.${mod_id}]] #optional
     # the modid of the dependency
     modId="forge" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[${forgeMinVersion},)" #mandatory
+    versionRange="${forge_version_range}" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="SERVER"
 
 # Minecraft dependency.
-[[dependencies.${modId}]]
+[[dependencies.${mod_id}]]
     modId="minecraft"
     mandatory=true
-    versionRange="[${minecraftMinVersion},)"
+    versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="SERVER"

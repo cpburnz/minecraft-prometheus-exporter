@@ -29,15 +29,15 @@ public class ServerConfig {
 	public boolean collector_mc;
 
 	/**
+	 * How to handle dimension (world) tick event errors.
+	 */
+	public TickErrorPolicy collector_mc_dimension_tick_errors;
+
+	/**
 	 * Whether collecting metrics about the entities in each dimension (world) is
 	 * enabled.
 	 */
 	public boolean collector_mc_entities;
-
-	/**
-	 * How to handle dimension (world) tick event errors.
-	 */
-	public TickErrorPolicy collector_mc_dimension_tick_errors;
 
 	/**
 	 * The Forge config specification.
@@ -89,8 +89,8 @@ public class ServerConfig {
 		// Get config values.
 		this.collector_jvm = this.internal_spec.collector_jvm.get();
 		this.collector_mc = this.internal_spec.collector_mc.get();
-		this.collector_mc_entities = this.internal_spec.collector_mc_entities.get();
 		this.collector_mc_dimension_tick_errors = this.internal_spec.collector_mc_dimension_tick_errors.get();
+		this.collector_mc_entities = this.internal_spec.collector_mc_entities.get();
 		this.web_listen_address = this.internal_spec.web_listen_address.get();
 		this.web_listen_port = this.internal_spec.web_listen_port.get();
 
