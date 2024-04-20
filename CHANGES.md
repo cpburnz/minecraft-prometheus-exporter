@@ -2,6 +2,25 @@ Change History
 ==============
 
 
+1.2.0 for MC 1.19.3 (2024-04-20)
+--------------------------------
+
+New features:
+
+- Added the "collector.mc_dimension_tick_errors" setting to control how to handle inconsistent dimension ticks from misbehaved mods. The new default behavior is to log a debug message rather than crash.
+
+Bug fixes:
+
+- Do not warn when the mod is not installed on the client (Forge only backported to MC 1.19.2 & 1.19.4).
+- Support inconsistent dimension ticks from misbehaved mods.
+- Support multithreaded dimension ticks.
+
+Miscellaneous:
+
+- Minor documentation.
+
+
+
 1.1.0 for MC 1.19.3 (2024-04-13)
 --------------------------------
 
