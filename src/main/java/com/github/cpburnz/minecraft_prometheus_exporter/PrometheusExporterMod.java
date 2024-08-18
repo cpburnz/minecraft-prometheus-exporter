@@ -55,8 +55,7 @@ public class PrometheusExporterMod {
 	/**
 	 * The server configuration.
 	 */
-	@SuppressWarnings("FieldMayBeFinal")
-	private ServerConfig config;
+	private final ServerConfig config;
 
 	/**
 	 * Construct the instance.
@@ -85,7 +84,12 @@ public class PrometheusExporterMod {
 		// WARNING: Remember to stop the HTTP server. Otherwise, the Minecraft
 		// client will crash because the TCP port will already be in use when trying
 		// to load a second saved world.
-		this.http_server.close();
+		if (this.http_server != null) {
+			this.http_server.close();
+			this.http_server = null;
+		} else {
+			LOG.warn("Cannot close http_server=null.");
+		}
 	}
 
 	/**

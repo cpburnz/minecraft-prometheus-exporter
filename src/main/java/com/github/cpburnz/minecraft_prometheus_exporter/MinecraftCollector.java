@@ -2,8 +2,9 @@ package com.github.cpburnz.minecraft_prometheus_exporter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 import com.mojang.authlib.GameProfile;
@@ -21,7 +22,6 @@ import org.apache.logging.log4j.Logger;
 import io.prometheus.client.Collector;
 import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.Histogram;
-
 
 /**
  * The MinecraftCollector class collects stats from the Minecraft server for
@@ -53,21 +53,20 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	private final ServerConfig config;
 
 	/**
-	 * The active dimension being timed.
-	 */
-	@Nullable
-	private String dim_tick_name;
-
-	/**
 	 * Histogram metrics for dimension tick timing.
 	 */
 	private final Histogram dim_tick_seconds;
 
 	/**
-	 * The active timer when timing a dimension tick.
+	 * Maps each dimension to its active timer when timing a dimension (world)
+	 * tick.
+	 *
+	 * <p>Track each dimension separately in order to support multi-threading.
+	 * Minecraft (as of at least 1.20) still does not run server-side dimension
+	 * ticks in multiple threads. However, some mods do for their custom
+	 * dimensions (e.g., Vault Hunters).</p>
 	 */
-	@Nullable
-	private Histogram.Timer dim_tick_timer;
+	private final ConcurrentHashMap<ResourceKey<Level>, Histogram.Timer> dim_tick_timers;
 
 	/**
 	 * The Minecraft server.
@@ -93,6 +92,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 */
 	public MinecraftCollector(ServerConfig config, MinecraftServer mc_server) {
 		this.config = config;
+		this.dim_tick_timers = new ConcurrentHashMap<>(3);
 		this.mc_server = mc_server;
 
 		// Setup server metrics.
@@ -229,7 +229,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 
 			// Get player info.
 			// - NOTICE: Both "id" and "name" are required to be non-null, unlike in
-			//   earlier versions.
+			//   Minecraft 1.19 and earlier.
 			String id_str = profile.getId().toString();
 			String name = profile.getName();
 
@@ -248,7 +248,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		// Aggregate metric descriptions.
 		ArrayList<MetricFamilySamples> descs = new ArrayList<>();
 		descs.add(newPlayerListMetric());
-		descs.add(newEntitiesTotalMetric());
+		if (this.config.collector_mc_entities) {
+			descs.add(newEntitiesTotalMetric());
+		}
 		descs.addAll(this.server_tick_seconds.describe());
 		descs.add(newDimensionChunksLoadedMetric());
 		descs.addAll(this.dim_tick_seconds.describe());
@@ -324,17 +326,32 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 * @param dim The dimension.
 	 */
 	public void startDimensionTick(ResourceKey<Level> dim) {
+		// Get dimension name.
 		String name = dim.location().getPath();
-		if (this.dim_tick_timer != null) {
-			throw new IllegalStateException(
-				"Dimension " + name + " tick started before stopping previous tick for "
-				+ "dimension " + this.dim_tick_name + "."
-			);
+
+		// Check for forgotten timer.
+		Histogram.Timer timer = this.dim_tick_timers.get(dim);
+		if (timer != null) {
+			switch (this.config.collector_mc_dimension_tick_errors) {
+				case IGNORE -> {}  // Ignore error.
+				case LOG -> LOG.debug(
+					"Dimension {} tick started before stopping previous tick.",
+					name
+				);
+				case STRICT -> throw new IllegalStateException(
+					"Dimension " + name + " tick started before stopping previous tick."
+				);
+			}
+
+			// Stop forgotten timer.
+			timer.close();
+			timer = null;
 		}
 
+		// Start timer for tick.
 		String id_str = Integer.toString(getDimensionId(dim));
-		this.dim_tick_name = name;
-		this.dim_tick_timer = this.dim_tick_seconds.labels(id_str, name).startTimer();
+		timer = this.dim_tick_seconds.labels(id_str, name).startTimer();
+		this.dim_tick_timers.put(dim, timer);
 	}
 
 	/**
@@ -356,21 +373,29 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 * @param dim The dimension.
 	 */
 	public void stopDimensionTick(ResourceKey<Level> dim) {
+		// Get dimension name.
 		String name = dim.location().getPath();
-		if (this.dim_tick_timer == null) {
-			throw new IllegalStateException(
-				"Dimension " + name + " tick stopped without an active tick."
-			);
-		} else if (!name.equals(this.dim_tick_name)) {
-			throw new IllegalStateException(
-				"Dimension " + name + " tick stopped while in an active tick for "
-				+ "dimension " + this.dim_tick_name + "."
-			);
+
+		// Get active timer.
+		Histogram.Timer timer = this.dim_tick_timers.remove(dim);
+		if (timer == null) {
+			switch (this.config.collector_mc_dimension_tick_errors) {
+				case IGNORE -> {}  // Ignore error.
+				case LOG -> LOG.debug(
+					"Dimension {} tick stopped without an active tick.",
+					name
+				);
+				case STRICT -> throw new IllegalStateException(
+					"Dimension " + name + " tick stopped without an active tick."
+				);
+			}
+
+			// No timer to stop.
+			return;
 		}
 
-		this.dim_tick_timer.observeDuration();
-		this.dim_tick_timer = null;
-		this.dim_tick_name = null;
+		// Record duration of tick.
+		timer.close();
 	}
 
 	/**

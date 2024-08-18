@@ -29,6 +29,11 @@ public class ServerConfig {
 	public boolean collector_mc;
 
 	/**
+	 * How to handle dimension (world) tick event errors.
+	 */
+	public TickErrorPolicy collector_mc_dimension_tick_errors;
+
+	/**
 	 * Whether collecting metrics about the entities in each dimension (world) is
 	 * enabled.
 	 */
@@ -84,6 +89,7 @@ public class ServerConfig {
 		// Get config values.
 		this.collector_jvm = this.internal_spec.collector_jvm.get();
 		this.collector_mc = this.internal_spec.collector_mc.get();
+		this.collector_mc_dimension_tick_errors = this.internal_spec.collector_mc_dimension_tick_errors.get();
 		this.collector_mc_entities = this.internal_spec.collector_mc_entities.get();
 		this.web_listen_address = this.internal_spec.web_listen_address.get();
 		this.web_listen_port = this.internal_spec.web_listen_port.get();
@@ -93,6 +99,10 @@ public class ServerConfig {
 
 		LOG.debug("collector.jvm: {}", this.collector_jvm);
 		LOG.debug("collector.mc: {}", this.collector_mc);
+		LOG.debug(
+			"collector.mc_dimension_tick_errors: {}",
+			this.collector_mc_dimension_tick_errors
+		);
 		LOG.debug("collector.mc_entities: {}", this.collector_mc_entities);
 		LOG.debug("web.listen_address: {}", this.web_listen_address);
 		LOG.debug("web.listen_port: {}", this.web_listen_port);
@@ -106,7 +116,8 @@ public class ServerConfig {
 	}
 
 	/**
-	 * This class is used to define the server-side Forge config specifications.
+	 * The InternalSpec class is used to define the server-side Forge config
+	 * specifications.
 	 */
 	private static class InternalSpec {
 
@@ -135,6 +146,7 @@ public class ServerConfig {
 
 		public final ForgeConfigSpec.BooleanValue collector_jvm;
 		public final ForgeConfigSpec.BooleanValue collector_mc;
+		public final ForgeConfigSpec.EnumValue<TickErrorPolicy> collector_mc_dimension_tick_errors;
 		public final ForgeConfigSpec.BooleanValue collector_mc_entities;
 		public final ForgeConfigSpec.ConfigValue<String> web_listen_address;
 		public final ForgeConfigSpec.IntValue web_listen_port;
@@ -156,6 +168,30 @@ public class ServerConfig {
 			this.collector_mc = builder
 				.comment("Enable collecting metrics about the Minecraft server.")
 				.define("mc", true);
+
+			this.collector_mc_dimension_tick_errors = builder
+				.comment(
+					(
+						"Configure how to handle dimension (world) tick errors. Some mods "
+						+ "handle the tick events for their custom dimensions, and may not "
+						+ "reliably start and stop ticks as expected."
+					),
+					(
+						"  IGNORE: Ignore tick errors. If a mod really botches tick "
+						+ "events, it could emit up to 20 log statements per second for "
+						+ "each dimension. This would cause large ballooning of the "
+						+ "\"logs/debug.txt\" file. Use this setting, or figure out how to "
+						+ "filter out DEBUG messages for "
+						+ "\"com.github.cpburnz.minecraft_prometheus_exporter.MinecraftCollector/\" "
+						+ "in \"log4j2.xml\"."
+					),
+					"  LOG: Log tick errors. This is the new default.",
+					(
+						"  STRICT: Raise an exception on tick error. This will crash the "
+						+ "server if an error occurs."
+					)
+				)
+				.defineEnum("mc_dimension_tick_errors", TickErrorPolicy.LOG);
 
 			this.collector_mc_entities = builder
 				.comment(
@@ -186,5 +222,26 @@ public class ServerConfig {
 
 			builder.pop();
 		}
+	}
+
+	/**
+	 * The TickErrorPolicy enum defines how to handle dimension (world) tick event
+	 * errors.
+	 */
+	public enum TickErrorPolicy {
+		/**
+		 * When a tick error occurs, ignore the error.
+		 */
+		IGNORE,
+
+		/**
+		 * When a tick error occurs, log the error.
+		 */
+		LOG,
+
+		/**
+		 * When a tick error occurs, raise an IllegalStateException.
+		 */
+		STRICT
 	}
 }

@@ -108,4 +108,4 @@ The UNIX timestamp when the metric was created (in seconds).
 The sum of the duration of the server ticks (in seconds).
 
 
-[^1]: Starting in Minecraft 1.16, dimensions no longer have ids. In order to maintain compatibility with older versions, in Minecraft 1.16+ the ids for the overworld, the nether, and the end will be hardcoded as 0, -1, and 1, respectively. Custom dimensions will have an id computed as `dim.hashCode()`.
+[^1]: Starting in Minecraft 1.16, dimensions no longer have ids. In order to maintain compatibility with older versions, in Minecraft 1.16+ the ids for the overworld, the nether, and the end will be hardcoded as 0, -1, and 1, respectively. Custom dimensions will have an id computed as `name.hashCode()`.
