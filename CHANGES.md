@@ -2,15 +2,19 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.20.2 with Forge 48.1.0 (2024-08-18)
+1.2.1 for Minecraft 1.20.4 with Forge 49.1.0 (2024-08-18)
 ---------------------------------------------------------
+
+New features:
+
+- Support MC 1.20.4.
 
 Bug fixes:
 
 - Prevent possible crash on bad start-up.
 
 
-1.2.0 for Minecraft 1.20.2 with Forge 48.1.0 (Unreleased)
+1.2.0 for Minecraft 1.20.4 with Forge 49.1.0 (Unreleased)
 ---------------------------------------------------------
 
 New features:
@@ -28,12 +32,11 @@ Miscellaneous:
 - Minor documentation.
 
 
-1.1.0 for Minecraft 1.20.2 with Forge 48.1.0 (2024-04-13)
+1.1.0 for Minecraft 1.20.4 with Forge 49.1.0 (Unreleased)
 ---------------------------------------------------------
 
 New features:
 
-- Support MC 1.20.2.
 - Add entity tracking with the "mc_entities_total" metric. This can be disabled by setting "collector.mc_entities" to "false" in the config.
 
 Bug fixes:
