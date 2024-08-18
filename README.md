@@ -57,8 +57,8 @@ Known compatible Grafana dashboards are listed in [dashboards.md].
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
 [Prometheus]: https://prometheus.io/
-[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4/dashboards.md
+[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-forge/dashboards.md
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
-[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4/metrics.md
-[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4/examples/output.txt
-[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4/examples/prometheus_exporter-server.toml
+[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-forge/metrics.md
+[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-forge/examples/output.txt
+[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-forge/examples/prometheus_exporter-server.toml
