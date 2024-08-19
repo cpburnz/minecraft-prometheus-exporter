@@ -2,19 +2,19 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.20.4 with Forge 49.1.0 (2024-08-18)
+1.2.1 for Minecraft 1.20.6 with Forge 50.1.0 (2024-08-19)
 ---------------------------------------------------------
 
 New features:
 
-- Support MC 1.20.4.
+- Support MC 1.20.6.
 
 Bug fixes:
 
 - Prevent possible crash on bad start-up.
 
 
-1.2.0 for Minecraft 1.20.4 with Forge 49.1.0 (Unreleased)
+1.2.0 for Minecraft 1.20.6 with Forge 50.1.0 (Unreleased)
 ---------------------------------------------------------
 
 New features:
@@ -32,7 +32,7 @@ Miscellaneous:
 - Minor documentation.
 
 
-1.1.0 for Minecraft 1.20.4 with Forge 49.1.0 (Unreleased)
+1.1.0 for Minecraft 1.20.6 with Forge 50.1.0 (Unreleased)
 ---------------------------------------------------------
 
 New features:
