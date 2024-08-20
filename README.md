@@ -5,6 +5,7 @@ use, and does not need to be installed client-side. This currently has builds
 for the following versions:
 
 - Minecraft 1.20.4 with Forge 49.1.0.
+- Minecraft 1.20.4 with Neoforge 47.1.0.
 - Minecraft 1.20.2 with Forge 48.1.0.
 - Minecraft 1.20.1 with Forge 47.1.0.
 - Minecraft 1.19.3 with Forge 44.1.0.

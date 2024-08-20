@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -16,8 +17,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.GaugeMetricFamily;
@@ -32,7 +32,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	/**
 	 * The logger to use.
 	 */
-	private static final Logger LOG = LogManager.getLogger();
+	private static final Logger LOG = LogUtils.getLogger();
 
 	/**
 	 * The histogram buckets to use for ticks.
