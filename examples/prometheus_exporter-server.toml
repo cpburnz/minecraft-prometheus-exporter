@@ -2,6 +2,7 @@
 # *world/serverconfig/prometheus_exporter-server.toml*. It will be
 # automatically generated upon server start if it does not already exist.
 
+
 #Collector settings.
 [collector]
 	#Enable collecting metrics about the JVM process.
@@ -16,6 +17,7 @@
 	mc_dimension_tick_errors = "LOG"
 	#Enable collecting metrics about the entities in each dimension (world).
 	mc_entities = true
+
 #Web server settings.
 [web]
 	#The IP address to listen on. To only allow connections from the local machine, use "127.0.0.1". To allow connections from remote machines, use "0.0.0.0".
@@ -23,3 +25,4 @@
 	#The TCP port to listen on. Ports 1-1023 will not work unless Minecraft is run as root which is not recommended.
 	#Range: 0 ~ 65535
 	listen_port = 19565
+

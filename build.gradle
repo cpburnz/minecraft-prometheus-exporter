@@ -53,6 +53,15 @@ runs {
 	client {
 		// Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
 		systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+
+		dependencies {
+			// Every shadowed dependency has to be relisted here for the runClient
+			// command to work.
+			runtime group: 'io.prometheus', name: 'simpleclient', version: '0.16.0'
+			runtime group: 'io.prometheus', name: 'simpleclient_common', version: '0.16.0'
+			runtime group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.16.0'
+			runtime group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.16.0'
+		}
 	}
 
 	server {
@@ -91,7 +100,6 @@ configurations {
 	compileAndShadow
 	compile.extendsFrom compileAndShadow
 	shadow.extendsFrom compileAndShadow
-	//minecraftLibrary.extendsFrom compileAndShadow
 }
 
 repositories {
@@ -190,7 +198,6 @@ tasks.named('jar', Jar).configure {
 	}
 
 	// This is the preferred method to reobfuscate/finalize your jar file
-	//finalizedBy 'reobfShadowJar'
 	finalizedBy 'shadowJar'
 }
 
@@ -216,20 +223,6 @@ task vendorShadowJarDeps(type: ConfigureShadowRelocation) {
 }
 
 tasks.shadowJar.dependsOn tasks.vendorShadowJarDeps
-
-// Reobfuscate the Shadow Jar because the Minecraft classes must be obfuscated.
-//reobf {
-//	jar {
-//		// Disable generation of unshadowed obfuscated JAR.
-//		enabled = false
-//	}
-//	shadowJar {
-//		enabled = true
-//	}
-//}
-
-//tasks.reobfShadowJar.dependsOn tasks.jar
-//tasks.assemble.dependsOn tasks.reobfShadowJar
 tasks.shadowJar.dependsOn tasks.jar
 tasks.assemble.dependsOn tasks.shadowJar
 

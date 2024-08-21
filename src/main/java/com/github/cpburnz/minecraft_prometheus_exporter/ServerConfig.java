@@ -1,9 +1,9 @@
 package com.github.cpburnz.minecraft_prometheus_exporter;
 
 import com.mojang.logging.LogUtils;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.config.ModConfig;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 
@@ -42,7 +42,7 @@ public class ServerConfig {
 	/**
 	 * The Forge config specification.
 	 */
-	private final ForgeConfigSpec forge_spec;
+	private final ModConfigSpec forge_spec;
 
 	/**
 	 * The server-side config specifications.
@@ -69,7 +69,7 @@ public class ServerConfig {
 	 */
 	public ServerConfig() {
 		// Setup config specs.
-		Pair<InternalSpec, ForgeConfigSpec> result = new ForgeConfigSpec.Builder().configure(InternalSpec::new);
+		Pair<InternalSpec, ModConfigSpec> result = new ModConfigSpec.Builder().configure(InternalSpec::new);
 		this.internal_spec = result.getLeft();
 		this.forge_spec = result.getRight();
 	}
@@ -144,19 +144,19 @@ public class ServerConfig {
 		 */
 		private static final int TCP_PORT_MIN = 0;
 
-		public final ForgeConfigSpec.BooleanValue collector_jvm;
-		public final ForgeConfigSpec.BooleanValue collector_mc;
-		public final ForgeConfigSpec.EnumValue<TickErrorPolicy> collector_mc_dimension_tick_errors;
-		public final ForgeConfigSpec.BooleanValue collector_mc_entities;
-		public final ForgeConfigSpec.ConfigValue<String> web_listen_address;
-		public final ForgeConfigSpec.IntValue web_listen_port;
+		public final ModConfigSpec.BooleanValue collector_jvm;
+		public final ModConfigSpec.BooleanValue collector_mc;
+		public final ModConfigSpec.EnumValue<TickErrorPolicy> collector_mc_dimension_tick_errors;
+		public final ModConfigSpec.BooleanValue collector_mc_entities;
+		public final ModConfigSpec.ConfigValue<String> web_listen_address;
+		public final ModConfigSpec.IntValue web_listen_port;
 
 		/**
 		 * Construct the instance.
 		 *
 		 * @param builder The Forge config builder.
 		 */
-		public InternalSpec(ForgeConfigSpec.Builder builder) {
+		public InternalSpec(ModConfigSpec.Builder builder) {
 			builder
 				.comment("Collector settings.")
 				.push("collector");

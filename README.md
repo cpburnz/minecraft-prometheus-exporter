@@ -4,8 +4,10 @@ systems monitoring toolkit, [Prometheus]. The mod is intended for server-side
 use, and does not need to be installed client-side. This currently has builds
 for the following versions:
 
+- Minecraft 1.21.1 with Forge 52.0.0.
+- Minecraft 1.20.6 with Forge 50.1.0.
 - Minecraft 1.20.4 with Forge 49.1.0.
-- Minecraft 1.20.4 with Neoforge 47.1.0.
+- Minecraft 1.20.4 with Neoforge 20.4.0.
 - Minecraft 1.20.2 with Forge 48.1.0.
 - Minecraft 1.20.1 with Forge 47.1.0.
 - Minecraft 1.19.3 with Forge 44.1.0.
@@ -58,8 +60,8 @@ Known compatible Grafana dashboards are listed in [dashboards.md].
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
 [Prometheus]: https://prometheus.io/
-[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-forge/dashboards.md
+[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-neoforge/dashboards.md
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
-[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-forge/metrics.md
-[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-forge/examples/output.txt
-[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-forge/examples/prometheus_exporter-server.toml
+[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-neoforge/metrics.md
+[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-neoforge/examples/output.txt
+[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-neoforge/examples/prometheus_exporter-server.toml
