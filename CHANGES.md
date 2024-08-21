@@ -2,19 +2,19 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.20.4 with NeoForge 20.4.0 (2024-08-20)
+1.2.1 for Minecraft 1.20.6 with NeoForge 20.6.0 (TBD)
 ------------------------------------------------------------
 
 New features:
 
-- Support Minecraft 1.20.4 with NeoForge.
+- Support Minecraft 1.20.6 with NeoForge.
 
 Bug fixes:
 
 - Prevent possible crash on bad start-up.
 
 
-1.2.0 for Minecraft 1.20.4 with NeoForge 20.4.0 (Unreleased)
+1.2.0 for Minecraft 1.20.6 with NeoForge 20.6.0 (Unreleased)
 ------------------------------------------------------------
 
 New features:
@@ -32,7 +32,7 @@ Miscellaneous:
 - Minor documentation.
 
 
-1.1.0 for Minecraft 1.20.4 with NeoForge 20.4.0 (Unreleased)
+1.1.0 for Minecraft 1.20.6 with NeoForge 20.6.0 (Unreleased)
 ------------------------------------------------------------
 
 New features:

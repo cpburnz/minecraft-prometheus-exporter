@@ -5,11 +5,11 @@ Java Environment
 ----------------
 
 Create a ".env" file, and assign the `JAVA_HOME` variable to the path of the
-Java 17 JDK. E.g.,
+Java 21 JDK. E.g.,
 
 ```shell
 # Define the version of Java to use with Gradle (i.e., "./gradlew").
-JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk
 ```
 
 The "env-gradlew" script is a wrapper around "gradlew", and loads the ".env" file to ensure Gradle is run with the proper version of Java.

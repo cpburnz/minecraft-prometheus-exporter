@@ -8,11 +8,11 @@ plugins {
 	// IDEA plugin (makes life easier using IntelliJ IDEA).
 	id 'idea'
 
-	// Neoforge Gradle plugin (required).
-	id 'net.neoforged.gradle.userdev' version '7.0.97'
+	// NeoForge Gradle plugin (required).
+	id 'net.neoforged.gradle.userdev' version '7.0.142'
 
 	// Shadow Jar plugin: bundle dependencies.
-	id 'com.github.johnrengelman.shadow' version '7.1.2'
+	id 'com.gradleup.shadow' version '8.3.0'
 }
 
 // Project settings.
@@ -23,8 +23,8 @@ base {
 	archivesName = 'Prometheus-Exporter'
 }
 
-// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+// Mojang ships Java 21 to end users starting in 1.20.5, so mods should target Java 21.
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 //minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -54,14 +54,14 @@ runs {
 		// Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
 		systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
 
-		dependencies {
-			// Every shadowed dependency has to be relisted here for the runClient
-			// command to work.
-			runtime group: 'io.prometheus', name: 'simpleclient', version: '0.16.0'
-			runtime group: 'io.prometheus', name: 'simpleclient_common', version: '0.16.0'
-			runtime group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.16.0'
-			runtime group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.16.0'
-		}
+//		dependencies {
+//			// Every shadowed dependency has to be relisted here for the runClient
+//			// command to work.
+//			runtime group: 'io.prometheus', name: 'simpleclient', version: '0.16.0'
+//			runtime group: 'io.prometheus', name: 'simpleclient_common', version: '0.16.0'
+//			runtime group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.16.0'
+//			runtime group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.16.0'
+//		}
 	}
 
 	server {
@@ -100,17 +100,6 @@ configurations {
 	compileAndShadow
 	compile.extendsFrom compileAndShadow
 	shadow.extendsFrom compileAndShadow
-}
-
-repositories {
-	// Put repositories for dependencies here
-	// ForgeGradle automatically adds the Forge maven and Maven Central for you
-
-	// If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
-	// flatDir {
-	//     dir 'libs'
-	// }
 }
 
 dependencies {
@@ -197,7 +186,7 @@ tasks.named('jar', Jar).configure {
 		])
 	}
 
-	// This is the preferred method to reobfuscate/finalize your jar file
+	// This is the preferred method to reobfuscate/finalize your jar file.
 	finalizedBy 'shadowJar'
 }
 
@@ -207,6 +196,10 @@ tasks.named('shadowJar').configure {
 	archiveAppendix = tasks.jar.archiveAppendix
 	archiveClassifier = tasks.jar.archiveClassifier
 
+	// Relocate shadowed dependencies.
+	enableRelocation = true
+	relocationPrefix = "${mod_package}.vendors"
+
 	// Only bundle dependencies explicitly marked to shadow.
 	configurations = [project.configurations.shadow]
 
@@ -214,15 +207,6 @@ tasks.named('shadowJar').configure {
 	minimize()
 }
 
-// Vendor dependencies with Shadow Jar.
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-
-task vendorShadowJarDeps(type: ConfigureShadowRelocation) {
-	target = tasks.shadowJar
-	prefix = "${mod_package}.vendors"
-}
-
-tasks.shadowJar.dependsOn tasks.vendorShadowJarDeps
 tasks.shadowJar.dependsOn tasks.jar
 tasks.assemble.dependsOn tasks.shadowJar
 
