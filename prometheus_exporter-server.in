@@ -1,3 +1,3 @@
 # This is an example configuration. The mod configuration is located at
-# *world/serverconfig/prometheus_exporter-server.toml*. It will be
-# automatically generated upon server start if it does not already exist.
+# *config/prometheus_exporter-server.toml*. It will be automatically generated
+# upon server start if it does not already exist.
