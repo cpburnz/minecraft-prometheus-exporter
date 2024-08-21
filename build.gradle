@@ -183,7 +183,7 @@ tasks.withType(ProcessResources).configureEach {
 // Project JAR settings.
 tasks.named('jar', Jar).configure {
 	// Include the Minecraft version in the JAR name.
-	archiveAppendix = "${minecraft_version}-forge"
+	archiveAppendix = "${minecraft_version}-neoforge"
 
 	manifest {
 		attributes([
