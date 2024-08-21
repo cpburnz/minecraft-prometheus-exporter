@@ -38,9 +38,9 @@ version.
 Configuration
 -------------
 
-The mod configuration is located at *config/prometheus_exporter-server.toml*.
-It will be automatically generated upon server start if it does not already
-exist. The default configuration can be seen in the example [prometheus_exporter-server.toml].
+The mod configuration is located at *config/prometheus_exporter-server.toml*. It
+will be automatically generated upon server start if it does not already exist.
+The default configuration can be seen in the example [prometheus_exporter-server.toml].
 
 
 Exporter
