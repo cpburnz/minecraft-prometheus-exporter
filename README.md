@@ -7,6 +7,7 @@ for the following versions:
 - Minecraft 1.21.1 with Forge 52.0.0.
 - Minecraft 1.20.6 with Forge 50.1.0.
 - Minecraft 1.20.4 with Forge 49.1.0.
+- Minecraft 1.20.4 with NeoForge 20.4.0.
 - Minecraft 1.20.2 with Forge 48.1.0.
 - Minecraft 1.20.1 with Forge 47.1.0.
 - Minecraft 1.19.3 with Forge 44.1.0.
@@ -37,9 +38,10 @@ version.
 Configuration
 -------------
 
-The mod configuration is located at *world/serverconfig/prometheus_exporter-server.toml*.
-It will be automatically generated upon server start if it does not already
-exist. The default configuration can be seen in the example [prometheus_exporter-server.toml].
+The mod configuration is located at *world/serverconfig/prometheus_exporter-server.toml*
+with Forge, and *config/prometheus_exporter-server.toml* with NeoForge. It will
+be automatically generated upon server start if it does not already exist. The
+default configuration can be seen in the example [prometheus_exporter-server.toml].
 
 
 Exporter
