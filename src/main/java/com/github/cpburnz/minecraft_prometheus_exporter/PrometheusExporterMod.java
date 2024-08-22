@@ -10,7 +10,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
@@ -121,18 +122,34 @@ public class PrometheusExporterMod {
 	}
 
 	/**
-	 * Called on a dimension tick.
+	 * Called at the start of a dimension tick.
 	 *
 	 * @param event The event.
 	 */
 	@SubscribeEvent
-	public void onDimensionTick(TickEvent.LevelTickEvent event) {
+	public void onDimensionTickStart(LevelTickEvent.Pre event) {
 		// Record dimension tick.
-		if (this.mc_collector != null && event.side == LogicalSide.SERVER) {
-			ResourceKey<Level> dim = event.level.dimension();
-			if (event.phase == TickEvent.Phase.START) {
+		if (this.mc_collector != null) {
+			Level level = event.getLevel();
+			if (!level.isClientSide()) {
+				ResourceKey<Level> dim = level.dimension();
 				this.mc_collector.startDimensionTick(dim);
-			} else if (event.phase == TickEvent.Phase.END) {
+			}
+		}
+	}
+
+	/**
+	 * Called at the end of a dimension tick.
+	 *
+	 * @param event The event.
+	 */
+	@SubscribeEvent
+	public void onDimensionTickStop(LevelTickEvent.Post event) {
+		// Record dimension tick.
+		if (this.mc_collector != null) {
+			Level level = event.getLevel();
+			if (!level.isClientSide()) {
+				ResourceKey<Level> dim = level.dimension();
 				this.mc_collector.stopDimensionTick(dim);
 			}
 		}
@@ -183,19 +200,28 @@ public class PrometheusExporterMod {
 	}
 
 	/**
-	 * Called on the server tick.
+	 * Called at the start of the server tick.
 	 *
 	 * @param event The event.
 	 */
 	@SubscribeEvent
-	public void onServerTick(TickEvent.ServerTickEvent event) {
+	public void onServerTickStart(ServerTickEvent.Pre event) {
 		// Record server tick.
-		if (this.mc_collector != null && event.side == LogicalSide.SERVER) {
-			if (event.phase == TickEvent.Phase.START) {
-				this.mc_collector.startServerTick();
-			} else if (event.phase == TickEvent.Phase.END) {
-				this.mc_collector.stopServerTick();
-			}
+		if (this.mc_collector != null) {
+			this.mc_collector.startServerTick();
+		}
+	}
+
+	/**
+	 * Called at the end of the server tick.
+	 *
+	 * @param event The event.
+	 */
+	@SubscribeEvent
+	public void onServerTickStop(ServerTickEvent.Post event) {
+		// Record server tick.
+		if (this.mc_collector != null) {
+			this.mc_collector.stopServerTick();
 		}
 	}
 }

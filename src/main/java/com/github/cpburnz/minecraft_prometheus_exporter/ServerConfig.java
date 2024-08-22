@@ -112,7 +112,7 @@ public class ServerConfig {
 	 * Register the server-side config with Forge.
 	 */
 	public void register() {
-		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, this.forge_spec);
+		ModLoadingContext.get().getActiveContainer().registerConfig(ModConfig.Type.SERVER, this.forge_spec);
 	}
 
 	/**
