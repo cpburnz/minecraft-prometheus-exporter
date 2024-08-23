@@ -48,20 +48,20 @@ runs {
 		systemProperty 'forge.logging.console.level', 'debug'
 
 		modSource project.sourceSets.main
-	}
-
-	client {
-		// Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-		systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
 
 		dependencies {
-			// Every shadowed dependency has to be relisted here for the runClient
-			// command to work.
+			// Every shadowed dependency has to be relisted here for the runClient and
+			// runServer commands to work.
 			runtime group: 'io.prometheus', name: 'simpleclient', version: '0.16.0'
 			runtime group: 'io.prometheus', name: 'simpleclient_common', version: '0.16.0'
 			runtime group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.16.0'
 			runtime group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.16.0'
 		}
+	}
+
+	client {
+		// Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+		systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
 	}
 
 	server {
