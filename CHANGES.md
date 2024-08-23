@@ -2,7 +2,7 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.20.6 with NeoForge 20.6.0 (TBD)
+1.2.1 for Minecraft 1.20.6 with NeoForge 20.6.0 (2024-08-22)
 ------------------------------------------------------------
 
 New features:
