@@ -36,13 +36,8 @@ displayName="${mod_name}" #mandatory
 displayURL="${mod_url}" #optional
 
 # A file name (in the root of the mod JAR) containing a logo for display
-#
-# WARNING: The logo crashes NeoForge:
-#
-#     java.lang.IllegalArgumentException: Illegal segment Prometheus_Exporter.png in path [Prometheus_Exporter.png]
-#             at TRANSFORMER/minecraft@1.20.6/net.minecraft.FileUtil.validatePath(FileUtil.java:175) ~[neoforge-20.6.119.jar%23194!/:?] {re:classloading}
-#
-#logoFile="${mod_logo_file}" #optional
+# - WARNING: No uppercase letters.
+logoFile="${mod_logo_file}" #optional
 
 # A text field displayed in the mod UI
 #credits="" #optional
