@@ -24,4 +24,3 @@
 	#The TCP port to listen on. Ports 1-1023 will not work unless Minecraft is run as root which is not recommended.
 	#Range: 0 ~ 65535
 	listen_port = 19565
-

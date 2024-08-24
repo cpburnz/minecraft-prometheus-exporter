@@ -2,15 +2,7 @@ Change History
 ==============
 
 
-1.2.2 for Minecraft 1.20.6 with NeoForge 20.6.0 (TBD)
-------------------------------------------------------------
-
-Bug fixes:
-
-- Fix logo image.
-
-
-1.2.1 for Minecraft 1.20.6 with NeoForge 20.6.0 (2024-08-22)
+1.2.1 for Minecraft 1.20.6 with NeoForge 21.1.0 (2024-08-23)
 ------------------------------------------------------------
 
 New features:
@@ -22,7 +14,7 @@ Bug fixes:
 - Prevent possible crash on bad start-up.
 
 
-1.2.0 for Minecraft 1.20.6 with NeoForge 20.6.0 (Unreleased)
+1.2.0 for Minecraft 1.20.6 with NeoForge 21.1.0 (Unreleased)
 ------------------------------------------------------------
 
 New features:
@@ -40,7 +32,7 @@ Miscellaneous:
 - Minor documentation.
 
 
-1.1.0 for Minecraft 1.20.6 with NeoForge 20.6.0 (Unreleased)
+1.1.0 for Minecraft 1.20.6 with NeoForge 21.1.0 (Unreleased)
 ------------------------------------------------------------
 
 New features:
