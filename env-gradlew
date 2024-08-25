@@ -17,7 +17,7 @@ set +a
 
 # Verify Gradle wrapper JAR.
 # - See <https://gradle.org/release-checksums/>.
-sha256sum --quiet -c "$home_dir/gradle-wrapper-v8.1.sha256"
+sha256sum --quiet -c "$home_dir/gradle-wrapper-v8.8.sha256"
 
 # Run Gradle.
 "$home_dir/gradlew" "$@"

@@ -5,23 +5,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nullable;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.Histogram;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The MinecraftCollector class collects stats from the Minecraft server for
@@ -66,7 +65,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 * ticks in multiple threads. However, some mods do for their custom
 	 * dimensions (e.g., Vault Hunters).</p>
 	 */
-	private final ConcurrentHashMap<ResourceKey<Level>, Histogram.Timer> dim_tick_timers;
+	private final ConcurrentHashMap<RegistryKey<World>, Histogram.Timer> dim_tick_timers;
 
 	/**
 	 * The Minecraft server.
@@ -161,11 +160,11 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 */
 	private GaugeMetricFamily collectDimensionChunksLoaded() {
 		GaugeMetricFamily metric = newDimensionChunksLoadedMetric();
-		for (ServerLevel world : this.mc_server.getAllLevels()) {
-			ResourceKey<Level> dim = world.dimension();
-			String id_str = Integer.toString(getDimensionId(dim));
-			String name = dim.location().getPath();
-			int loaded = world.getChunkSource().getLoadedChunksCount();
+		for (ServerWorld world : this.mc_server.getWorlds()) {
+			RegistryKey<World> dim_key = world.getRegistryKey();
+			String id_str = Integer.toString(getDimensionId(dim_key));
+			String name = getDimensionName(dim_key);
+			int loaded = world.getChunkManager().getLoadedChunkCount();
 			metric.addMetric(List.of(id_str, name), loaded);
 		}
 		return metric;
@@ -179,15 +178,15 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	private GaugeMetricFamily collectEntitiesTotal() {
 		// Aggregate stats.
 		HashMap<EntityKey, Integer> entity_totals = new HashMap<>();
-		for (ServerLevel world : this.mc_server.getAllLevels()) {
+		for (ServerWorld world : this.mc_server.getWorlds()) {
 			// Get dimension info.
-			ResourceKey<Level> dim_resource = world.dimension();
-			int dim_id = getDimensionId(dim_resource);
-			String dim = dim_resource.location().getPath();
+			RegistryKey<World> dim_key = world.getRegistryKey();
+			int dim_id = getDimensionId(dim_key);
+			String dim_name = getDimensionName(dim_key);
 
 			// Get entity info.
-			for (Entity entity : world.getAllEntities()) {
-				if (!(entity instanceof Player)) {
+			for (Entity entity : world.iterateEntities()) {
+				if (!(entity instanceof ServerPlayerEntity)) {
 					// Get entity type.
 					String entity_type;
 					if (entity instanceof ItemEntity) {
@@ -197,7 +196,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 						entity_type = entity.getName().getString();
 					}
 
-					EntityKey entity_key = new EntityKey(dim, dim_id, entity_type);
+					EntityKey entity_key = new EntityKey(dim_name, dim_id, entity_type);
 					entity_totals.merge(entity_key, 1, Integer::sum);
 				}
 			}
@@ -223,7 +222,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 */
 	private GaugeMetricFamily collectPlayerList() {
 		GaugeMetricFamily metric = newPlayerListMetric();
-		for (ServerPlayer player : this.mc_server.getPlayerList().getPlayers()) {
+		for (ServerPlayerEntity player : this.mc_server.getPlayerManager().getPlayerList()) {
 			// Get player profile.
 			GameProfile profile = player.getGameProfile();
 
@@ -266,19 +265,31 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 * 0, 1), and the id of a custom dimension is now calculated from the
 	 * dimension name.</p>
 	 *
-	 * @param dim The dimension.
+	 * @param dim_key The dimension key.
+	 *
+	 * @return The dimension id.
 	 */
-	private static int getDimensionId(ResourceKey<Level> dim) {
-		if (dim.equals(Level.OVERWORLD)) {
+	private static int getDimensionId(RegistryKey<World> dim_key) {
+		if (dim_key.equals(World.OVERWORLD)) {
 			return 0;
-		} else if (dim.equals(Level.END)) {
+		} else if (dim_key.equals(World.END)) {
 			return 1;
-		} else if (dim.equals(Level.NETHER)) {
+		} else if (dim_key.equals(World.NETHER)) {
 			return -1;
 		} else {
-			String name = dim.location().getPath();
-			return name.hashCode();
+			return getDimensionName(dim_key).hashCode();
 		}
+	}
+
+	/**
+	 * Get the dimension name.
+	 *
+	 * @param dim_key The dimension key.
+	 *
+	 * @return The dimension name.
+	 */
+	private static String getDimensionName(RegistryKey<World> dim_key) {
+		return dim_key.getValue().getPath();
 	}
 
 	/**
@@ -321,16 +332,19 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	}
 
 	/**
-	 * Record when a dimension tick begins.
+	 * Record when a dimension (world) tick begins.
 	 *
-	 * @param dim The dimension.
+	 * @param world The world.
 	 */
-	public void startDimensionTick(ResourceKey<Level> dim) {
+	public void startDimensionTick(ServerWorld world) {
+		// Get dimension key.
+		RegistryKey<World> dim_key = world.getRegistryKey();
+
 		// Get dimension name.
-		String name = dim.location().getPath();
+		String name = getDimensionName(dim_key);
 
 		// Check for forgotten timer.
-		Histogram.Timer timer = this.dim_tick_timers.get(dim);
+		Histogram.Timer timer = this.dim_tick_timers.get(dim_key);
 		if (timer != null) {
 			switch (this.config.collector_mc_dimension_tick_errors) {
 				case IGNORE -> {}  // Ignore error.
@@ -349,9 +363,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		}
 
 		// Start timer for tick.
-		String id_str = Integer.toString(getDimensionId(dim));
+		String id_str = Integer.toString(getDimensionId(dim_key));
 		timer = this.dim_tick_seconds.labels(id_str, name).startTimer();
-		this.dim_tick_timers.put(dim, timer);
+		this.dim_tick_timers.put(dim_key, timer);
 	}
 
 	/**
@@ -368,16 +382,19 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	}
 
 	/**
-	 * Record when a dimension tick finishes.
+	 * Record when a dimension (world) tick finishes.
 	 *
-	 * @param dim The dimension.
+	 * @param world The world.
 	 */
-	public void stopDimensionTick(ResourceKey<Level> dim) {
+	public void stopDimensionTick(ServerWorld world) {
+		// Get dimension key.
+		RegistryKey<World> dim_key = world.getRegistryKey();
+
 		// Get dimension name.
-		String name = dim.location().getPath();
+		String name = getDimensionName(dim_key);
 
 		// Get active timer.
-		Histogram.Timer timer = this.dim_tick_timers.remove(dim);
+		Histogram.Timer timer = this.dim_tick_timers.remove(dim_key);
 		if (timer == null) {
 			switch (this.config.collector_mc_dimension_tick_errors) {
 				case IGNORE -> {}  // Ignore error.

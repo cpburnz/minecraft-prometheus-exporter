@@ -1,31 +1,34 @@
 package com.github.cpburnz.minecraft_prometheus_exporter;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
-import net.minecraft.resources.ResourceKey;
+import net.fabricmc.api.DedicatedServerModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.server.world.ServerWorld;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
-
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The PrometheusExporterMod class defines the mod.
  */
-@Mod(PrometheusExporterMod.MOD_ID)
-public class PrometheusExporterMod {
+public class PrometheusExporterMod implements
+	DedicatedServerModInitializer,
+	ServerLifecycleEvents.ServerStarted,
+	ServerLifecycleEvents.ServerStarting,
+	ServerLifecycleEvents.ServerStopped,
+	ServerTickEvents.EndTick,
+	ServerTickEvents.EndWorldTick,
+	ServerTickEvents.StartTick,
+	ServerTickEvents.StartWorldTick
+{
 
 	/**
 	 * The logger to use.
@@ -33,23 +36,21 @@ public class PrometheusExporterMod {
 	private static final Logger LOG = LogManager.getLogger();
 
 	/**
-	 * The mod id.
-	 */
-	public static final String MOD_ID = "prometheus_exporter";
-
-	/**
 	 * The HTTP server.
 	 */
+	@Nullable
 	private HTTPServer http_server;
 
 	/**
 	 * The Minecraft metrics collector.
 	 */
+	@Nullable
 	private MinecraftCollector mc_collector;
 
 	/**
 	 * The Minecraft server.
 	 */
+	@Nullable
 	private MinecraftServer mc_server;
 
 	/**
@@ -61,12 +62,7 @@ public class PrometheusExporterMod {
 	 * Construct the instance.
 	 */
 	public PrometheusExporterMod() {
-		// Register to receive events.
-		MinecraftForge.EVENT_BUS.register(this);
-
-		// Register the server config.
 		this.config = new ServerConfig();
-		this.config.register();
 	}
 
 	/**
@@ -121,48 +117,76 @@ public class PrometheusExporterMod {
 	}
 
 	/**
-	 * Called on a dimension tick.
+	 * Called at the end of the server tick.
 	 *
-	 * @param event The event.
+	 * @param server The server.
 	 */
-	@SubscribeEvent
-	public void onDimensionTick(TickEvent.LevelTickEvent event) {
-		// Record dimension tick.
-		if (this.mc_collector != null && event.side == LogicalSide.SERVER) {
-			ResourceKey<Level> dim = event.level.dimension();
-			if (event.phase == TickEvent.Phase.START) {
-				this.mc_collector.startDimensionTick(dim);
-			} else if (event.phase == TickEvent.Phase.END) {
-				this.mc_collector.stopDimensionTick(dim);
-			}
+	@Override
+	public void onEndTick(MinecraftServer server) {
+		// Record server tick.
+		if (this.mc_collector != null) {
+			this.mc_collector.stopServerTick();
 		}
 	}
 
 	/**
-	 * Called before the server begins loading anything.
+	 * Called at the end of a dimension (world) tick.
 	 *
-	 * @param event The event.
+	 * @param world The world.
 	 */
-	@SubscribeEvent
-	public void onServerAboutToStart(ServerAboutToStartEvent event) {
-		// NOTE: This appears to be the earliest event where Forge has loaded the
-		// server-side config.
-		this.config.loadValues();
+	@Override
+	public void onEndTick(ServerWorld world) {
+		// Record dimension tick.
+		if (this.mc_collector != null && !world.isClient()) {
+			this.mc_collector.stopDimensionTick(world);
+		}
+	}
+
+	/**
+	 * Runs the mod initializer on the server environment.
+	 */
+	@Override
+	public void onInitializeServer() {
+		// Register to receive events.
+		ServerLifecycleEvents.SERVER_STARTED.register(this);
+		ServerLifecycleEvents.SERVER_STARTING.register(this);
+		ServerLifecycleEvents.SERVER_STOPPED.register(this);
+		ServerTickEvents.END_SERVER_TICK.register(this);
+		ServerTickEvents.END_WORLD_TICK.register(this);
+		ServerTickEvents.START_SERVER_TICK.register(this);
+		ServerTickEvents.START_WORLD_TICK.register(this);
+	}
+
+	/**
+	 * Called when the server is starting.
+	 *
+	 * @param server The server.
+	 */
+	@Override
+	public void onServerStarting(MinecraftServer server) {
+		// Record the Minecraft server.
+		this.mc_server = server;
+
+		// Load the server config.
+		// - NOTICE: Fabric does not yet provide config file loading.
+		Path config_file;
+		this.config.loadFile(config_file);
 	}
 
 	/**
 	 * Called when the server has started.
 	 *
-	 * @param event The event.
-	 * @throws IOException
+	 * @param server The server.
 	 */
-	@SubscribeEvent
-	public void onServerStarted(ServerStartedEvent event) throws IOException {
-		// Record the Minecraft server.
-		this.mc_server = event.getServer();
-
+	@Override
+	public void onServerStarted(MinecraftServer server) {
 		// Initialize HTTP server.
-		this.initHttpServer();
+		try {
+			this.initHttpServer();
+		} catch (IOException e) {
+			LOG.error("Failed to initialize HTTP server.", e);
+			return;
+		}
 
 		// Initialize collectors.
 		this.initCollectors();
@@ -171,10 +195,10 @@ public class PrometheusExporterMod {
 	/**
 	 * Called when the server has stopped.
 	 *
-	 * @param event The event.
+	 * @param server The server.
 	 */
-	@SubscribeEvent
-	public void onServerStopped(ServerStoppedEvent event) {
+	@Override
+	public void onServerStopped(MinecraftServer server) {
 		// Unregister collectors.
 		this.closeCollectors();
 
@@ -183,19 +207,28 @@ public class PrometheusExporterMod {
 	}
 
 	/**
-	 * Called on the server tick.
+	 * Called at the start of the server tick.
 	 *
-	 * @param event The event.
+	 * @param server The server.
 	 */
-	@SubscribeEvent
-	public void onServerTick(TickEvent.ServerTickEvent event) {
+	@Override
+	public void onStartTick(MinecraftServer server) {
 		// Record server tick.
-		if (this.mc_collector != null && event.side == LogicalSide.SERVER) {
-			if (event.phase == TickEvent.Phase.START) {
-				this.mc_collector.startServerTick();
-			} else if (event.phase == TickEvent.Phase.END) {
-				this.mc_collector.stopServerTick();
-			}
+		if (this.mc_collector != null) {
+			this.mc_collector.startServerTick();
+		}
+	}
+
+	/**
+	 * Called at the start of a dimension (world) tick.
+	 *
+	 * @param world The world.
+	 */
+	@Override
+	public void onStartTick(ServerWorld world) {
+		// Record dimension tick.
+		if (this.mc_collector != null && !world.isClient()) {
+			this.mc_collector.startDimensionTick(world);
 		}
 	}
 }
