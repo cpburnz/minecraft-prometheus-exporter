@@ -1,17 +1,17 @@
 package com.github.cpburnz.minecraft_prometheus_exporter;
 
+import java.nio.file.Path;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.EnumGetMethod;
-import com.electronwill.nightconfig.core.UnmodifiableCommentedConfig;
-import com.electronwill.nightconfig.core.file.FileConfig;
-import com.electronwill.nightconfig.core.file.FileNotFoundAction;
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-
-import java.nio.file.Path;
 
 /**
  * The ServerConfig class defines the server-side mod config. This is used to
@@ -46,7 +46,7 @@ public class ServerConfig {
 	public boolean collector_mc_entities;
 
 	/**
-	 * The server-side config specifications.
+	 * The internal server-side config specifications.
 	 */
 	private final InternalSpec internal_spec;
 
@@ -75,7 +75,6 @@ public class ServerConfig {
 	/**
 	 * @return Whether the config is loaded.
 	 */
-	@SuppressWarnings("unused")
 	public boolean isLoaded() {
 		return this.is_loaded;
 	}
@@ -94,8 +93,11 @@ public class ServerConfig {
 	 * Load the values from the server-side config.
 	 */
 	private void loadValues() {
+		// Get loaded config.
+		assert this.internal_spec.config != null;
+		UnmodifiableConfig config = this.internal_spec.config.unmodifiable();
+
 		// Get config values.
-		UnmodifiableCommentedConfig config = this.internal_spec.config;
 		this.collector_jvm = config.get("collector.jvm");
 		this.collector_mc = config.get("collector.mc");
 		this.collector_mc_dimension_tick_errors = config.get(
@@ -104,9 +106,6 @@ public class ServerConfig {
 		this.collector_mc_entities = config.get("collector.mc_entities");
 		this.web_listen_address = config.get("web.listen_address");
 		this.web_listen_port = config.get("web.listen_port");
-
-		// Record that the config is loaded.
-		this.is_loaded = true;
 
 		LOG.debug("collector.jvm: {}", this.collector_jvm);
 		LOG.debug("collector.mc: {}", this.collector_mc);
@@ -117,11 +116,15 @@ public class ServerConfig {
 		LOG.debug("collector.mc_entities: {}", this.collector_mc_entities);
 		LOG.debug("web.listen_address: {}", this.web_listen_address);
 		LOG.debug("web.listen_port: {}", this.web_listen_port);
+
+		// Record that the config is loaded.
+		this.is_loaded = true;
 	}
 
 	/**
-	 * The InternalSpec class is used to define the server-side Forge config
-	 * specifications.
+	 * The InternalSpec class is used to define the server-side config
+	 * specifications. Fabric does not yet provide config file loading, so this
+	 * class handles it.
 	 */
 	private static class InternalSpec {
 
@@ -152,7 +155,7 @@ public class ServerConfig {
 		 * The loaded config.
 		 */
 		@Nullable
-		private UnmodifiableCommentedConfig config;
+		private CommentedConfig config;
 
 		/**
 		 * The config specification.
@@ -167,90 +170,38 @@ public class ServerConfig {
 		}
 
 		/**
-		 * Add comments to the config.
-		 *
-		 * @param config The config.
-		 */
-		private static void addComments(CommentedConfig config) {
-			config.setComment("collector", "Collector settings.");
-
-			config.setComment(
-				"collector.jvm",
-				"Enable collecting metrics about the JVM process."
-			);
-
-			config.setComment(
-				"collector.mc",
-				"Enable collecting metrics about the Minecraft server."
-			);
-
-			config.setComment(
-				"collector.mc_dimension_tick_errors",
-				(
-					"Configure how to handle dimension (world) tick errors. Some mods "
-					+ "handle the tick events for their custom dimensions, and may not "
-					+ "reliably start and stop ticks as expected.\n"
-					+ "  IGNORE: Ignore tick errors. If a mod really botches tick events, "
-					+ "it could emit up to 20 log statements per second for each "
-					+ "dimension. This would cause large ballooning of the \"logs/debug.txt\" "
-					+ "file. Use this setting, or figure out how to filter out DEBUG "
-					+ "messages for \"com.github.cpburnz.minecraft_prometheus_exporter.MinecraftCollector/\" "
-					+ "in \"log4j2.xml\".\n"
-					+ "  LOG: Log tick errors. This is the new default.\n"
-					+ "  STRICT: Raise an exception on tick error. This will crash the "
-					+ "server if an error occurs."
-				)
-			);
-
-			config.setComment(
-				"collector.mc_entities",
-				"Enable collecting metrics about the entities in each dimension (world)."
-			);
-
-			config.setComment("web", "Web server settings.");
-
-			config.setComment(
-				"web.listen_address",
-				(
-					"The IP address to listen on. To only allow connections from the local "
-					+ "machine, use \"127.0.0.1\". To allow connections from remote "
-					+ "machines, use \"0.0.0.0\"."
-				)
-			);
-
-			config.setComment(
-				"web.listen_port",
-				(
-					"The TCP port to listen on. Ports 1-1023 will not work unless "
-					+ "Minecraft is run as root which is not recommended."
-				)
-			);
-		}
-
-		/**
 		 * Load the config.
 		 *
 		 * @param file The config file path.
 		 */
 		public void loadFile(Path file) {
-			// TODO: Load config file.
-			// TODO: Config class must support comments.
-			try (FileConfig config = FileConfig.of(file, TomlFormat.instance())) {
-				this.config = TomlFormat.instance().createParser().parse(file, FileNotFoundAction.READ_NOTHING);
+			LOG.debug("Load config file {}.", file);
+			try (
+				CommentedFileConfig config = CommentedFileConfig
+					.builder(file, TomlFormat.instance())
+					.sync()
+					.build()
+					.checked()
+			) {
+				this.config = config;
+
+				// Load config.
+				config.load();
 
 				// Correct config from spec.
-				this.spec.correct(config, ((action, path, bad_value, new_value) -> {
+				int changes = this.spec.correct(config, ((_action, path, bad_value, new_value) -> {
 					String name = String.join(".", path);
 					LOG.debug("Corrected {} from {} to {}.", name, bad_value, new_value);
 				}));
 
-				// Add comments to config.
-				addComments(config);
+				// Set comments on config.
+				changes += this.setComments();
 
-				// TODO: Save config if there are changes.
-
-
-				this.config = config.unmodifiable();
+				// Save config if there are any changes.
+				if (changes > 0) {
+					LOG.debug("Save config file {}.", file);
+					config.save();
+				}
 			}
 		}
 
@@ -276,8 +227,85 @@ public class ServerConfig {
 			return spec;
 		}
 
-	}
+		/**
+		 * Set the comment on a config field.
+		 *
+		 * @param path The field path.
+		 * @param comment The comment.
+		 *
+		 * @return Whether the comment was changed.
+		 */
+		private int setComment(String path, String comment) {
+			assert this.config != null;
+			@Nullable String old = this.config.setComment(path, comment);
+			return comment.equals(old) ? 0 : 1;
+		}
 
+		/**
+		 * Set the comments on the config.
+		 *
+		 * @return The number of changed comments.
+		 */
+		private int setComments() {
+			int changes = 0;
+
+			changes += this.setComment("collector", "Collector settings.");
+
+			changes += this.setComment(
+				"collector.jvm",
+				"Enable collecting metrics about the JVM process."
+			);
+
+			changes += this.setComment(
+				"collector.mc",
+				"Enable collecting metrics about the Minecraft server."
+			);
+
+			changes += this.setComment(
+				"collector.mc_dimension_tick_errors",
+				(
+					"Configure how to handle dimension (world) tick errors. Some mods "
+					+ "handle the tick events for their custom dimensions, and may not "
+					+ "reliably start and stop ticks as expected.\n"
+					+ "  IGNORE: Ignore tick errors. If a mod really botches tick events, "
+					+ "it could emit up to 20 log statements per second for each "
+					+ "dimension. This would cause large ballooning of the \"logs/debug.txt\" "
+					+ "file. Use this setting, or figure out how to filter out DEBUG "
+					+ "messages for \"com.github.cpburnz.minecraft_prometheus_exporter.MinecraftCollector/\" "
+					+ "in \"log4j2.xml\".\n"
+					+ "  LOG: Log tick errors. This is the new default.\n"
+					+ "  STRICT: Raise an exception on tick error. This will crash the "
+					+ "server if an error occurs."
+				)
+			);
+
+			changes += this.setComment(
+				"collector.mc_entities",
+				"Enable collecting metrics about the entities in each dimension (world)."
+			);
+
+			changes += this.setComment("web", "Web server settings.");
+
+			changes += this.setComment(
+				"web.listen_address",
+				(
+					"The IP address to listen on. To only allow connections from the local "
+					+ "machine, use \"127.0.0.1\". To allow connections from remote "
+					+ "machines, use \"0.0.0.0\"."
+				)
+			);
+
+			changes += this.setComment(
+				"web.listen_port",
+				(
+					"The TCP port to listen on. Ports 1-1023 will not work unless "
+					+ "Minecraft is run as root which is not recommended."
+				)
+			);
+
+			return changes;
+		}
+	}
 
 	/**
 	 * The TickErrorPolicy enum defines how to handle dimension (world) tick event

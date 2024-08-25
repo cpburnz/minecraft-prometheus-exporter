@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.WorldSavePath;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -117,6 +118,25 @@ public class PrometheusExporterMod implements
 	}
 
 	/**
+	 * Load the server-side config.
+	 */
+	private void loadConfig() {
+		// Get config file path.
+		assert this.mc_server != null;
+		Path server_dir = this.mc_server.getSavePath(WorldSavePath.ROOT);
+		Path config_file = server_dir.resolve(Path.of(
+			"serverconfig", "prometheus_exporter-server.toml"
+		));
+
+		// Load config.
+		try {
+			this.config.loadFile(config_file);
+		} catch (Exception e) {
+			LOG.error("Failed to load config file {}.", config_file, e);
+		}
+	}
+
+	/**
 	 * Called at the end of the server tick.
 	 *
 	 * @param server The server.
@@ -169,8 +189,7 @@ public class PrometheusExporterMod implements
 
 		// Load the server config.
 		// - NOTICE: Fabric does not yet provide config file loading.
-		Path config_file;
-		this.config.loadFile(config_file);
+		this.loadConfig();
 	}
 
 	/**
@@ -180,6 +199,11 @@ public class PrometheusExporterMod implements
 	 */
 	@Override
 	public void onServerStarted(MinecraftServer server) {
+		if (!this.config.isLoaded()) {
+			// Config failed to load, do not start HTTP server or collectors.
+			return;
+		}
+
 		// Initialize HTTP server.
 		try {
 			this.initHttpServer();
