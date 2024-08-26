@@ -58,10 +58,10 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// Annotation dependency.
-	implementation 'org.jetbrains:annotations:24.1.0'
+	compileOnly 'org.jetbrains:annotations:24.1.0'
 
 	// Config dependency.
-	implementation 'com.electronwill.night-config:toml:3.8.1'
+	compileAndShadow 'com.electronwill.night-config:toml:3.8.1'
 
 	// Prometheus dependencies.
 	compileAndShadow 'io.prometheus:simpleclient:0.16.0'
