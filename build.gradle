@@ -1,4 +1,7 @@
 plugins {
+	// Java Library plugin.
+	id 'java-library'
+
 	// Eclipse plugin (makes life easier using Eclipse).
 	id 'eclipse'
 
@@ -41,11 +44,15 @@ loom {
 }
 
 configurations {
-	// Create the `compileAndShadow` group to be both compile time dependencies
-	// and shadow dependencies (bundle via Shadow Jar).
-	compileAndShadow
-	compile.extendsFrom compileAndShadow
-	shadow.extendsFrom compileAndShadow
+	// Create the `shadowImplementation` group to be both implementation
+	// dependencies and shadow dependencies (bundle via Shadow Jar).
+	shadowImplementation
+	implementation.extendsFrom shadowImplementation
+	shadow.extendsFrom shadowImplementation
+
+	// The `testImplementation` group needs to be aware of the shadowed
+	// dependencies while testing.
+	testImplementation.extendsFrom shadowImplementation
 }
 
 dependencies {
@@ -58,15 +65,15 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// Annotation dependency.
-	compileOnly 'org.jetbrains:annotations:24.1.0'
+	annotationProcessor 'org.jetbrains:annotations:24.1.0'
 
 	// Config dependency.
-	compileAndShadow 'com.electronwill.night-config:toml:3.8.1'
+	shadowImplementation 'com.electronwill.night-config:toml:3.8.1'
 
 	// Prometheus dependencies.
-	compileAndShadow 'io.prometheus:simpleclient:0.16.0'
-	compileAndShadow 'io.prometheus:simpleclient_httpserver:0.16.0'
-	compileAndShadow 'io.prometheus:simpleclient_hotspot:0.16.0'
+	shadowImplementation 'io.prometheus:simpleclient:0.16.0'
+	shadowImplementation 'io.prometheus:simpleclient_httpserver:0.16.0'
+	shadowImplementation 'io.prometheus:simpleclient_hotspot:0.16.0'
 }
 
 // Expand variables in resource files.
@@ -112,14 +119,15 @@ tasks.named('jar', Jar).configure {
 }
 
 // Configure Shadow Jar.
-tasks.named('shadowJar').configure {
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
+tasks.named('shadowJar', ShadowJar).configure {
 	// Remove JAR suffix.
 	archiveAppendix = tasks.jar.archiveAppendix
 	archiveClassifier = tasks.jar.archiveClassifier
 
 	// Relocate shadowed dependencies.
 	enableRelocation = true
-	relocationPrefix = "${mod_package}.vendors"
+	relocationPrefix = "${mod_package}.vendor"
 
 	// Only bundle dependencies explicitly marked to shadow.
 	configurations = [project.configurations.shadow]

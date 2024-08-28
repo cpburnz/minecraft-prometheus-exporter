@@ -100,8 +100,10 @@ public class ServerConfig {
 		// Get config values.
 		this.collector_jvm = config.get("collector.jvm");
 		this.collector_mc = config.get("collector.mc");
-		this.collector_mc_dimension_tick_errors = config.get(
-			"collector.mc_dimension_tick_errors"
+		this.collector_mc_dimension_tick_errors = config.getEnum(
+			"collector.mc_dimension_tick_errors",
+			TickErrorPolicy.class,
+			EnumGetMethod.NAME
 		);
 		this.collector_mc_entities = config.get("collector.mc_entities");
 		this.web_listen_address = config.get("web.listen_address");
@@ -116,6 +118,9 @@ public class ServerConfig {
 		LOG.debug("collector.mc_entities: {}", this.collector_mc_entities);
 		LOG.debug("web.listen_address: {}", this.web_listen_address);
 		LOG.debug("web.listen_port: {}", this.web_listen_port);
+
+		assert this.collector_mc_dimension_tick_errors != null;
+		assert this.web_listen_address != null;
 
 		// Record that the config is loaded.
 		this.is_loaded = true;
@@ -194,6 +199,24 @@ public class ServerConfig {
 					LOG.debug("Corrected {} from {} to {}.", name, bad_value, new_value);
 				}));
 
+				// BUG: NightConfig is not correcting enums for some strange reason.
+				@Nullable TickErrorPolicy tick_errors = config.getEnum(
+					"collector.mc_dimension_tick_errors",
+					TickErrorPolicy.class,
+					EnumGetMethod.NAME
+				);
+				if (tick_errors == null) {
+					tick_errors = TickErrorPolicy.LOG;
+					config.set("collector.mc_dimension_tick_errors", tick_errors);
+					changes += 1;
+					LOG.debug(
+						"Corrected {} from {} to {}.",
+						"collector.mc_dimension_tick_errors",
+						null,
+						tick_errors
+					);
+				}
+
 				// Set comments on config.
 				changes += this.setComments();
 
@@ -215,6 +238,7 @@ public class ServerConfig {
 
 			spec.define("collector.jvm", true);
 			spec.define("collector.mc", true);
+			// BUG: NightConfig is not correcting enums for some strange reason.
 			spec.defineEnum(
 				"collector.mc_dimension_tick_errors",
 				TickErrorPolicy.LOG,

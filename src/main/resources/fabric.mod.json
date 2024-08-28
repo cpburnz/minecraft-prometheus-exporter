@@ -14,7 +14,7 @@
 	},
 	"license": "MIT",
 	"icon": "assets/${mod_id}/icon.png",
-	"environment": "server",
+	"environment": "*",
 	"entrypoints": {
 		"server": [
 			"${mod_package}.PrometheusExporterMod"

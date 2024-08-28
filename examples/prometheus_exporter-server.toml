@@ -2,6 +2,13 @@
 # *world/serverconfig/prometheus_exporter-server.toml*. It will be
 # automatically generated upon server start if it does not already exist.
 
+#Web server settings.
+[web]
+	#The TCP port to listen on. Ports 1-1023 will not work unless Minecraft is run as root which is not recommended.
+	listen_port = 19565
+	#The IP address to listen on. To only allow connections from the local machine, use "127.0.0.1". To allow connections from remote machines, use "0.0.0.0".
+	listen_address = "0.0.0.0"
+
 #Collector settings.
 [collector]
 	#Enable collecting metrics about the JVM process.
@@ -12,15 +19,6 @@
 	#  IGNORE: Ignore tick errors. If a mod really botches tick events, it could emit up to 20 log statements per second for each dimension. This would cause large ballooning of the "logs/debug.txt" file. Use this setting, or figure out how to filter out DEBUG messages for "com.github.cpburnz.minecraft_prometheus_exporter.MinecraftCollector/" in "log4j2.xml".
 	#  LOG: Log tick errors. This is the new default.
 	#  STRICT: Raise an exception on tick error. This will crash the server if an error occurs.
-	#Allowed Values: IGNORE, LOG, STRICT
 	mc_dimension_tick_errors = "LOG"
 	#Enable collecting metrics about the entities in each dimension (world).
 	mc_entities = true
-
-#Web server settings.
-[web]
-	#The IP address to listen on. To only allow connections from the local machine, use "127.0.0.1". To allow connections from remote machines, use "0.0.0.0".
-	listen_address = "0.0.0.0"
-	#The TCP port to listen on. Ports 1-1023 will not work unless Minecraft is run as root which is not recommended.
-	#Range: 0 ~ 65535
-	listen_port = 19565

@@ -1,6 +1,8 @@
 package com.github.cpburnz.minecraft_prometheus_exporter;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import net.fabricmc.api.DedicatedServerModInitializer;
@@ -124,9 +126,17 @@ public class PrometheusExporterMod implements
 		// Get config file path.
 		assert this.mc_server != null;
 		Path server_dir = this.mc_server.getSavePath(WorldSavePath.ROOT);
-		Path config_file = server_dir.resolve(Path.of(
-			"serverconfig", "prometheus_exporter-server.toml"
-		));
+		Path config_dir = server_dir.resolve("serverconfig");
+		Path config_file = config_dir.resolve("prometheus_exporter-server.toml");
+
+		// Create the config directory if it does not exist.
+		try {
+			Files.createDirectory(config_dir);
+		} catch (FileAlreadyExistsException e) {
+			// Directory already exists.
+		} catch (Exception e) {
+			LOG.error("Failed to create config directory {}.", config_dir, e);
+		}
 
 		// Load config.
 		try {
