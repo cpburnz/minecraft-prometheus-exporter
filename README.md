@@ -4,23 +4,26 @@ systems monitoring toolkit, [Prometheus]. The mod is intended for server-side
 use, and does not need to be installed client-side. This currently has builds
 for the following versions:
 
-- Minecraft 1.21.1 with Forge 52.0.0.
-- Minecraft 1.21.1 with NeoForge 21.1.0.
-- Minecraft 1.20.6 with Forge 50.1.0.
-- Minecraft 1.20.6 with NeoForge 20.6.0.
-- Minecraft 1.20.4 with Forge 49.1.0.
-- Minecraft 1.20.4 with NeoForge 20.4.0.
-- Minecraft 1.20.2 with Forge 48.1.0.
-- Minecraft 1.20.1 with Forge 47.1.0.
-- Minecraft 1.19.3 with Forge 44.1.0.
-- Minecraft 1.19.2 with Forge 43.0.0.
-- Minecraft 1.18.2 with Forge 40.2.0.
-- Minecraft 1.18.1 with Forge 39.0.0.
-- Minecraft 1.16.5 with Forge 36.2.0.
-- Minecraft 1.15.2 with Forge 21.2.0.
-- Minecraft 1.14.4 with Forge 28.1.0.
-- Minecraft 1.12.2 with Forge 14.23.0.
-- Minecraft 1.7.10 with Forge 10.13.4.
+- [Minecraft 1.21.1 with Forge 52.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.21.1-forge-1.2.1).
+- [Minecraft 1.21.1 with NeoForge 21.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.21.1-neoforge-1.2.1).
+- [Minecraft 1.20.6 with Forge 50.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.6-forge-1.2.1).
+- [Minecraft 1.20.6 with NeoForge 20.6.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.6-neoforge-1.2.1).
+- [Minecraft 1.20.4 with Forge 49.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.4-forge-1.2.1).
+- [Minecraft 1.20.4 with NeoForge 20.4.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.4-neoforge-1.2.1).
+- [Minecraft 1.20.2 with Forge 48.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.2-forge-1.2.1).
+- [Minecraft 1.20.1 with Forge 47.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.1-forge-1.0.0).
+- [Minecraft 1.19.3 with Forge 44.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.19.3-forge-1.0.0).
+- [Minecraft 1.19.2 with Forge 43.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.19.2-forge-1.0.0).
+- [Minecraft 1.18.2 with Forge 40.2.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.18.2-forge-1.2.0).
+- [Minecraft 1.18.1 with Forge 39.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.18.1-forge-1.0.0).
+- [Minecraft 1.16.5 with Forge 36.2.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.16.5-forge-1.0.0).
+- [Minecraft 1.12.2 with Forge 14.23.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.12.2-forge-1.0.0)
+- [Minecraft 1.7.10 with Forge 10.13.4](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.7.10-forge-1.1.0).
+
+# The below releases do not exist!
+- [Minecraft 1.15.2 with Forge 21.2.0].
+- [Minecraft 1.14.4 with Forge 28.1.0].
+
 
 Is there a newer version of Minecraft not listed? Is the mod outdated for one of
 the listed Minecraft versions? Let me know by opening an [issue on GitHub].
