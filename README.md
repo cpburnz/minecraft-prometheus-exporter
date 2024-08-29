@@ -19,7 +19,7 @@ for the following versions:
 - [Minecraft 1.16.5 with Forge 36.2.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.16.5-forge-1.0.0).
 - [Minecraft 1.15.2 with Forge 21.2.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/v0.3.1).
 - [Minecraft 1.14.4 with Forge 28.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/v0.3.0).
-- [Minecraft 1.12.2 with Forge 14.23.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.12.2-forge-1.0.0)
+- [Minecraft 1.12.2 with Forge 14.23.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.12.2-forge-1.0.0).
 - [Minecraft 1.7.10 with Forge 10.13.4](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.7.10-forge-1.1.0).
 
 Is there a newer version of Minecraft not listed? Is the mod outdated for one of
