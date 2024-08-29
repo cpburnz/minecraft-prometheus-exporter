@@ -2,7 +2,7 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.21.1 with Fabric 0.100.0 (TBD)
+1.2.1 for Minecraft 1.21.1 with Fabric 0.103.0 (2024-08-28)
 -----------------------------------------------------------
 
 New features:
@@ -14,7 +14,7 @@ Bug fixes:
 - Prevent possible crash on bad start-up.
 
 
-1.2.0 for Minecraft 1.21.1 with Fabric 0.100.0 (Unreleased)
+1.2.0 for Minecraft 1.21.1 with Fabric 0.103.0 (Unreleased)
 -----------------------------------------------------------
 
 New features:
@@ -27,12 +27,8 @@ Bug fixes:
 - Support inconsistent dimension ticks from misbehaved mods.
 - Support multithreaded dimension ticks.
 
-Miscellaneous:
 
-- Minor documentation.
-
-
-1.1.0 for Minecraft 1.21.1 with Fabric 0.100.0 (Unreleased)
+1.1.0 for Minecraft 1.21.1 with Fabric 0.103.0 (Unreleased)
 -----------------------------------------------------------
 
 New features:

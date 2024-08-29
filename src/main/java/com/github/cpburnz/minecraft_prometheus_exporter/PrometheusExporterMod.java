@@ -5,7 +5,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import net.fabricmc.api.DedicatedServerModInitializer;
+import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
  * The PrometheusExporterMod class defines the mod.
  */
 public class PrometheusExporterMod implements
-	DedicatedServerModInitializer,
+	ModInitializer,
 	ServerLifecycleEvents.ServerStarted,
 	ServerLifecycleEvents.ServerStarting,
 	ServerLifecycleEvents.ServerStopped,
@@ -173,10 +173,10 @@ public class PrometheusExporterMod implements
 	}
 
 	/**
-	 * Runs the mod initializer on the server environment.
+	 * Runs the mod initializer.
 	 */
 	@Override
-	public void onInitializeServer() {
+	public void onInitialize() {
 		// Register to receive events.
 		ServerLifecycleEvents.SERVER_STARTED.register(this);
 		ServerLifecycleEvents.SERVER_STARTING.register(this);

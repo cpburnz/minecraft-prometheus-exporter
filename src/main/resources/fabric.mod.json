@@ -16,14 +16,14 @@
 	"icon": "assets/${mod_id}/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"server": [
+		"main": [
 			"${mod_package}.PrometheusExporterMod"
 		]
 	},
 	"depends": {
 		"fabric-api": "*",
-		"fabricloader": ">=${loader_version}",
-		"java": ">=21",
-		"minecraft": "~${minecraft_version}"
+		"fabricloader": "${loader_version_range}",
+		"java": "${java_version_range}",
+		"minecraft": "${minecraft_version_range}"
 	}
 }

@@ -79,9 +79,9 @@ dependencies {
 // Expand variables in resource files.
 processResources {
 	var replaceProperties = [
-		fabric_version: fabric_version,
-		loader_version: loader_version,
-		minecraft_version: minecraft_version,
+		java_version_range: java_version_range,
+		loader_version_range: loader_version_range,
+		minecraft_version_range: minecraft_version_range,
 		mod_authors: mod_authors,
 		mod_id: mod_id,
 		mod_name: mod_name,
@@ -114,8 +114,8 @@ tasks.named('jar', Jar).configure {
 		])
 	}
 
-	// This is the preferred method to reobfuscate/finalize your jar file.
-	finalizedBy 'shadowJar'
+	// This is the preferred method to finalize your jar file.
+	finalizedBy 'remapJar'
 }
 
 // Configure Shadow Jar.
@@ -136,8 +136,17 @@ tasks.named('shadowJar', ShadowJar).configure {
 	minimize()
 }
 
-tasks.shadowJar.dependsOn tasks.jar
-tasks.assemble.dependsOn tasks.shadowJar
+// Remap the Shadow Jar because the Minecraft classes must be obfuscated.
+import net.fabricmc.loom.task.RemapJarTask;
+tasks.named('remapJar', RemapJarTask).configure {
+	// Include the Minecraft version in the JAR name.
+	archiveAppendix = jar.archiveAppendix
+
+	// Remap the Shadow Jar.
+	inputFile = shadowJar.archiveFile
+}
+
+tasks.remapJar.dependsOn tasks.shadowJar
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation

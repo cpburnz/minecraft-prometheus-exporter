@@ -4,7 +4,7 @@ systems monitoring toolkit, [Prometheus]. The mod is intended for server-side
 use, and does not need to be installed client-side. This currently has builds
 for the following versions:
 
-- Minecraft 1.21.1 with Fabric 0.100.0.
+- Minecraft 1.21.1 with Fabric 0.103.0.
 - Minecraft 1.21.1 with Forge 52.0.0.
 - Minecraft 1.21.1 with NeoForge 21.1.0.
 - Minecraft 1.20.6 with Forge 50.1.0.
@@ -63,7 +63,7 @@ Known compatible Grafana dashboards are listed in [dashboards.md].
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
 [Prometheus]: https://prometheus.io/
-[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.1-fabric/dashboards.md
+[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/master/dashboards.md
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
 [metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.1-fabric/metrics.md
 [output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.1-fabric/examples/output.txt

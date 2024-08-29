@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
+import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.EnumGetMethod;
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
@@ -195,8 +196,10 @@ public class ServerConfig {
 
 				// Correct config from spec.
 				int changes = this.spec.correct(config, ((_action, path, bad_value, new_value) -> {
-					String name = String.join(".", path);
-					LOG.debug("Corrected {} from {} to {}.", name, bad_value, new_value);
+					if (!(new_value instanceof Config)) {
+						String name = String.join(".", path);
+						LOG.debug("Corrected {} from {} to {}.", name, bad_value, new_value);
+					}
 				}));
 
 				// BUG: NightConfig is not correcting enums for some strange reason.
