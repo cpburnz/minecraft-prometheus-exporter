@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# This is a tiny wrapper to load the environment variables from ".env" before
+# running "gradlew". This makes using the correct version of Java easier.
+#
+
+# Exit on error.
+set -e
+
+# Get project directory.
+home_dir="$(cd "$(dirname "$0")" && pwd)"
+
+# Load ".env".
+set -a
+. "$home_dir/.env"
+set +a
+
+# Verify Gradle wrapper JAR.
+# - See <https://gradle.org/release-checksums/>.
+sha256sum --quiet -c "$home_dir/gradle-wrapper-v8.8.sha256"
+
+# Run Gradle.
+"$home_dir/gradlew" "$@"

@@ -11,6 +11,7 @@ import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +22,7 @@ import io.prometheus.client.hotspot.DefaultExports;
 
 
 /**
- * This class is the Prometheus Exporter mod.
+ * The PrometheusExporterMod class defines the mod.
  */
 @Mod(PrometheusExporterMod.MOD_ID)
 public class PrometheusExporterMod {
@@ -54,8 +55,7 @@ public class PrometheusExporterMod {
 	/**
 	 * The server configuration.
 	 */
-	@SuppressWarnings("FieldMayBeFinal")
-	private ServerConfig config;
+	private final ServerConfig config;
 
 	/**
 	 * Construct the instance.
@@ -84,7 +84,12 @@ public class PrometheusExporterMod {
 		// WARNING: Remember to stop the HTTP server. Otherwise, the Minecraft
 		// client will crash because the TCP port will already be in use when trying
 		// to load a second saved world.
-		this.http_server.close();
+		if (this.http_server != null) {
+			this.http_server.close();
+			this.http_server = null;
+		} else {
+			LOG.warn("Cannot close http_server=null.");
+		}
 	}
 
 	/**
@@ -98,7 +103,7 @@ public class PrometheusExporterMod {
 
 		// Collect Minecraft stats.
 		if (this.config.collector_mc) {
-			this.mc_collector = new MinecraftCollector(this.mc_server);
+			this.mc_collector = new MinecraftCollector(this.config, this.mc_server);
 			this.mc_collector.register();
 		}
 	}
@@ -123,7 +128,7 @@ public class PrometheusExporterMod {
 	@SubscribeEvent
 	public void onDimensionTick(TickEvent.LevelTickEvent event) {
 		// Record dimension tick.
-		if (this.mc_collector != null) {
+		if (this.mc_collector != null && event.side == LogicalSide.SERVER) {
 			ResourceKey<Level> dim = event.level.dimension();
 			if (event.phase == TickEvent.Phase.START) {
 				this.mc_collector.startDimensionTick(dim);
@@ -185,7 +190,7 @@ public class PrometheusExporterMod {
 	@SubscribeEvent
 	public void onServerTick(TickEvent.ServerTickEvent event) {
 		// Record server tick.
-		if (this.mc_collector != null) {
+		if (this.mc_collector != null && event.side == LogicalSide.SERVER) {
 			if (event.phase == TickEvent.Phase.START) {
 				this.mc_collector.startServerTick();
 			} else if (event.phase == TickEvent.Phase.END) {
