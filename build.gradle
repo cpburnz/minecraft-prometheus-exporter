@@ -15,8 +15,9 @@ plugins {
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-version = mod_version
+// Project settings.
 group = mod_group_id
+version = mod_version
 
 base {
     archivesName = 'Prometheus-Exporter'
@@ -24,7 +25,7 @@ base {
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-println 'Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch')
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 minecraft {
 	// The mappings can be changed at any time and must be in the following format.
@@ -92,16 +93,6 @@ minecraft {
 					source sourceSets.main
 				}
 			}
-
-			// TODO: Figure out testing dependencies.
-			dependencies {
-				// Every shadowed dependency has to be relisted here for the runClient and
-				// runServer commands to work.
-				runtimeOnly 'io.prometheus:simpleclient:0.16.0'
-				runtimeOnly 'io.prometheus:simpleclient_common:0.16.0'
-				runtimeOnly 'io.prometheus:simpleclient_httpserver:0.16.0'
-				runtimeOnly 'io.prometheus:simpleclient_hotspot:0.16.0'
-			}
 		}
 
 		client {
@@ -140,6 +131,7 @@ configurations {
 	shadowImplementation
 	implementation.extendsFrom shadowImplementation
 	shadow.extendsFrom shadowImplementation
+	minecraftLibrary.extendsFrom shadowImplementation
 }
 
 repositories {
