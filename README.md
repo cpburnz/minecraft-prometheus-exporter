@@ -14,7 +14,7 @@ for the following versions:
 - [Minecraft 1.20.2 with Forge 48.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.2-forge-1.2.1).
 - [Minecraft 1.20.1 with Forge 47.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.1-forge-1.0.0).
 - [Minecraft 1.19.3 with Forge 44.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.19.3-forge-1.0.0).
-- [Minecraft 1.19.2 with Forge 43.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.19.2-forge-1.0.0).
+- [Minecraft 1.19.2 with Forge 43.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.19.2-forge-1.2.1).
 - [Minecraft 1.18.2 with Forge 40.2.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.18.2-forge-1.2.0).
 - [Minecraft 1.18.1 with Forge 39.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.18.1-forge-1.0.0).
 - [Minecraft 1.16.5 with Forge 36.2.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.16.5-forge-1.0.0).
@@ -32,19 +32,20 @@ Installation
 
 The Prometheus Exporter mod only needs to be installed on the server. It can be
 downloaded from [GitHub] and [Curse Forge]. To install it, copy the JAR
-(*Prometheus-Exporter-{MC Version}-{Mod Loader}-{Mod Version}.jar*) to the server
-*mods/* directory. Since this mod does not add anything to the Minecraft world,
-it can be safely upgraded by simply replacing an older version with a newer
-version.
+(*Prometheus-Exporter-{MC Version}-{Mod Loader}-{Mod Version}.jar*) to the
+server *mods/* directory. Since this mod does not add anything to the Minecraft
+world, it can be safely upgraded by simply replacing an older version with a
+newer version.
 
 
 Configuration
 -------------
 
 The mod configuration is located at *world/serverconfig/prometheus_exporter-server.toml*
-with Forge, and *config/prometheus_exporter-server.toml* with NeoForge. It will
-be automatically generated upon server start if it does not already exist. The
-default configuration can be seen in the example [prometheus_exporter-server.toml].
+with Forge and Fabric, and *config/prometheus_exporter-server.toml* with
+NeoForge. It will be automatically generated upon server start if it does not
+already exist. The default configuration can be seen in the example
+[prometheus_exporter-server.toml].
 
 
 Exporter
@@ -64,8 +65,8 @@ Known compatible Grafana dashboards are listed in [dashboards.md].
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
 [Prometheus]: https://prometheus.io/
-[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.1-forge/dashboards.md
+[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/master/dashboards.md
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
-[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.1-forge/metrics.md
-[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.1-forge/examples/output.txt
-[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.1-forge/examples/prometheus_exporter-server.toml
+[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/master/metrics.md
+[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/master/examples/output.txt
+[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/master/examples/prometheus_exporter-server.toml
