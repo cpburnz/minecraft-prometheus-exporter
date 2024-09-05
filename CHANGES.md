@@ -3,7 +3,7 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.19.2 (TBD)
+1.2.1 for Minecraft 1.19.2 (2024-09-04)
 ---------------------------------------
 
 New features:
