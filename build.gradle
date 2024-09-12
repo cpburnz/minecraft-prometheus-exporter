@@ -12,7 +12,13 @@ plugins {
 	id 'fabric-loom' version '1.7-SNAPSHOT'
 
 	// Shadow Jar plugin: bundle dependencies.
-	id 'com.gradleup.shadow' version '8.3.0'
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
+
+	// CurseForge plugin.
+	id 'net.darkhax.curseforgegradle' version '1.1.25'
+
+	// GitHub plugin.
+	id 'com.github.breadmoirai.github-release' version '2.4.1'
 }
 
 // Project settings.
@@ -23,8 +29,8 @@ base {
 	archivesName = 'Prometheus-Exporter'
 }
 
-// Mojang ships Java 21 to end users in 1.20.5+, so your mod should target Java 21.
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 repositories {
@@ -98,7 +104,7 @@ processResources {
 }
 
 // Project JAR settings.
-tasks.named('jar', Jar).configure {
+jar {
 	// Include the Minecraft version in the JAR name.
 	archiveAppendix = "${minecraft_version}-fabric"
 
@@ -119,15 +125,10 @@ tasks.named('jar', Jar).configure {
 }
 
 // Configure Shadow Jar.
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
-tasks.named('shadowJar', ShadowJar).configure {
+shadowJar {
 	// Remove JAR suffix.
 	archiveAppendix = tasks.jar.archiveAppendix
 	archiveClassifier = tasks.jar.archiveClassifier
-
-	// Relocate shadowed dependencies.
-	enableRelocation = true
-	relocationPrefix = "${mod_package}.vendor"
 
 	// Only bundle dependencies explicitly marked to shadow.
 	configurations = [project.configurations.shadow]
@@ -136,9 +137,17 @@ tasks.named('shadowJar', ShadowJar).configure {
 	minimize()
 }
 
+// Vendor dependencies with Shadow Jar.
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+tasks.register('vendorShadowJarDeps', ConfigureShadowRelocation) {
+	target = tasks.shadowJar
+	prefix = "${mod_package}.vendor"
+}
+
+tasks.shadowJar.dependsOn tasks.vendorShadowJarDeps
+
 // Remap the Shadow Jar because the Minecraft classes must be obfuscated.
-import net.fabricmc.loom.task.RemapJarTask;
-tasks.named('remapJar', RemapJarTask).configure {
+remapJar {
 	// Include the Minecraft version in the JAR name.
 	archiveAppendix = jar.archiveAppendix
 
@@ -156,8 +165,48 @@ java {
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 	// if it is present.
 	// If you remove this line, sources will not be generated.
-	withSourcesJar()
+	//withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
+
+// Publish release to CurseForge.
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+	var curseforge_token = System.env.CURSEFORGE_TOKEN
+	var project_id = 351938
+
+	apiToken = curseforge_token
+
+	upload(project_id, remapJar.archiveFile) {
+		changelog = file('CHANGES.md').filterLine {
+			!it.startsWith('Change History') && !it.startsWith('====')
+		}.toString()
+		changelogType = 'markdown'
+		releaseType = 'release'
+
+		addEnvironment 'Server'
+		addRequirement 'fabric-api'
+	}
+}
+
+// Publish release to GitHub.
+githubRelease {
+	var branch = "mc${minecraft_version}-fabric"
+	var changes_url = "https://github.com/cpburnz/minecraft-prometheus-exporter/blob/${branch}/CHANGES.md"
+	var github_token = System.env.GITHUB_TOKEN
+
+	body = "Release v${mod_version} for Minecraft ${minecraft_version} with Fabric ${fabric_version_min}. See [CHANGES.md](${changes_url})."
+	draft = false
+	releaseAssets = remapJar.archiveFile
+	releaseName = "Minecraft ${minecraft_version} (Fabric) / v${mod_version}"
+	repo = 'minecraft-prometheus-exporter'
+	tagName = "${minecraft_version}-fabric-${mod_version}"
+	targetCommitish = branch
+	token = github_token ?: ""
+}
+
+// Alias for publishing to GitHub.
+tasks.register('publishGithub')
+tasks.publishGithub.dependsOn tasks.githubRelease

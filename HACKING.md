@@ -5,11 +5,11 @@ Java Environment
 ----------------
 
 Create a ".env" file, and assign the `JAVA_HOME` variable to the path of the
-Java 21 JDK. E.g.,
+Java 17 JDK. E.g.,
 
 ```shell
 # Define the version of Java to use with Gradle (i.e., "./gradlew").
-JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ```
 
 The "env-gradlew" script is a wrapper around "gradlew", and loads the ".env" file to ensure Gradle is run with the proper version of Java.
@@ -52,4 +52,4 @@ The release JAR can be compiled by running the "assemble" task:
 ./env-gradlew assemble
 ```
 
-The release JAR will be located at "build/libs/Prometheus-Exporter-{MC Version}-forge-{Mod Version}.jar".
+The release JAR will be located at "build/libs/Prometheus-Exporter-{MC Version}-{Mod Loader}-{Mod Version}.jar".
