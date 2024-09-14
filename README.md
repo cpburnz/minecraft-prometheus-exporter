@@ -10,6 +10,7 @@ for the following versions:
 - [Minecraft 1.20.6 with Fabric 0.100.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.6-fabric-1.2.1).
 - [Minecraft 1.20.6 with Forge 50.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.6-forge-1.2.1).
 - [Minecraft 1.20.6 with NeoForge 20.6.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.6-neoforge-1.2.1).
+- [Minecraft 1.20.4 with Fabric 0.97.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.4-fabric-1.2.1).
 - [Minecraft 1.20.4 with Forge 49.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.4-forge-1.2.1).
 - [Minecraft 1.20.4 with NeoForge 20.4.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.4-neoforge-1.2.1).
 - [Minecraft 1.20.2 with Forge 48.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.2-forge-1.2.1).
