@@ -2,7 +2,7 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.20.4 with Fabric 0.97.0 (2024-09-11)
+1.2.1 for Minecraft 1.20.1 with Fabric 0.92.0 (2024-09-13)
 ----------------------------------------------------------
 
 New features:

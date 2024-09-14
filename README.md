@@ -14,6 +14,7 @@ for the following versions:
 - Minecraft 1.20.4 with Forge 49.1.0.
 - Minecraft 1.20.4 with NeoForge 20.4.0.
 - Minecraft 1.20.2 with Forge 48.1.0.
+- Minecraft 1.20.1 with Fabric 0.92.0.
 - Minecraft 1.20.1 with Forge 47.1.0.
 - Minecraft 1.19.3 with Forge 44.1.0.
 - Minecraft 1.19.2 with Forge 43.0.0.
@@ -69,6 +70,6 @@ Known compatible Grafana dashboards are listed in [dashboards.md].
 [Prometheus]: https://prometheus.io/
 [dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/master/dashboards.md
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
-[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-fabric/metrics.md
-[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-fabric/examples/output.txt
-[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.4-fabric/examples/prometheus_exporter-server.toml
+[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1-fabric/metrics.md
+[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1-fabric/examples/output.txt
+[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1-fabric/examples/prometheus_exporter-server.toml
