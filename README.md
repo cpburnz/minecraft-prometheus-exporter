@@ -14,6 +14,7 @@ for the following versions:
 - [Minecraft 1.20.4 with Forge 49.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.4-forge-1.2.1).
 - [Minecraft 1.20.4 with NeoForge 20.4.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.4-neoforge-1.2.1).
 - [Minecraft 1.20.2 with Forge 48.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.2-forge-1.2.1).
+- [Minecraft 1.20.1 with Fabric 0.92.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.1-fabric-1.2.1).
 - [Minecraft 1.20.1 with Forge 47.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.20.1-forge-1.0.0).
 - [Minecraft 1.19.3 with Forge 44.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.19.3-forge-1.0.0).
 - [Minecraft 1.19.2 with Forge 43.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.19.2-forge-1.2.1).
