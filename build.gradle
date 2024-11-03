@@ -271,7 +271,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 
 	apiToken = curseforge_token
 
-	upload(project_id, remapJar.archiveFile) {
+	upload(project_id, jar.archiveFile) {
 		changelog = file('CHANGES.md').filterLine {
 			!it.startsWith('Change History') && !it.startsWith('====')
 		}.toString()
@@ -281,6 +281,8 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 		addEnvironment 'Server'
 	}
 }
+
+tasks.publishCurseForge.dependsOn tasks.jar, tasks.shadowJar
 
 // Publish release to GitHub.
 githubRelease {
@@ -299,8 +301,7 @@ githubRelease {
 	token = github_token ?: ""
 }
 
-tasks.githubRelease.dependsOn tasks.jar
-tasks.githubRelease.dependsOn tasks.shadowJar
+tasks.githubRelease.dependsOn tasks.jar, tasks.shadowJar
 
 // Alias for publishing to GitHub.
 tasks.register('publishGithub')
