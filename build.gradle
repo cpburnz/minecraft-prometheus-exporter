@@ -1,5 +1,11 @@
 plugins {
-	// IntelliJ IDEA plugin (makes life easier).
+	// Java Library plugin.
+	id 'java-library'
+
+	// Eclipse plugin (makes life easier using Eclipse).
+	id 'eclipse'
+
+	// IDEA plugin (makes life easier using IntelliJ IDEA).
 	id 'idea'
 
 	// Forge Gradle plugin (required).
@@ -8,8 +14,11 @@ plugins {
 	// Shadow Jar plugin: bundle dependencies.
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
 
-	// Curse Gradle (publishing)
-	//id 'com.matthewprenger.cursegradle' version '1.4.0'
+	// CurseForge plugin.
+	id 'net.darkhax.curseforgegradle' version '1.1.25'
+
+	// GitHub plugin.
+	id 'com.github.breadmoirai.github-release' version '2.4.1'
 }
 
 // Project settings.
@@ -125,6 +134,7 @@ configurations {
 	compileAndShadow
 	compile.extendsFrom compileAndShadow
 	shadow.extendsFrom compileAndShadow
+	minecraftLibrary.extendsFrom compileAndShadow
 }
 
 repositories {
@@ -173,19 +183,14 @@ dependencies {
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.
 // When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.
 // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-tasks.named('processResources', ProcessResources).configure {
-	def replaceProperties = [
+processResources {
+	var replaceProperties = [
 		'forge_version_range': forge_version_range,
 		'loader_version_range': loader_version_range,
 		'minecraft_version_range': minecraft_version_range,
 		'mod_authors': mod_authors,
-		'mod_description': mod_description,
 		'mod_id': mod_id,
-		'mod_license': mod_license,
-		'mod_logo_file': mod_logo_file,
 		'mod_name': mod_name,
-		'mod_tracker_url': mod_tracker_url,
-		'mod_url': mod_url,
 		'mod_version': mod_version,
 	]
 
@@ -198,7 +203,7 @@ tasks.named('processResources', ProcessResources).configure {
 }
 
 // Project JAR settings.
-tasks.named('jar', Jar).configure {
+jar {
 	// Include the Minecraft version in the JAR name.
 	archiveAppendix = "${minecraft_version}-forge"
 
@@ -206,17 +211,20 @@ tasks.named('jar', Jar).configure {
 		attributes([
 			'Specification-Title': mod_id,
 			'Specification-Vendor': mod_authors,
-			'Specification-Version': '1', // We are version 1 of ourselves
+			'Specification-Version': mod_version,
 			'Implementation-Title': mod_name,
 			'Implementation-Version': mod_version,
 			'Implementation-Vendor': mod_authors,
 			'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 		])
 	}
+
+	// This is the preferred method to reobfuscate your jar file.
+	finalizedBy 'reobfShadowJar'
 }
 
 // Configure Shadow Jar.
-tasks.named('shadowJar').configure {
+shadowJar {
 	// Remove JAR suffix.
 	archiveAppendix = tasks.jar.archiveAppendix
 	archiveClassifier = tasks.jar.archiveClassifier
@@ -230,10 +238,9 @@ tasks.named('shadowJar').configure {
 
 // Vendor dependencies with Shadow Jar.
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-
-task vendorShadowJarDeps(type: ConfigureShadowRelocation) {
+tasks.register('vendorShadowJarDeps', ConfigureShadowRelocation) {
 	target = tasks.shadowJar
-	prefix = "${project.group}.minecraft_prometheus_exporter.vendors"
+	prefix = "${mod_package}.vendor"
 }
 
 tasks.shadowJar.dependsOn tasks.vendorShadowJarDeps
@@ -252,24 +259,49 @@ reobf {
 tasks.reobfShadowJar.dependsOn tasks.jar
 tasks.assemble.dependsOn tasks.reobfShadowJar
 
-// Configure Curse Gradle for publishing to Curse Forge.
-/*
-curseforge {
-	apiKey = "test"
-
-	project {
-		id = '351938'
-		changelog = 'CHANGES.md'
-		changelogType = 'markdown'
-		releaseType = 'beta'
-
-		mainArtifact shadowJar
-	}
-}
-
-tasks.curseforge.dependsOn tasks.build
-*/
-
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
+
+// Publish release to CurseForge.
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+	var curseforge_token = System.env.CURSEFORGE_TOKEN
+	var project_id = 351938
+
+	apiToken = curseforge_token
+
+	upload(project_id, remapJar.archiveFile) {
+		changelog = file('CHANGES.md').filterLine {
+			!it.startsWith('Change History') && !it.startsWith('====')
+		}.toString()
+		changelogType = 'markdown'
+		releaseType = 'release'
+
+		addEnvironment 'Server'
+	}
+}
+
+// Publish release to GitHub.
+githubRelease {
+	var branch = "mc${minecraft_version}-forge"
+	var changes_url = "https://github.com/cpburnz/minecraft-prometheus-exporter/blob/${branch}/CHANGES.md"
+	var github_token = System.env.GITHUB_TOKEN
+
+	body = "Release v${mod_version} for Minecraft ${minecraft_version} with Forge ${forge_version_min}. See [CHANGES.md](${changes_url})."
+	draft = false
+	//dryRun = true
+	releaseAssets = jar.archiveFile
+	releaseName = "Minecraft ${minecraft_version} (Forge) / v${mod_version}"
+	repo = 'minecraft-prometheus-exporter'
+	tagName = "${minecraft_version}-forge-${mod_version}"
+	targetCommitish = branch
+	token = github_token ?: ""
+}
+
+tasks.githubRelease.dependsOn tasks.jar
+tasks.githubRelease.dependsOn tasks.shadowJar
+
+// Alias for publishing to GitHub.
+tasks.register('publishGithub')
+tasks.publishGithub.dependsOn tasks.githubRelease

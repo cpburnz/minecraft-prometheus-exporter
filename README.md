@@ -1,20 +1,11 @@
 This mod provides a Prometheus exporter for Minecraft. It exports metrics
 related to the Minecraft server and the JVM for consumption by the open-source
 systems monitoring toolkit, [Prometheus]. The mod is intended for server-side
-use, and does not need to be installed client-side. This currently has builds
-for the following versions:
+use, and does not need to be installed client-side. You can find the latest
+builds for various versions of Minecraft and mod loaders in [Releases].
 
-- Minecraft 1.20.1 with Forge 47.1.0.
-- Minecraft 1.19.3 with Forge 44.1.0.
-- Minecraft 1.19.2 with Forge 43.0.0.
-- Minecraft 1.18.1 with Forge 39.0.0.
-- Minecraft 1.16.5 with Forge 36.2.0.
-- Minecraft 1.15.2 with Forge 21.2.0.
-- Minecraft 1.14.4 with Forge 28.1.0.
-- Minecraft 1.12.2 with Forge 14.23.0.
-
-Is there a newer version of Minecraft not listed? Let me know by opening an
-[issue on GitHub].
+Is there a newer version of Minecraft not listed? Is the mod outdated for one of
+the listed Minecraft versions? Let me know by opening an [issue on GitHub].
 
 
 Installation
@@ -39,13 +30,16 @@ exist. The default configuration can be seen in the example [prometheus_exporter
 Exporter Output
 ---------------
 
+The metrics are documented in [metrics.md].
+
 A sample output from the exporter can be seen in the example [output.txt].
-Please note as of version 1.0.0 the "mc_world_tick_seconds" metric has been
-renamed to "mc_dimension_tick_seconds".
 
 
 Dashboards
 ----------
+
+Known compatible Grafana dashboards are listed in [dashboards.md].
+
 
 Known compatible Grafana dashboards:
 
@@ -54,9 +48,10 @@ Known compatible Grafana dashboards:
 
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
-[Minecraft Server Stats]: https://grafana.com/grafana/dashboards/16508-minecraft-server-stats/
 [Prometheus]: https://prometheus.io/
+[Releases]: https://github.com/cpburnz/minecraft-prometheus-exporter/wiki/Releases
+[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1-forge/dashboards.md
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
-[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1/examples/output.txt
-[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1/examples/prometheus_exporter-server.toml
-[randombk]: https://github.com/randombk
+[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1-forge/metrics.md
+[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1-forge/examples/output.txt
+[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.20.1-forge/examples/prometheus_exporter-server.toml
