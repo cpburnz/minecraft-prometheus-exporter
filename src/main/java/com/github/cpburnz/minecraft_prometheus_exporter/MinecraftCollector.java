@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.mojang.authlib.GameProfile;
@@ -14,6 +15,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -227,10 +229,10 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			GameProfile profile = player.getGameProfile();
 
 			// Get player info.
-			// - NOTICE: Both "id" and "name" are required to be non-null, unlike in
-			//   Minecraft 1.19 and earlier.
-			String id_str = profile.getId().toString();
-			String name = profile.getName();
+			// - WARNING: Either "id" or "name" can be null in Minecraft 1.19 and
+			//   earlier.
+			String id_str = Objects.toString(profile.getId(), "");
+			String name = ObjectUtils.defaultIfNull(profile.getName(), "");
 
 			metric.addMetric(List.of(id_str, name), 1);
 		}
