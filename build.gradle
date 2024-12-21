@@ -282,16 +282,16 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 
 // Publish release to GitHub.
 githubRelease {
-	var branch = "mc${minecraft_version}-forge"
+	var branch = "mc${minecraft_version_tag}-forge"
 	var changes_url = "https://github.com/cpburnz/minecraft-prometheus-exporter/blob/${branch}/CHANGES.md"
 	var github_token = System.env.GITHUB_TOKEN
 
-	body = "Release v${mod_version} for Minecraft ${minecraft_version} with Forge ${forge_version_min}. See [CHANGES.md](${changes_url})."
+	body = "Release v${mod_version} for Minecraft ${minecraft_version_tag} with Forge ${forge_version_min}. See [CHANGES.md](${changes_url})."
 	draft = false
 	releaseAssets = shadowJar.archiveFile
-	releaseName = "Minecraft ${minecraft_version} (Forge) / v${mod_version}"
+	releaseName = "Minecraft ${minecraft_version_tag} (Forge) / v${mod_version}"
 	repo = 'minecraft-prometheus-exporter'
-	tagName = "${minecraft_version}-forge-${mod_version}"
+	tagName = "${minecraft_version_tag}-forge-${mod_version}"
 	targetCommitish = branch
 	token = github_token ?: ""
 }
