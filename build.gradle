@@ -12,7 +12,13 @@ plugins {
 	id 'fabric-loom' version '1.7-SNAPSHOT'
 
 	// Shadow Jar plugin: bundle dependencies.
-	id 'com.gradleup.shadow' version '8.3.0'
+	id 'com.gradleup.shadow' version '8.3.5'
+
+	// CurseForge plugin.
+	id 'net.darkhax.curseforgegradle' version '1.1.25'
+
+	// GitHub plugin.
+	id 'com.github.breadmoirai.github-release' version '2.5.2'
 }
 
 // Project settings.
@@ -98,9 +104,9 @@ processResources {
 }
 
 // Project JAR settings.
-tasks.named('jar', Jar).configure {
+jar {
 	// Include the Minecraft version in the JAR name.
-	archiveAppendix = "${minecraft_version}-fabric"
+	archiveAppendix = "${minecraft_version_tag}-fabric"
 
 	manifest {
 		attributes([
@@ -119,8 +125,7 @@ tasks.named('jar', Jar).configure {
 }
 
 // Configure Shadow Jar.
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
-tasks.named('shadowJar', ShadowJar).configure {
+shadowJar {
 	// Remove JAR suffix.
 	archiveAppendix = tasks.jar.archiveAppendix
 	archiveClassifier = tasks.jar.archiveClassifier
@@ -137,8 +142,7 @@ tasks.named('shadowJar', ShadowJar).configure {
 }
 
 // Remap the Shadow Jar because the Minecraft classes must be obfuscated.
-import net.fabricmc.loom.task.RemapJarTask;
-tasks.named('remapJar', RemapJarTask).configure {
+remapJar {
 	// Include the Minecraft version in the JAR name.
 	archiveAppendix = jar.archiveAppendix
 
@@ -161,3 +165,43 @@ java {
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
 }
+
+// Publish release to CurseForge.
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+	var curseforge_token = System.env.CURSEFORGE_TOKEN
+	var project_id = 351938
+
+	apiToken = curseforge_token
+
+	upload(project_id, remapJar.archiveFile) {
+		changelog = file('CHANGES.md').filterLine {
+			!it.startsWith('Change History') && !it.startsWith('====')
+		}.toString()
+		changelogType = 'markdown'
+		releaseType = 'release'
+
+		addEnvironment 'Server'
+		addRequirement 'fabric-api'
+	}
+}
+
+// Publish release to GitHub.
+githubRelease {
+	var branch = "mc${minecraft_version_tag}-fabric"
+	var changes_url = "https://github.com/cpburnz/minecraft-prometheus-exporter/blob/${branch}/CHANGES.md"
+	var github_token = System.env.GITHUB_TOKEN
+
+	body = "Release v${mod_version} for Minecraft ${minecraft_version_tag} with Fabric ${fabric_version_min}. See [CHANGES.md](${changes_url})."
+	draft = false
+	releaseAssets = remapJar.archiveFile
+	releaseName = "Minecraft ${minecraft_version_tag} (Fabric) / v${mod_version}"
+	repo = 'minecraft-prometheus-exporter'
+	tagName = "${minecraft_version_tag}-fabric-${mod_version}"
+	targetCommitish = branch
+	token = github_token ?: ""
+}
+
+// Alias for publishing to GitHub.
+tasks.register('publishGithub')
+tasks.publishGithub.dependsOn tasks.githubRelease
