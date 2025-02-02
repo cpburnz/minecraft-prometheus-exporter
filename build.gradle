@@ -25,14 +25,21 @@ plugins {
 	// Eclipse plugin (makes life easier using Eclipse).
 	id 'eclipse'
 
+	// IDEA plugin (makes life easier using IntelliJ IDEA).
+	id 'idea'
+
 	// Java plugin (required).
 	id 'java'
 
 	// Shadow Jar plugin: bundle dependencies.
-	id 'com.github.johnrengelman.shadow' version '4.0.4'
+	// - NOTICE: v6.1.0 is the last version supported by Gradle 6.
+	id 'com.github.johnrengelman.shadow' version '6.1.0'
 
-	// Curse Gradle (publishing)
-	//id 'com.matthewprenger.cursegradle' version '1.4.0'
+	// CurseForge plugin.
+	id 'net.darkhax.curseforgegradle' version '1.0.7'
+
+	// GitHub plugin.
+	id 'com.github.breadmoirai.github-release' version '2.4.1'
 }
 
 // Forge Gradle plugin (required).
@@ -40,89 +47,82 @@ apply plugin: 'net.minecraftforge.gradle'
 
 // Project settings.
 archivesBaseName = 'Prometheus-Exporter'
-group = 'com.github.cpburnz'
-version = '1.0.0'
+group = mod_group_id
+version = mod_version
 
-// Extra project settings.
-ext {
-	modAuthors = 'cpburnz'
-	modId = 'prometheus_exporter'
-	modName = 'Prometheus Exporter'
-	modPackage = "${project.group}.minecraft_prometheus_exporter"
-	modTrackerUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter/issues'
-	modUrl = 'https://github.com/cpburnz/minecraft-prometheus-exporter'
-
-	forgeMinVersion = '36'
-	minecraftMinVersion = '1.16.5'
-}
-
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 minecraft {
-	// The mappings can be changed at any time, and must be in the following format.
-	// snapshot_YYYYMMDD   Snapshot are built nightly.
-	// stable_#			Stables are built at the discretion of the MCP team.
-	// Use non-default mappings at your own risk. they may not always work.
+	// The mappings can be changed at any time and must be in the following format.
+	// Channel:   Version:
+	// official   MCVersion  Official field/method names from Mojang mapping files
+	// parchment  YYYY.MM.DD-MCVersion  Open community-sourced parameter names and javadocs layered on top of official
+	//
+	// You must be aware of the Mojang license when using the 'official' or 'parchment' mappings.
+	// See more information here: https://github.com/MinecraftForge/MCPConfig/blob/master/Mojang.md
+	//
+	// Parchment is an unofficial project maintained by ParchmentMC, separate from MinecraftForge
+	// Additional setup is needed to use their mappings: https://github.com/ParchmentMC/Parchment/wiki/Getting-Started
+	//
+	// Use non-default mappings at your own risk. They may not always work.
 	// Simply re-run your setup task after changing the mappings to update your workspace.
-	mappings channel: 'official', version: '1.16.5'
-	// makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+	mappings channel: project.mapping_channel, version: project.mapping_version
 
+	// This property enables access transformers for use in development.
+	// They will be applied to the Minecraft artifact.
+	// The access transformer file can be anywhere in the project.
+	// However, it must be at "META-INF/accesstransformer.cfg" in the final mod jar to be loaded by Forge.
+	// This default location is a best practice to automatically put the file in the right place in the final jar.
+	// See https://docs.minecraftforge.net/en/latest/advanced/accesstransformers/ for more information.
 	// accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
 	// Default run configurations.
 	// These can be tweaked, removed, or duplicated as needed.
 	runs {
-		client {
+		// applies to all the run configs below
+		configureEach {
 			workingDirectory project.file('run')
 
 			// Recommended logging data for a userdev environment
-			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+			// The markers can be added/remove as needed separated by commas.
+			// "SCAN": For mods scan.
+			// "REGISTRIES": For firing of registry events.
+			// "REGISTRYDUMP": For getting the contents of all registries.
+			property 'forge.logging.markers', 'REGISTRIES'
 
 			// Recommended logging level for the console
+			// You can set various levels here.
+			// Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
 			property 'forge.logging.console.level', 'debug'
 
 			mods {
-				prometheus_exporter {
+				"${mod_id}" {
 					source sourceSets.main
 				}
 			}
+		}
+
+		client {
+			// this block needs to be here for runClient to exist
 		}
 
 		server {
-			workingDirectory project.file('run')
-
-			// Recommended logging data for a userdev environment
-			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-			// Recommended logging level for the console
-			property 'forge.logging.console.level', 'debug'
-
-			mods {
-				prometheus_exporter {
-					source sourceSets.main
-				}
-			}
+			args '--nogui'
 		}
 
 		data {
-			workingDirectory project.file('run')
+			// example of overriding the workingDirectory set in configureEach above
+			workingDirectory project.file('run-data')
 
-			// Recommended logging data for a userdev environment
-			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-			// Recommended logging level for the console
-			property 'forge.logging.console.level', 'debug'
-
-			args '--mod', project.modId, '--all', '--output', file('src/generated/resources/')
-
-			mods {
-				prometheus_exporter {
-					source sourceSets.main
-				}
-			}
+			// Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+			args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 		}
 	}
 }
+
+// Include resources generated by data generators.
+sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 configurations {
 	// Create the `compileAndShadow` group to be both compile time dependencies
@@ -132,70 +132,95 @@ configurations {
 	shadow.extendsFrom compileAndShadow
 }
 
+repositories {
+	// Put repositories for dependencies here
+	// ForgeGradle automatically adds the Forge maven and Maven Central for you
+
+	// If you have mod jar dependencies in ./libs, you can declare them as a repository like so:
+	// flatDir {
+	//     dir 'libs'
+	// }
+}
+
 dependencies {
-	// Specify the version of Minecraft to use, If this is any group other then
-	// 'net.minecraft' it is assumed that the dep is a ForgeGradle 'patcher'
-	// dependency. And it's patches will be applied. The userdev artifact is a
-	// special name and will get all sorts of transformations applied to it.
-	minecraft 'net.minecraftforge:forge:1.16.5-36.1.4'
+	// Specify the version of Minecraft to use.
+	// Any artifact can be supplied so long as it has a "userdev" classifier artifact and is a compatible patcher artifact.
+	// The "userdev" classifier will be requested and setup by ForgeGradle.
+	// If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
+	// then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
+	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+	// Real mod deobf dependency examples - these get remapped to your current mappings
+	// compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
+	// runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}") // Adds the full JEI mod as a runtime dependency
+	// implementation fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}") // Adds registrate as a dependency
+
+	// Example mod dependency using a mod jar from ./libs with a flat dir repository
+	// This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
+	// The group id is ignored when searching -- in this case, it is "blank"
+	// implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
+
+	// For more info:
+	// http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+	// http://www.gradle.org/docs/current/userguide/dependency_management.html
 
 	// Prometheus dependencies.
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.10.0'
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.10.0'
-	compileAndShadow group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.10.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient', version: '0.16.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient_httpserver', version: '0.16.0'
+	compileAndShadow group: 'io.prometheus', name: 'simpleclient_hotspot', version: '0.16.0'
 }
+
+
+
 
 // Expand variables in resource files.
 processResources {
-	def vars = [
-		'forgeMinVersion': project.forgeMinVersion,
-		'minecraftMinVersion': project.minecraftMinVersion,
-		'modAuthors': project.modAuthors,
-		'modName': project.modName,
-		'modId': project.modId,
-		'modTrackerUrl': project.modTrackerUrl,
-		'modUrl': project.modUrl,
-		'version': project.version,
+	def replaceProperties = [
+		forge_version_range: forge_version_range,
+		loader_version_range: loader_version_range,
+		minecraft_version_range: minecraft_version_range,
+		mod_authors: mod_authors,
+		mod_id: mod_id,
+		mod_name: mod_name,
+		mod_version: mod_version,
 	]
 
 	// Record the inputs so Gradle knows when to regenerate the resource files.
-	inputs.properties vars
+	inputs.properties replaceProperties
 
-	from(sourceSets.main.resources.srcDirs) {
-		include 'META-INF/mods.toml'
-		expand vars
-	}
-
-	from(sourceSets.main.resources.srcDirs) {
-		exclude 'META-INF/mods.toml'
+	filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+		expand replaceProperties + [project: project]
 	}
 }
 
 // Project JAR settings.
 jar {
 	// Include the Minecraft version in the JAR name.
-	appendix = "${project.minecraftMinVersion}-forge"
+	archiveAppendix = "${minecraft_version}-forge"
 
 	manifest {
 		attributes([
-			'Specification-Title': 'examplemod',
-			'Specification-Vendor': 'examplemodsareus',
-			'Specification-Version': '1',
-			'Implementation-Title': project.modName,
-			'Implementation-Version': project.version,
-			'Implementation-Vendor': project.modAuthors,
+			'Specification-Title': mod_id,
+			'Specification-Vendor': mod_authors,
+			'Specification-Version': mod_version,
+			'Implementation-Title': mod_name,
+			'Implementation-Version': mod_version,
+			'Implementation-Vendor': mod_authors,
 			'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 		])
 	}
+
+	// This is the preferred method to reobfuscate/finalize your jar file.
+	finalizedBy 'reobfShadowJar'
 }
 
 // Configure Shadow Jar.
 shadowJar {
 	// Remove JAR suffix.
-	appendix = tasks.jar.appendix
-	classifier = tasks.jar.classifier
+	archiveAppendix = tasks.jar.archiveAppendix
+	archiveClassifier = tasks.jar.archiveClassifier
 
-	// Only bundle dependencies explicitly marked instead of every damn one.
+	// Only bundle dependencies explicitly marked to shadow.
 	configurations = [project.configurations.shadow]
 
 	// Exclude unused classes.
@@ -204,10 +229,9 @@ shadowJar {
 
 // Vendor dependencies with Shadow Jar.
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-
-task vendorShadowJarDeps(type: ConfigureShadowRelocation) {
+tasks.register('vendorShadowJarDeps', ConfigureShadowRelocation) {
 	target = tasks.shadowJar
-	prefix = "${project.modPackage}.vendors"
+	prefix = "${mod_package}.vendor"
 }
 
 tasks.shadowJar.dependsOn tasks.vendorShadowJarDeps
@@ -224,22 +248,48 @@ reobf {
 	}
 }
 
+tasks.reobfShadowJar.dependsOn tasks.jar
 tasks.assemble.dependsOn tasks.reobfShadowJar
 
-// Configure Curse Gradle for publishing to Curse Forge.
-/*
-curseforge {
-	apiKey = "test"
+// Publish release to CurseForge.
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+	var curseforge_token = System.env.CURSEFORGE_TOKEN
+	var project_id = 351938
 
-	project {
-		id = '351938'
-		changelog = 'CHANGES.md'
+	apiToken = curseforge_token
+
+	upload(project_id, shadowJar.archiveFile) {
+		changelog = file('CHANGES.md').filterLine {
+			!it.startsWith('Change History') && !it.startsWith('====')
+		}.toString()
 		changelogType = 'markdown'
-		releaseType = 'beta'
+		releaseType = 'release'
 
-		mainArtifact shadowJar
+		addEnvironment 'Server'
 	}
 }
 
-tasks.curseforge.dependsOn tasks.build
-*/
+// Publish release to GitHub.
+githubRelease {
+	def branch = "mc${minecraft_version_tag}-forge"
+	def changes_url = "https://github.com/cpburnz/minecraft-prometheus-exporter/blob/${branch}/CHANGES.md"
+	def github_token = System.env.GITHUB_TOKEN
+
+	body = "Release v${mod_version} for Minecraft ${minecraft_version_tag} with Forge ${forge_version_min}. See [CHANGES.md](${changes_url})."
+	draft = false
+	releaseAssets = shadowJar.archiveFile
+	releaseName = "Minecraft ${minecraft_version_tag} (Forge) / v${mod_version}"
+	repo = 'minecraft-prometheus-exporter'
+	tagName = "${minecraft_version_tag}-forge-${mod_version}"
+	targetCommitish = branch
+	token = github_token ?: ""
+}
+
+// Alias for publishing to GitHub.
+tasks.register('publishGithub')
+tasks.publishGithub.dependsOn tasks.githubRelease
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}

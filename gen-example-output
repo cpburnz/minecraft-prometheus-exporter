@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# This script regenerates "examples/output.txt".
+#
+
+# Exit on error.
+set -e
+
+# Get project directory.
+home_dir="$(cd "$(dirname "$0")" && pwd)"
+
+# Copy generated config from run.
+out_file="$home_dir/examples/output.txt"
+curl -Ss 'http://localhost:19565/metrics' > "$out_file"
+cat "$out_file"

@@ -1,6 +1,6 @@
 {
 	"pack": {
-		"description": "Prometheus Exporter resources.",
+		"description": "${mod_id} resources",
 		"pack_format": 6
 	}
 }

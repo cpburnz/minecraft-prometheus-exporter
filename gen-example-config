@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# This script regenerates "examples/prometheus_exporter-server.toml".
+#
+
+# Exit on error.
+set -e
+
+# Get project directory.
+home_dir="$(cd "$(dirname "$0")" && pwd)"
+
+# Copy generated config from run.
+out_file="$home_dir/examples/prometheus_exporter-server.toml"
+cp "$home_dir/prometheus_exporter-server.in" "$out_file"
+#echo '' >> "$out_file"
+cat "$home_dir/run/saves/New World/serverconfig/prometheus_exporter-server.toml" >> "$out_file"
+cat "$out_file"
