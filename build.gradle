@@ -224,7 +224,7 @@ shadowJar {
 	configurations = [project.configurations.shadow]
 
 	// Exclude unused classes.
-	minimize()
+	//minimize()
 }
 
 // Vendor dependencies with Shadow Jar.
