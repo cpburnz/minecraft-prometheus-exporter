@@ -1,43 +1,24 @@
-package com.github.cpburnz.minecraft_prometheus_exporter;
+package com.github.cpburnz.minecraft_prometheus_exporter.forge;
 
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.github.cpburnz.minecraft_prometheus_exporter.base.ServerConfig;
+
 /**
- * The ServerConfig class defines the server-side mod config. This is used to
- * load and generate the "prometheus_exporter-server.toml" config file.
+ * The ForgeServerConfig class defines the server-side mod config. This is used
+ * to load and generate the "prometheus_exporter-server.toml" config file.
  */
-public class ServerConfig {
+public class ForgeServerConfig extends ServerConfig {
 
 	/**
 	 * The logger to use.
 	 */
 	private static final Logger LOG = LogManager.getLogger();
-
-	/**
-	 * Whether collecting metrics about the JVM process is enabled.
-	 */
-	public boolean collector_jvm;
-
-	/**
-	 * Whether collecting metrics about the Minecraft server is enabled.
-	 */
-	public boolean collector_mc;
-
-	/**
-	 * How to handle dimension (world) tick event errors.
-	 */
-	public TickErrorPolicy collector_mc_dimension_tick_errors;
-
-	/**
-	 * Whether collecting metrics about the entities in each dimension (world) is
-	 * enabled.
-	 */
-	public boolean collector_mc_entities;
 
 	/**
 	 * The Forge config specification.
@@ -50,36 +31,15 @@ public class ServerConfig {
 	private final InternalSpec internal_spec;
 
 	/**
-	 * Whether the config has been loaded.
-	 */
-	private boolean is_loaded;
-
-	/**
-	 * The IP address to listen on.
-	 */
-	public String web_listen_address;
-
-	/**
-	 * The TCP port to listen on.
-	 */
-	public int web_listen_port;
-
-	/**
 	 * Construct the instance.
 	 */
-	public ServerConfig() {
+	public ForgeServerConfig() {
 		// Setup config specs.
-		Pair<InternalSpec, ForgeConfigSpec> result = new ForgeConfigSpec.Builder().configure(InternalSpec::new);
+		Pair<InternalSpec, ForgeConfigSpec> result = (
+			new ForgeConfigSpec.Builder().configure(InternalSpec::new)
+		);
 		this.internal_spec = result.getLeft();
 		this.forge_spec = result.getRight();
-	}
-
-	/**
-	 * @return Whether the config is loaded.
-	 */
-	@SuppressWarnings("unused")
-	public boolean isLoaded() {
-		return this.is_loaded;
 	}
 
 	/**
@@ -89,13 +49,15 @@ public class ServerConfig {
 		// Get config values.
 		this.collector_jvm = this.internal_spec.collector_jvm.get();
 		this.collector_mc = this.internal_spec.collector_mc.get();
-		this.collector_mc_dimension_tick_errors = this.internal_spec.collector_mc_dimension_tick_errors.get();
+		this.collector_mc_dimension_tick_errors = (
+			this.internal_spec.collector_mc_dimension_tick_errors.get()
+		);
 		this.collector_mc_entities = this.internal_spec.collector_mc_entities.get();
 		this.web_listen_address = this.internal_spec.web_listen_address.get();
 		this.web_listen_port = this.internal_spec.web_listen_port.get();
 
 		// Record that the config is loaded.
-		this.is_loaded = true;
+		this.setIsLoaded(true);
 
 		LOG.debug("collector.jvm: {}", this.collector_jvm);
 		LOG.debug("collector.mc: {}", this.collector_mc);
@@ -110,9 +72,11 @@ public class ServerConfig {
 
 	/**
 	 * Register the server-side config with Forge.
+	 *
+	 * @param context The mod loading context.
 	 */
-	public void register() {
-		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, this.forge_spec);
+	public void register(FMLJavaModLoadingContext context) {
+		context.registerConfig(ModConfig.Type.SERVER, this.forge_spec);
 	}
 
 	/**
@@ -222,26 +186,5 @@ public class ServerConfig {
 
 			builder.pop();
 		}
-	}
-
-	/**
-	 * The TickErrorPolicy enum defines how to handle dimension (world) tick event
-	 * errors.
-	 */
-	public enum TickErrorPolicy {
-		/**
-		 * When a tick error occurs, ignore the error.
-		 */
-		IGNORE,
-
-		/**
-		 * When a tick error occurs, log the error.
-		 */
-		LOG,
-
-		/**
-		 * When a tick error occurs, raise an IllegalStateException.
-		 */
-		STRICT
 	}
 }

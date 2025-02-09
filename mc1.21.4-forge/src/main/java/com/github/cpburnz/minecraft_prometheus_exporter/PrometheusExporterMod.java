@@ -13,6 +13,7 @@ import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,6 +21,8 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
 
+import com.github.cpburnz.minecraft_prometheus_exporter.forge.ForgeMinecraftCollector;
+import com.github.cpburnz.minecraft_prometheus_exporter.forge.ForgeServerConfig;
 
 /**
  * The PrometheusExporterMod class defines the mod.
@@ -45,7 +48,7 @@ public class PrometheusExporterMod {
 	/**
 	 * The Minecraft metrics collector.
 	 */
-	private MinecraftCollector mc_collector;
+	private ForgeMinecraftCollector mc_collector;
 
 	/**
 	 * The Minecraft server.
@@ -55,18 +58,20 @@ public class PrometheusExporterMod {
 	/**
 	 * The server configuration.
 	 */
-	private final ServerConfig config;
+	private final ForgeServerConfig config;
 
 	/**
 	 * Construct the instance.
+	 *
+	 * @param context The mod loading context.
 	 */
-	public PrometheusExporterMod() {
+	public PrometheusExporterMod(FMLJavaModLoadingContext context) {
 		// Register to receive events.
 		MinecraftForge.EVENT_BUS.register(this);
 
 		// Register the server config.
-		this.config = new ServerConfig();
-		this.config.register();
+		this.config = new ForgeServerConfig();
+		this.config.register(context);
 	}
 
 	/**
@@ -103,7 +108,7 @@ public class PrometheusExporterMod {
 
 		// Collect Minecraft stats.
 		if (this.config.collector_mc) {
-			this.mc_collector = new MinecraftCollector(this.config, this.mc_server);
+			this.mc_collector = new ForgeMinecraftCollector(this.config, this.mc_server);
 			this.mc_collector.register();
 		}
 	}

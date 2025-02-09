@@ -2,19 +2,19 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.21.1 with Forge 52.0.0 (2024-08-19)
+1.2.1 for Minecraft 1.21.4 with Forge 54.0.0 (TBD)
 ---------------------------------------------------------
 
 New features:
 
-- Support Minecraft 1.21.1.
+- Support Minecraft 1.21.4.
 
 Bug fixes:
 
 - Prevent possible crash on bad start-up.
 
 
-1.2.0 for Minecraft 1.21.1 with Forge 52.0.0 (Unreleased)
+1.2.0 for Minecraft 1.21.4 with Forge 54.0.0 (Unreleased)
 ---------------------------------------------------------
 
 New features:
@@ -32,7 +32,7 @@ Miscellaneous:
 - Minor documentation.
 
 
-1.1.0 for Minecraft 1.21.1 with Forge 52.0.0 (Unreleased)
+1.1.0 for Minecraft 1.21.4 with Forge 54.0.0 (Unreleased)
 ---------------------------------------------------------
 
 New features:

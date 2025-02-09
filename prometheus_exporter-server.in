@@ -1,3 +1,4 @@
 # This is an example configuration. The mod configuration is located at
-# *world/serverconfig/prometheus_exporter-server.toml*. It will be
+# *world/serverconfig/prometheus_exporter-server.toml* with Forge and Fabric,
+# and *config/prometheus_exporter-server.toml* with NeoForge. It will be
 # automatically generated upon server start if it does not already exist.
