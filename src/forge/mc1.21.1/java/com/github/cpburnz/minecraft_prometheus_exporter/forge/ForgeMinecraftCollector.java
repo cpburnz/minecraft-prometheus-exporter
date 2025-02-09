@@ -162,6 +162,8 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	 * Get the dimension name.
 	 *
 	 * @param dim The dimension.
+	 *
+	 * @return The dimension name.
 	 */
 	private static String getDimensionName(ResourceKey<Level> dim) {
 		return dim.location().getPath();
