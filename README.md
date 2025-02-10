@@ -4,6 +4,9 @@ systems monitoring toolkit, [Prometheus]. The mod is intended for server-side
 use, and does not need to be installed client-side. This currently has builds
 for the following versions:
 
+- [Minecraft 1.21.4 with Fabric 0.115.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.21.4-fabric-1.2.1).
+- [Minecraft 1.21.4 with Forge 54.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.21.4-forge-1.2.1).
+- [Minecraft 1.21.4 with NeoForge 21.4.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.21.4-neoforge-1.2.1).
 - [Minecraft 1.21.1 with Fabric 0.103.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.21.1-fabric-1.2.1).
 - [Minecraft 1.21.1 with Forge 52.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.21.1-forge-1.2.1).
 - [Minecraft 1.21.1 with NeoForge 21.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.21.1-neoforge-1.2.1).
