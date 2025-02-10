@@ -2,7 +2,7 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.21.4 with Fabric 0.115.0 (TBD)
+1.2.1 for Minecraft 1.21.4 with Fabric 0.115.0 (2025-02-09)
 -----------------------------------------------------------
 
 New features:

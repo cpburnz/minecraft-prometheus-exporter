@@ -226,3 +226,7 @@ githubRelease {
 	targetCommitish = github_branch
 	token = github_token ?: ""
 }
+
+// Alias for publishing to GitHub.
+tasks.register('publishGithub')
+tasks.publishGithub.dependsOn tasks.githubRelease

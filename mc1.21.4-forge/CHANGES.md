@@ -2,12 +2,12 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.21.4 with Forge 54.0.0 (TBD)
+1.2.1 for Minecraft 1.21.4 with Forge 54.0.0 (2025-02-09)
 ---------------------------------------------------------
 
 New features:
 
-- Support Minecraft 1.21.4.
+- Support Minecraft 1.21.4 with Forge.
 
 Bug fixes:
 
