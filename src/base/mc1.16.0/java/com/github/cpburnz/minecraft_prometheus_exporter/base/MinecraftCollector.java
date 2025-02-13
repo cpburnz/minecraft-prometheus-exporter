@@ -1,25 +1,13 @@
-package com.github.cpburnz.minecraft_prometheus_exporter;
+package com.github.cpburnz.minecraft_prometheus_exporter.base;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
-import com.mojang.authlib.GameProfile;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,7 +18,7 @@ import io.prometheus.client.Histogram;
 /**
  * This class collects stats from the Minecraft server for export.
  */
-public class MinecraftCollector extends Collector implements Collector.Describable {
+public abstract class MinecraftCollector extends Collector implements Collector.Describable {
 
 	/**
 	 * The logger to use.
@@ -69,12 +57,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 * ticks in multiple threads. However, some mods do for their custom
 	 * dimensions (e.g., Vault Hunters).</p>
 	 */
-	private final ConcurrentHashMap<RegistryKey<World>, Histogram.Timer> dim_tick_timers;
-
-	/**
-	 * The Minecraft server.
-	 */
-	private final MinecraftServer mc_server;
+	private final ConcurrentHashMap<String, Histogram.Timer> dim_tick_timers;
 
 	/**
 	 * Histogram metrics for server tick timing.
@@ -91,12 +74,10 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 * Constructs the instance.
 	 *
 	 * @param config The mod configuration.
-	 * @param mc_server The Minecraft server.
 	 */
-	public MinecraftCollector(ServerConfig config, MinecraftServer mc_server) {
+	public MinecraftCollector(ServerConfig config) {
 		this.config = config;
 		this.dim_tick_timers = new ConcurrentHashMap<>(3);
-		this.mc_server = mc_server;
 
 		// Setup server metrics.
 		this.server_tick_seconds = Histogram.build()
@@ -162,82 +143,21 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 *
 	 * @return The dimension chunks loaded metric.
 	 */
-	private GaugeMetricFamily collectDimensionChunksLoaded() {
-		GaugeMetricFamily metric = newDimensionChunksLoadedMetric();
-		for (ServerWorld world : this.mc_server.getAllLevels()) {
-			String id = Integer.toString(getDimensionId(world.dimension()));
-			String name = world.dimension().location().getPath();
-			int loaded = world.getChunkSource().getLoadedChunksCount();
-			metric.addMetric(Arrays.asList(id, name), loaded);
-		}
-		return metric;
-	}
+	protected abstract GaugeMetricFamily collectDimensionChunksLoaded();
 
 	/**
 	 * Get the entities per dimension.
 	 *
 	 * @return The entities total metric.
 	 */
-	private GaugeMetricFamily collectEntitiesTotal() {
-		// Aggregate stats.
-		HashMap<EntityKey, Integer> entity_totals = new HashMap<>();
-		for (ServerWorld world : this.mc_server.getAllLevels()) {
-			// Get dimension info.
-			RegistryKey<World> dim_reg = world.dimension();
-			int dim_id = getDimensionId(dim_reg);
-			String dim = dim_reg.location().getPath();
-
-			// Get entity info.
-			for (Entity entity : world.getAllEntities()) {
-				if (!(entity instanceof PlayerEntity)) {
-					// Get entity type.
-					String entity_type;
-					if (entity instanceof ItemEntity) {
-						// Merge items. Do not count items individually by type.
-						entity_type = "Item";
-					} else {
-						entity_type = entity.getName().getString();
-					}
-
-					EntityKey entity_key = new EntityKey(dim, dim_id, entity_type);
-					entity_totals.merge(entity_key, 1, Integer::sum);
-				}
-			}
-		}
-
-		// Record metrics.
-		GaugeMetricFamily metric = newEntitiesTotalMetric();
-		for (Map.Entry<EntityKey, Integer> entry : entity_totals.entrySet()) {
-			EntityKey entity_key = entry.getKey();
-			double total = entry.getValue();
-			String dim_id_str = Integer.toString(entity_key.dim_id);
-			metric.addMetric(
-				Arrays.asList(entity_key.dim, dim_id_str, entity_key.type), total
-			);
-		}
-		return metric;
-	}
+	protected abstract GaugeMetricFamily collectEntitiesTotal();
 
 	/**
 	 * Get the active players.
 	 *
 	 * @return The player list metric.
 	 */
-	private GaugeMetricFamily collectPlayerList() {
-		GaugeMetricFamily metric = newPlayerListMetric();
-		for (ServerPlayerEntity player : this.mc_server.getPlayerList().getPlayers()) {
-			// Get player profile.
-			GameProfile profile = player.getGameProfile();
-
-			// Get player info.
-			// - WARNING: Either "id" or "name" can be null in Minecraft 1.19 and
-			//   earlier.
-			String id_str = Objects.toString(profile.getId(), "");
-			String name = ObjectUtils.defaultIfNull(profile.getName(), "");
-			metric.addMetric(Arrays.asList(id_str, name), 1);
-		}
-		return metric;
-	}
+	protected abstract GaugeMetricFamily collectPlayerList();
 
 	/**
 	 * Return all metric descriptions for the collector.
@@ -259,35 +179,11 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	}
 
 	/**
-	 * Get the dimension id.
-	 *
-	 * <p>With the new version of Minecraft, 1.16, a dimension no longer has an
-	 * id. However, to keep backward compatibility with older versions of the
-	 * exporter, we need this method. Vanilla dimensions use fixed id values (-1,
-	 * 0, 1), and the id of a custom dimension is now calculated from the
-	 * dimension name.</p>
-	 *
-	 * @param dim The dimension (world).
-	 */
-	private static int getDimensionId(RegistryKey<World> dim) {
-		if (dim == World.OVERWORLD) {
-			return 0;
-		} else if (dim == World.END) {
-			return 1;
-		} else if (dim == World.NETHER) {
-			return -1;
-		} else {
-			String name = dim.location().getPath();
-			return name.hashCode();
-		}
-	}
-
-	/**
 	 * Create a new metric for the dimension chunks loaded.
 	 *
 	 * @return The dimension chunks loaded metric.
 	 */
-	private static GaugeMetricFamily newDimensionChunksLoadedMetric() {
+	protected static GaugeMetricFamily newDimensionChunksLoadedMetric() {
 		return new GaugeMetricFamily(
 			"mc_dimension_chunks_loaded",
 			"The number of loaded dimension chunks.",
@@ -300,7 +196,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 *
 	 * @return The entities total metric.
 	 */
-	private static GaugeMetricFamily newEntitiesTotalMetric() {
+	protected static GaugeMetricFamily newEntitiesTotalMetric() {
 		return new GaugeMetricFamily(
 			"mc_entities_total",
 			"The number of entities in each dimension by type.",
@@ -313,7 +209,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 *
 	 * @return The player list metric.
 	 */
-	private static GaugeMetricFamily newPlayerListMetric() {
+	protected static GaugeMetricFamily newPlayerListMetric() {
 		return new GaugeMetricFamily(
 			"mc_player_list",
 			"The players connected to the server.",
@@ -324,12 +220,10 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	/**
 	 * Record when a dimension tick begins.
 	 *
-	 * @param dim The dimension.
+	 * @param dim The unique dimension name.
+	 * @param dim_id The dimension id.
 	 */
-	public void startDimensionTick(RegistryKey<World> dim) {
-		// Get dimension name.
-		String name = dim.location().getPath();
-
+	protected void startDimensionTick(String dim, int dim_id) {
 		// Check for forgotten timer.
 		Histogram.Timer timer = this.dim_tick_timers.get(dim);
 		if (timer != null) {
@@ -340,14 +234,14 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 
 				case LOG:
 					LOG.debug(
-						"Dimension {} tick started before stopping previous tick.", name
+						"Dimension {} tick started before stopping previous tick.", dim
 					);
 					break;
 
 				case STRICT:
-					throw new IllegalStateException(
-						"Dimension " + name + " tick started before stopping previous tick."
-					);
+					throw new IllegalStateException((
+						"Dimension " + dim + " tick started before stopping previous tick."
+					));
 			}
 
 			// Stop forgotten timer.
@@ -356,8 +250,8 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		}
 
 		// Start timer for tick.
-		String id_str = Integer.toString(getDimensionId(dim));
-		timer = this.dim_tick_seconds.labels(id_str, name).startTimer();
+		String id_str = Integer.toString(dim_id);
+		timer = this.dim_tick_seconds.labels(id_str, dim).startTimer();
 		this.dim_tick_timers.put(dim, timer);
 	}
 
@@ -366,9 +260,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 */
 	public void startServerTick() {
 		if (this.server_tick_timer != null) {
-			throw new IllegalStateException(
+			throw new IllegalStateException((
 				"Server tick started before stopping previous tick."
-			);
+			));
 		}
 
 		this.server_tick_timer = this.server_tick_seconds.startTimer();
@@ -377,12 +271,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	/**
 	 * Record when a dimension tick finishes.
 	 *
-	 * @param dim The dimension.
+	 * @param dim The unique dimension name.
 	 */
-	public void stopDimensionTick(RegistryKey<World> dim) {
-		// Get dimension name.
-		String name = dim.location().getPath();
-
+	protected void stopDimensionTick(String dim) {
 		// Get active timer.
 		Histogram.Timer timer = this.dim_tick_timers.remove(dim);
 		if (timer == null) {
@@ -393,14 +284,14 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 
 				case LOG:
 					LOG.debug(
-						"Dimension {} tick stopped without an active tick.", name
+						"Dimension {} tick stopped without an active tick.", dim
 					);
 					break;
 
 				case STRICT:
-					throw new IllegalStateException(
-						"Dimension " + name + " tick stopped without an active tick."
-					);
+					throw new IllegalStateException((
+						"Dimension " + dim + " tick stopped without an active tick."
+					));
 			}
 
 			// No timer to stop.
@@ -428,7 +319,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	/**
 	 * The EntityKey class is used to count entities per dimension.
 	 */
-	private static final class EntityKey {
+	public static final class EntityKey {
 
 		public final String dim;
 		public final int dim_id;
@@ -441,7 +332,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		 * @param dim_id The dimension id.
 		 * @param type The entity type.
 		 */
-		EntityKey(String dim, int dim_id, String type) {
+		public EntityKey(String dim, int dim_id, String type) {
 			this.dim = dim;
 			this.dim_id = dim_id;
 			this.type = type;

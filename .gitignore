@@ -1,8 +1,9 @@
 # Gradle
 .gradle
-/bin/
-/build/
-/run/
+/*/bin/
+/*/build/
+/*/run/
+/*/runs/
 
 # Eclipse
 .classpath
