@@ -1,0 +1,232 @@
+plugins {
+	// Java Library plugin.
+	id 'java-library'
+
+	// Eclipse plugin (makes life easier using Eclipse).
+	id 'eclipse'
+
+	// IDEA plugin (makes life easier using IntelliJ IDEA).
+	id 'idea'
+
+	// Fabric Loom plugin (required).
+	id 'fabric-loom' version '1.9-SNAPSHOT'
+
+	// Shadow Jar plugin: bundle dependencies.
+	id 'com.gradleup.shadow' version '8.3.0'
+
+	// CurseForge plugin.
+	id 'net.darkhax.curseforgegradle' version '1.1.26'
+
+	// GitHub plugin.
+	id 'com.github.breadmoirai.github-release' version '2.5.2'
+}
+
+// Load "mod.properties".
+var mod_props = new Properties();
+file("../mod.properties").withInputStream { mod_props.load(it)}
+
+var mod_authors = mod_props.getProperty('mod_authors')
+var mod_group_id = mod_props.getProperty('mod_group_id')
+var mod_id = mod_props.getProperty('mod_id')
+var mod_name = mod_props.getProperty('mod_name')
+var mod_package = mod_props.getProperty('mod_package')
+var mod_version = mod_props.getProperty('mod_version')
+
+// Project settings.
+group = mod_group_id
+version = mod_version
+
+base {
+	archivesName = 'Prometheus-Exporter'
+}
+
+// Mojang ships Java 21 to end users in 1.20.5+, so your mod should target Java 21.
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+
+repositories {
+	// Add repositories to retrieve artifacts from in here.
+	// You should only use this when depending on other mods because
+	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+	// for more information about repositories.
+}
+
+loom {
+	mods {
+		"${mod_id}" {
+			sourceSet sourceSets.main
+		}
+	}
+}
+
+// Include shared sources.
+sourceSets.main.java {
+	srcDir "$projectDir/../src/base/mc1.16.0/java"
+	srcDir "$projectDir/../src/fabric/mc1.16.0/java"
+}
+
+configurations {
+	// Create the `shadowImplementation` group to be both implementation
+	// dependencies and shadow dependencies (bundle via Shadow Jar).
+	shadowImplementation
+	implementation.extendsFrom shadowImplementation
+	shadow.extendsFrom shadowImplementation
+
+	// The `testImplementation` group needs to be aware of the shadowed
+	// dependencies while testing.
+	testImplementation.extendsFrom shadowImplementation
+}
+
+dependencies {
+	// To change the versions see the gradle.properties file
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	// Annotation dependency.
+	compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+	//annotationProcessor 'org.jetbrains:annotations:24.1.0'
+
+	// Config dependency.
+	shadowImplementation 'com.electronwill.night-config:toml:3.8.1'
+
+	// Prometheus dependencies.
+	shadowImplementation 'io.prometheus:simpleclient:0.16.0'
+	shadowImplementation 'io.prometheus:simpleclient_httpserver:0.16.0'
+	shadowImplementation 'io.prometheus:simpleclient_hotspot:0.16.0'
+}
+
+// Expand variables in resource files.
+processResources {
+	var replaceProperties = [
+		java_version_range: java_version_range,
+		loader_version_range: loader_version_range,
+		minecraft_version_range: minecraft_version_range,
+		mod_authors: mod_authors,
+		mod_description: mod_props.getProperty('mod_description'),
+		mod_id: mod_id,
+		mod_license_spdx_id: mod_props.getProperty('mod_license_spdx_id'),
+		mod_name: mod_name,
+		mod_package: mod_package,
+		mod_tracker_url: mod_props.getProperty('mod_tracker_url'),
+		mod_url: mod_props.getProperty('mod_url'),
+		mod_version: mod_version,
+	]
+
+	// Record the inputs so Gradle knows when to regenerate the resource files.
+	inputs.properties replaceProperties
+
+	filesMatching(['fabric.mod.json', 'pack.mcmeta']) {
+		expand replaceProperties + [project: project]
+	}
+}
+
+// Project JAR settings.
+jar {
+	// Include the Minecraft version in the JAR name.
+	archiveAppendix = "${minecraft_version}-fabric"
+
+	manifest {
+		attributes([
+			'Specification-Title': mod_id,
+			'Specification-Vendor': mod_authors,
+			'Specification-Version': mod_version,
+			'Implementation-Title': mod_name,
+			'Implementation-Version': mod_version,
+			'Implementation-Vendor': mod_authors,
+			'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+		])
+	}
+
+	// This is the preferred method to finalize your jar file.
+	finalizedBy 'remapJar'
+}
+
+// Configure Shadow Jar.
+shadowJar {
+	// Remove JAR suffix.
+	archiveAppendix = tasks.jar.archiveAppendix
+	archiveClassifier = tasks.jar.archiveClassifier
+
+	// Relocate shadowed dependencies.
+	enableRelocation = true
+	relocationPrefix = "${mod_package}.vendor"
+
+	// Only bundle dependencies explicitly marked to shadow.
+	configurations = [project.configurations.shadow]
+
+	// Exclude unused classes.
+	minimize()
+}
+
+// Remap the Shadow Jar because the Minecraft classes must be obfuscated.
+import net.fabricmc.loom.task.RemapJarTask;
+tasks.named('remapJar', RemapJarTask).configure {
+	// Include the Minecraft version in the JAR name.
+	archiveAppendix = jar.archiveAppendix
+
+	// Remap the Shadow Jar.
+	inputFile = shadowJar.archiveFile
+}
+
+tasks.remapJar.dependsOn tasks.shadowJar
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+java {
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+// Publish release to CurseForge.
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+	var curseforge_token = System.env.CURSEFORGE_TOKEN
+	var project_id = mod_props.getProperty('curseforge_project_id')
+
+	apiToken = curseforge_token
+
+	upload(project_id, remapJar.archiveFile) {
+		changelog = file('CHANGES.md').filterLine {
+			!it.startsWith('Change History') && !it.startsWith('====')
+		}.toString()
+		changelogType = 'markdown'
+		releaseType = 'release'
+
+		addEnvironment 'Server'
+		addRequirement 'fabric-api'
+	}
+}
+
+// Publish release to GitHub.
+githubRelease {
+	var github_branch = mod_props.getProperty('github_branch')
+	var github_token = System.env.GITHUB_TOKEN
+	var github_url = mod_props.getProperty('github_url')
+	var release_dir = "mc${minecraft_version_tag}-fabric"
+	var changes_url = "${github_url}/blob/${github_branch}/${release_dir}/CHANGES.md"
+
+	body = "Release v${mod_version} for Minecraft ${minecraft_version_tag} with Fabric ${fabric_version_min}. See [CHANGES.md](${changes_url})."
+	draft = false
+	releaseAssets = remapJar.archiveFile
+	releaseName = "Minecraft ${minecraft_version_tag} (Fabric) / v${mod_version}"
+	repo = 'minecraft-prometheus-exporter'
+	tagName = "${minecraft_version_tag}-fabric-${mod_version}"
+	targetCommitish = github_branch
+	token = github_token ?: ""
+}
+
+// Alias for publishing to GitHub.
+tasks.register('publishGithub')
+tasks.publishGithub.dependsOn tasks.githubRelease
