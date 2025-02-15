@@ -23,7 +23,8 @@ for the following versions:
 - [Minecraft 1.19.2 with Forge 43.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.19.2-forge-1.2.1).
 - [Minecraft 1.18.2 with Forge 40.2.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.18.2-forge-1.2.0).
 - [Minecraft 1.18.1 with Forge 39.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.18.1-forge-1.0.0).
-- [Minecraft 1.16.5 with Forge 36.2.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.16.5-forge-1.0.0).
+- [Minecraft 1.16.5 with Fabric 0.42.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.16.5-fabric-1.2.1).
+- [Minecraft 1.16.5 with Forge 36.0.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.16.5-forge-1.2.1).
 - [Minecraft 1.15.2 with Forge 21.2.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/v0.3.1).
 - [Minecraft 1.14.4 with Forge 28.1.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/v0.3.0).
 - [Minecraft 1.12.2 with Forge 14.23.0](https://github.com/cpburnz/minecraft-prometheus-exporter/releases/tag/1.12.2-forge-1.0.0).
