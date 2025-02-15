@@ -195,6 +195,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 	var project_id = mod_props.getProperty('curseforge_project_id')
 
 	apiToken = curseforge_token
+	debugMode = false
 
 	upload(project_id, remapJar.archiveFile) {
 		changelog = file('CHANGES.md').filterLine {

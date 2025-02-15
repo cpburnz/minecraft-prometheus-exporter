@@ -36,7 +36,8 @@ plugins {
 	id 'com.github.johnrengelman.shadow' version '6.1.0'
 
 	// CurseForge plugin.
-	id 'net.darkhax.curseforgegradle' version '1.0.7'
+	// - NOTICE: v1.1.24 is that last version that appears to work with Gradle 6.
+	id 'net.darkhax.curseforgegradle' version '1.1.24'
 
 	// GitHub plugin.
 	id 'com.github.breadmoirai.github-release' version '2.2.12'
@@ -284,6 +285,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 	def project_id = mod_props.getProperty('curseforge_project_id')
 
 	apiToken = curseforge_token
+	debugMode = false
 
 	upload(project_id, shadowJar.archiveFile) {
 		changelog = file('CHANGES.md').filterLine {
