@@ -3,7 +3,7 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.16.5 with Forge 36.0.0 (TBD)
+1.2.1 for Minecraft 1.16.5 with Forge 36.0.0 (2025-02-15)
 ---------------------------------------------------------
 
 Bug fixes:
