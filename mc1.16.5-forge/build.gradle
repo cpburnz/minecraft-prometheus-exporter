@@ -39,7 +39,7 @@ plugins {
 	id 'net.darkhax.curseforgegradle' version '1.0.7'
 
 	// GitHub plugin.
-	id 'com.github.breadmoirai.github-release' version '2.4.1'
+	id 'com.github.breadmoirai.github-release' version '2.2.12'
 }
 
 // Forge Gradle plugin (required).
