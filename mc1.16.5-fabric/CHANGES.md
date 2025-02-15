@@ -2,20 +2,20 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.21.4 with Fabric 0.115.0 (2025-02-09)
------------------------------------------------------------
+1.2.1 for Minecraft 1.16.5 with Fabric 0.42.0 (2025-02-15)
+----------------------------------------------------------
 
 New features:
 
-- Support Minecraft 1.21.4 with Fabric.
+- Support Minecraft 1.16.5 with Fabric.
 
 Bug fixes:
 
 - Prevent possible crash on bad start-up.
 
 
-1.2.0 for Minecraft 1.21.4 with Fabric 0.115.0 (Unreleased)
------------------------------------------------------------
+1.2.0 for Minecraft 1.16.5 with Fabric 0.42.0 (Unreleased)
+----------------------------------------------------------
 
 New features:
 
@@ -28,8 +28,8 @@ Bug fixes:
 - Support multithreaded dimension ticks.
 
 
-1.1.0 for Minecraft 1.21.4 with Fabric 0.115.0 (Unreleased)
------------------------------------------------------------
+1.1.0 for Minecraft 1.16.5 with Fabric 0.42.0 (Unreleased)
+----------------------------------------------------------
 
 New features:
 
