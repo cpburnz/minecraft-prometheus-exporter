@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import javax.annotation.Nullable;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -17,7 +18,6 @@ import org.apache.logging.log4j.Logger;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
-import org.jetbrains.annotations.Nullable;
 
 import com.github.cpburnz.minecraft_prometheus_exporter.fabric.FabricMinecraftCollector;
 import com.github.cpburnz.minecraft_prometheus_exporter.fabric.FabricServerConfig;
