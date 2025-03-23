@@ -2,7 +2,7 @@ Change History
 ==============
 
 
-1.2.1 for Minecraft 1.18.2 with Forge 40.0.0 (TBD)
+1.2.1 for Minecraft 1.18.2 with Forge 40.0.0 (2025-03-22)
 ---------------------------------------------------------
 
 Bug fixes:
