@@ -1,8 +1,8 @@
 package com.github.cpburnz.minecraft_prometheus_exporter.forge;
 
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -75,7 +75,7 @@ public class ForgeServerConfig extends ServerConfig {
 	 *
 	 * @param context The mod loading context.
 	 */
-	public void register(FMLJavaModLoadingContext context) {
+	public void register(ModLoadingContext context) {
 		context.registerConfig(ModConfig.Type.SERVER, this.forge_spec);
 	}
 

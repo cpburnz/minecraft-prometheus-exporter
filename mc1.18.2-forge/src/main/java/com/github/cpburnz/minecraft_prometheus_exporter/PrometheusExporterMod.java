@@ -12,8 +12,8 @@ import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -62,16 +62,14 @@ public class PrometheusExporterMod {
 
 	/**
 	 * Construct the instance.
-	 *
-	 * @param context The mod loading context.
 	 */
-	public PrometheusExporterMod(FMLJavaModLoadingContext context) {
+	public PrometheusExporterMod() {
 		// Register to receive events.
 		MinecraftForge.EVENT_BUS.register(this);
 
 		// Register the server config.
 		this.config = new ForgeServerConfig();
-		this.config.register(context);
+		this.config.register(ModLoadingContext.get());
 	}
 
 	/**
@@ -131,10 +129,10 @@ public class PrometheusExporterMod {
 	 * @param event The event.
 	 */
 	@SubscribeEvent
-	public void onDimensionTick(TickEvent.LevelTickEvent event) {
+	public void onDimensionTick(TickEvent.WorldTickEvent event) {
 		// Record dimension tick.
 		if (this.mc_collector != null && event.side == LogicalSide.SERVER) {
-			ResourceKey<Level> dim = event.level.dimension();
+			ResourceKey<Level> dim = event.world.dimension();
 			if (event.phase == TickEvent.Phase.START) {
 				this.mc_collector.startDimensionTick(dim);
 			} else if (event.phase == TickEvent.Phase.END) {
