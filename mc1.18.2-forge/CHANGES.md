@@ -2,6 +2,14 @@ Change History
 ==============
 
 
+1.2.1.1 for Minecraft 1.18.2 with Forge 40.0.0 (2025-03-30)
+-----------------------------------------------------------
+
+Bug fixes:
+
+- Release JAR with proper reobf mappings. Fixes immediate crash.
+
+
 1.2.1 for Minecraft 1.18.2 with Forge 40.0.0 (2025-03-22)
 ---------------------------------------------------------
 

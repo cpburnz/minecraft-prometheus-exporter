@@ -304,6 +304,8 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 	}
 }
 
+tasks.publishCurseForge.dependsOn tasks.assemble
+
 // Publish release to GitHub.
 githubRelease {
 	var github_branch = mod_props.getProperty('github_branch')
@@ -325,3 +327,5 @@ githubRelease {
 // Alias for publishing to GitHub.
 tasks.register('publishGithub')
 tasks.publishGithub.dependsOn tasks.githubRelease
+
+tasks.githubRelease.dependsOn tasks.assemble
