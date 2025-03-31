@@ -298,6 +298,8 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 	}
 }
 
+tasks.publishCurseForge.dependsOn tasks.assemble
+
 // Publish release to GitHub.
 githubRelease {
 	def github_branch = mod_props.getProperty('github_branch')

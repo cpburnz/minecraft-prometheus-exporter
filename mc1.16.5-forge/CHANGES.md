@@ -8,7 +8,7 @@ Change History
 
 Bug fixes:
 
-- Release JAR with proper reobf mappings.
+- Release JAR with proper reobf mappings. Fixes immediate crash.
 
 
 1.2.1 for Minecraft 1.16.5 with Forge 36.0.0 (2025-02-15)
