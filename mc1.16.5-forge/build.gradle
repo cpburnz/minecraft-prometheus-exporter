@@ -316,6 +316,8 @@ githubRelease {
 	token = github_token ?: ""
 }
 
+tasks.githubRelease.dependsOn tasks.assemble
+
 // Alias for publishing to GitHub.
 tasks.register('publishGithub')
 tasks.publishGithub.dependsOn tasks.githubRelease
