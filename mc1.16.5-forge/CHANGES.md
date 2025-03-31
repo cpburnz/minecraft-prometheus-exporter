@@ -3,6 +3,14 @@ Change History
 ==============
 
 
+1.2.1.1 for Minecraft 1.16.5 with Forge 36.0.0 (2025-03-30)
+-----------------------------------------------------------
+
+Bug fixes:
+
+- Release JAR with proper reobf mappings.
+
+
 1.2.1 for Minecraft 1.16.5 with Forge 36.0.0 (2025-02-15)
 ---------------------------------------------------------
 
