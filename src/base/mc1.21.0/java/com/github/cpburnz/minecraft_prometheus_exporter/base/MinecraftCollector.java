@@ -252,9 +252,9 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 */
 	public void startServerTick() {
 		if (this.server_tick_timer != null) {
-			throw new IllegalStateException(
+			throw new IllegalStateException((
 				"Server tick started before stopping previous tick."
-			);
+			));
 		}
 
 		this.server_tick_timer = this.server_tick_seconds.startTimer();
