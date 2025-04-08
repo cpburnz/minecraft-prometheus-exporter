@@ -9,7 +9,7 @@ plugins {
 	id 'idea'
 
 	// Fabric Loom plugin (required).
-	id 'fabric-loom' version '1.9-SNAPSHOT'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
 
 	// Shadow Jar plugin: bundle dependencies.
 	id 'com.gradleup.shadow' version '8.3.0'
@@ -23,7 +23,7 @@ plugins {
 
 // Load "mod.properties".
 var mod_props = new Properties();
-file("../mod.properties").withInputStream { mod_props.load(it)}
+file("../mod.properties").withInputStream { mod_props.load(it) }
 
 var mod_authors = mod_props.getProperty('mod_authors')
 var mod_group_id = mod_props.getProperty('mod_group_id')
@@ -40,8 +40,8 @@ base {
 	archivesName = 'Prometheus-Exporter'
 }
 
-// Mojang ships Java 21 to end users in 1.20.5+, so your mod should target Java 21.
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 repositories {
@@ -62,8 +62,8 @@ loom {
 
 // Include shared sources.
 sourceSets.main.java {
-	srcDir "$projectDir/../src/base/mc1.21.0/java"
-	srcDir "$projectDir/../src/fabric/mc1.21.0/java"
+	srcDir "$projectDir/../src/base/mc1.19.0/java"
+	srcDir "$projectDir/../src/fabric/mc1.19.4/java"
 }
 
 configurations {
@@ -183,10 +183,10 @@ java {
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 	// if it is present.
 	// If you remove this line, sources will not be generated.
-	withSourcesJar()
+	//withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
 // Publish release to CurseForge.
@@ -209,6 +209,8 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 	}
 }
 
+tasks.publishCurseForge.dependsOn tasks.jar
+
 // Publish release to GitHub.
 githubRelease {
 	var github_branch = mod_props.getProperty('github_branch')
@@ -226,6 +228,8 @@ githubRelease {
 	targetCommitish = github_branch
 	token = github_token ?: ""
 }
+
+tasks.githubRelease.dependsOn tasks.jar
 
 // Alias for publishing to GitHub.
 tasks.register('publishGithub')

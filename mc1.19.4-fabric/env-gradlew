@@ -13,6 +13,7 @@ home_dir="$(cd "$(dirname "$0")" && pwd)"
 # Load ".env".
 set -a
 . "$home_dir/../.env"
+. "$home_dir/.env"
 set +a
 
 # Verify Gradle wrapper JAR.
