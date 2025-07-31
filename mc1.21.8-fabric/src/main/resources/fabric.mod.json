@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "${mod_id}",
+	"version": "${mod_version}",
+	"name": "${mod_name}",
+	"description": "${mod_description}",
+	"authors": [
+		"${mod_authors}"
+	],
+	"contact": {
+		"homepage": "${mod_url}",
+		"issues": "${mod_tracker_url}",
+		"sources": "${mod_url}"
+	},
+	"license": "${mod_license_spdx_id}",
+	"icon": "assets/${mod_id}/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"${mod_package}.PrometheusExporterMod"
+		]
+	},
+	"depends": {
+		"fabric-api": "*",
+		"fabricloader": "${loader_version_range}",
+		"java": "${java_version_range}",
+		"minecraft": "${minecraft_version_range}"
+	}
+}
