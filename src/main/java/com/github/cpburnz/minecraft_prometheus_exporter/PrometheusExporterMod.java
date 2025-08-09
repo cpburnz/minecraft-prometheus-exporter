@@ -3,17 +3,19 @@ package com.github.cpburnz.minecraft_prometheus_exporter;
 import java.io.IOException;
 import java.net.BindException;
 
-import net.minecraft.server.MinecraftServer;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.WorldProvider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
@@ -38,6 +40,11 @@ public class PrometheusExporterMod {
 	public static final Logger LOG = LogManager.getLogger(Tags.MODID);
 
 	/**
+	 * The mod configuration.
+	 */
+	private ForgeModConfig config;
+
+	/**
 	 * The HTTP server.
 	 */
 	private HTTPServer http_server;
@@ -45,17 +52,12 @@ public class PrometheusExporterMod {
 	/**
 	 * The Minecraft metrics collector.
 	 */
-	public static MinecraftCollector mc_collector;
+	private ForgeMinecraftCollector mc_collector;
 
 	/**
 	 * The Minecraft server.
 	 */
 	private MinecraftServer mc_server;
-
-	/**
-	 * The mod configuration.
-	 */
-	private Config config;
 
 	/**
 	 * Unregister the metrics collectors.
@@ -86,8 +88,8 @@ public class PrometheusExporterMod {
 
 		// Collect Minecraft stats.
 		if (this.config.collector_mc) {
-			mc_collector = new MinecraftCollector(this.config, this.mc_server);
-			mc_collector.register();
+			this.mc_collector = new ForgeMinecraftCollector(this.config, this.mc_server);
+			this.mc_collector.register();
 		}
 	}
 
@@ -104,11 +106,29 @@ public class PrometheusExporterMod {
 			LOG.info("Listening on {}:{}", address, port);
 		} catch (BindException e) {
 			LOG.error(
-				"Failed to start prometheus exporter, port " + port + " already in use."
+				"Failed to start prometheus exporter, port {} already in use.",
+				port
 			);
 		}
 	}
 
+	/**
+	 * Called on a dimension tick.
+	 *
+	 * @param event The event.
+	 */
+	@SubscribeEvent
+	public void onDimensionTick(TickEvent.WorldTickEvent event) {
+		// Record dimension tick.
+		if (this.mc_collector != null) {
+			WorldProvider dim = event.world.provider;
+			if (event.phase == TickEvent.Phase.START) {
+				this.mc_collector.startDimensionTick(dim);
+			} else if (event.phase == TickEvent.Phase.END) {
+				this.mc_collector.stopDimensionTick(dim);
+			}
+		}
+	}
 	/**
 	 * Called before any other phase. Configuration files should be read.
 	 *
@@ -116,27 +136,12 @@ public class PrometheusExporterMod {
 	 */
 	@Mod.EventHandler
 	public void onPreInitialization(FMLPreInitializationEvent event) {
-		// Register the server config.
-		this.config = new Config();
+		// Load the config.
+		this.config = new ForgeModConfig();
 		this.config.loadValues(event.getSuggestedConfigurationFile());
 
 		// Register event handlers.
-		FMLCommonHandler.instance()
-			.bus()
-			.register(new TickHandler());
-	}
-
-	/**
-	 * Called when the server is starting up.
-	 *
-	 * @param event The event.
-	 */
-	@Mod.EventHandler
-	public void serverStarting(FMLServerStartingEvent event) {
-		// Register server commands in this event handler.
-
-		// Record the Minecraft server.
-		this.mc_server = event.getServer();
+		FMLCommonHandler.instance().bus().register(this);
 	}
 
 	/**
@@ -155,6 +160,19 @@ public class PrometheusExporterMod {
 	}
 
 	/**
+	 * Called when the server is starting up.
+	 *
+	 * @param event The event.
+	 */
+	@Mod.EventHandler
+	public void onServerStarting(FMLServerStartingEvent event) {
+		// Register server commands in this event handler.
+
+		// Record the Minecraft server.
+		this.mc_server = event.getServer();
+	}
+
+	/**
 	 * Called when the server has stopped.
 	 *
 	 * @param event The event.
@@ -166,5 +184,22 @@ public class PrometheusExporterMod {
 
 		// Stop HTTP server.
 		this.closeHttpServer();
+	}
+
+	/**
+	 * Called on the server tick.
+	 *
+	 * @param event The event.
+	 */
+	@SubscribeEvent
+	public void onServerTick(TickEvent.ServerTickEvent event) {
+		// Record server tick.
+		if (this.mc_collector != null) {
+			if (event.phase == TickEvent.Phase.START) {
+				this.mc_collector.startServerTick();
+			} else if (event.phase == TickEvent.Phase.END) {
+				this.mc_collector.stopServerTick();
+			}
+		}
 	}
 }

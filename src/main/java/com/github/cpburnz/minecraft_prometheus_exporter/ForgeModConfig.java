@@ -9,31 +9,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * The Config class defines the mod config. This is used to load and generate
- * the "prometheus_exporter.cfg" config file.
+ * The ForgeModConfig class defines the mod config. This is used to load and
+ * generate the "prometheus_exporter.cfg" config file.
  */
-public class Config {
+public class ForgeModConfig extends ModConfig {
 
 	/**
 	 * The logger to use.
 	 */
 	private static final Logger LOG = LogManager.getLogger();
-
-	/**
-	 * Whether collecting metrics about the JVM process is enabled.
-	 */
-	public boolean collector_jvm;
-
-	/**
-	 * Whether collecting metrics about the Minecraft server is enabled.
-	 */
-	public boolean collector_mc;
-
-	/**
-	 * Whether collecting metrics about the entities in each dimension (world) is
-	 * enabled.
-	 */
-	public boolean collector_mc_entities;
 
 	/**
 	 * The Forge config file specification.
@@ -46,36 +30,6 @@ public class Config {
 	 */
 	@SuppressWarnings("FieldCanBeLocal")
 	private InternalSpec internal_spec;
-
-	/**
-	 * Whether the configuration has been loaded.
-	 */
-	private boolean is_loaded;
-
-	/**
-	 * The IP address to listen on.
-	 */
-	public String web_listen_address;
-
-	/**
-	 * The TCP port to listen on.
-	 */
-	public int web_listen_port;
-
-	/**
-	 * Construct the instance.
-	 */
-	public Config() {
-		// Nothing to do.
-	}
-
-	/**
-	 * @return Whether the configuration is loaded.
-	 */
-	@SuppressWarnings("unused")
-	public boolean isLoaded() {
-		return this.is_loaded;
-	}
 
 	/**
 	 * Load the values from the config file.
@@ -94,18 +48,36 @@ public class Config {
 		this.web_listen_address = this.internal_spec.web_listen_address.getString();
 		this.web_listen_port = this.internal_spec.web_listen_port.getInt();
 
+		// Parse tick errors value.
+		String raw_tick_errors = this.internal_spec.collector_mc_dimension_tick_errors.getString();
+		try {
+			this.collector_mc_dimension_tick_errors = TickErrorPolicy.valueOf(raw_tick_errors);
+		} catch (IllegalArgumentException e) {
+			this.collector_mc_dimension_tick_errors = TickErrorPolicy.LOG;
+			LOG.debug(
+				"Failed to parse {} value {}, default {}.",
+				"collector.mc_dimension_tick_errors",
+				raw_tick_errors,
+				TickErrorPolicy.LOG
+			);
+		}
+
 		// Record that the config is loaded.
-		this.is_loaded = true;
+		this.setIsLoaded(true);
 
 		LOG.debug("collector.jvm: {}", this.collector_jvm);
 		LOG.debug("collector.mc: {}", this.collector_mc);
+		LOG.debug(
+			"collector.mc_dimension_tick_errors: {}",
+			this.collector_mc_dimension_tick_errors
+		);
 		LOG.debug("collector.mc_entities: {}", this.collector_mc_entities);
 		LOG.debug("web.listen_address: {}", this.web_listen_address);
 		LOG.debug("web.listen_port: {}", this.web_listen_port);
 	}
 
 	/**
-	 * This class is used to define the mod config file properties.
+	 * This class is used to define the Forge configuration specifications.
 	 */
 	private static class InternalSpec {
 
@@ -134,6 +106,7 @@ public class Config {
 
 		public final Property collector_jvm;
 		public final Property collector_mc;
+		public final Property collector_mc_dimension_tick_errors;
 		public final Property collector_mc_entities;
 		public final Property web_listen_address;
 		public final Property web_listen_port;
@@ -155,6 +128,27 @@ public class Config {
 			this.collector_mc = config.get("collector", "mc", true);
 			this.collector_mc.comment = (
 				"Enable collecting metrics about the Minecraft server."
+			);
+
+			this.collector_mc_dimension_tick_errors = config
+				.get("collector", "mc_dimension_tick_errors", TickErrorPolicy.LOG.name());
+			this.collector_mc_dimension_tick_errors.comment = (
+				"Configure how to handle dimension (world) tick errors. Some mods "
+				+ "handle the tick events for their custom dimensions, and may not "
+				+ "reliably start and stop ticks as expected."
+				+ "\n"
+				+ "  IGNORE: Ignore tick errors. If a mod really botches tick events, "
+				+ "it could emit up to 20 log statements per second for each "
+				+ "dimension. This would cause large ballooning of the "
+				+ "\"logs/debug.txt\" file. Use this setting, or figure out how to "
+				+ "filter out DEBUG messages for "
+				+ "\"com.github.cpburnz.minecraft_prometheus_exporter.MinecraftCollector/\" "
+				+ "in \"log4j2.xml\"."
+				+ "\n"
+				+ "  LOG: Log tick errors. This is the new default."
+				+ "\n"
+				+ "  STRICT: Raise an exception on tick error. This will crash the "
+				+ "server if an error occurs."
 			);
 
 			this.collector_mc_entities = config.get("collector", "mc_entities", true);
