@@ -1,4 +1,4 @@
-package com.github.cpburnz.minecraft_prometheus_exporter;
+package com.github.cpburnz.minecraft_prometheus_exporter.collectors;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +19,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import io.prometheus.client.GaugeMetricFamily;
+
+import com.github.cpburnz.minecraft_prometheus_exporter.config.ModConfig;
 
 /**
  * The MinecraftCollector class collects stats from the Minecraft server for
@@ -79,19 +81,17 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 			String dim = getDimensionName(world.provider);
 
 			// Get entity info.
-			List loaded_entities = world.loadedEntityList;
+			List<Entity> loaded_entities = world.loadedEntityList;
 			for (int i = loaded_entities.size(); i-- > 0; ) {
-				Object entityObj;
+				Entity entity;
 				try {
-					entityObj = loaded_entities.get(i);
+					entity = loaded_entities.get(i);
 				} catch (IndexOutOfBoundsException e) {
 					LOG.debug("Dimension {} loaded entity list shrank.", dim_id);
 					break;
 				}
 
-				if (entityObj instanceof Entity && !(entityObj instanceof EntityPlayer)) {
-					Entity entity = (Entity)entityObj;
-
+				if (!(entity instanceof EntityPlayer)) {
 					// Get entity type.
 					String entity_type = EntityList.getEntityString(entity);
 					if (entity_type == null && entity instanceof IMob) {
@@ -130,9 +130,8 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	@Override
 	protected GaugeMetricFamily collectPlayerList() {
 		GaugeMetricFamily metric = newPlayerListMetric();
-		for (Object playerObj : this.mc_server.getConfigurationManager().playerEntityList) {
+		for (EntityPlayerMP player : this.mc_server.getConfigurationManager().playerEntityList) {
 			// Get player profile.
-			EntityPlayerMP player = (EntityPlayerMP)playerObj;
 			GameProfile profile = player.getGameProfile();
 
 			// Get player info.

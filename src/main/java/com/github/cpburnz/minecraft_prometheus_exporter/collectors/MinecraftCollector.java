@@ -1,4 +1,4 @@
-package com.github.cpburnz.minecraft_prometheus_exporter;
+package com.github.cpburnz.minecraft_prometheus_exporter.collectors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
+import com.github.cpburnz.minecraft_prometheus_exporter.config.ModConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -200,7 +201,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		return new GaugeMetricFamily(
 			"mc_entities_total",
 			"The number of entities in each dimension by type.",
-			Arrays.asList("dim", "dim_id", "type")
+			Arrays.asList("dim", "dim_id", "id", "type")
 		);
 	}
 
@@ -228,20 +229,15 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		Histogram.Timer timer = this.dim_tick_timers.get(dim_id);
 		if (timer != null) {
 			switch (this.config.collector_mc_dimension_tick_errors) {
-				case IGNORE:
-					// Ignore error.
-					break;
+				case IGNORE -> {}  // Ignore error.
 
-				case LOG:
-					LOG.debug(
-						"Dimension {} tick started before stopping previous tick.", dim_id
-					);
-					break;
+				case LOG -> LOG.debug(
+					"Dimension {} tick started before stopping previous tick.", dim_id
+				);
 
-				case STRICT:
-					throw new IllegalStateException((
-						"Dimension " + dim_id + " tick started before stopping previous tick."
-					));
+				case STRICT -> throw new IllegalStateException((
+					"Dimension " + dim_id + " tick started before stopping previous tick."
+				));
 			}
 
 			// Stop forgotten timer.
@@ -278,20 +274,15 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		Histogram.Timer timer = this.dim_tick_timers.remove(dim_id);
 		if (timer == null) {
 			switch (this.config.collector_mc_dimension_tick_errors) {
-				case IGNORE:
-					// Ignore error.
-					break;
+				case IGNORE -> {} // Ignore error.
 
-				case LOG:
-					LOG.debug(
-						"Dimension {} tick stopped without an active tick.", dim_id
-					);
-					break;
+				case LOG ->  LOG.debug(
+					"Dimension {} tick stopped without an active tick.", dim_id
+				);
 
-				case STRICT:
-					throw new IllegalStateException((
-						"Dimension " + dim_id + " tick stopped without an active tick."
-					));
+				case STRICT -> throw new IllegalStateException((
+					"Dimension " + dim_id + " tick stopped without an active tick."
+				));
 			}
 
 			// No timer to stop.

@@ -1,4 +1,4 @@
-package com.github.cpburnz.minecraft_prometheus_exporter;
+package com.github.cpburnz.minecraft_prometheus_exporter.config;
 
 import java.io.File;
 

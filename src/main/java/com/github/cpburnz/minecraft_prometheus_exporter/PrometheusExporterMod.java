@@ -3,6 +3,8 @@ package com.github.cpburnz.minecraft_prometheus_exporter;
 import java.io.IOException;
 import java.net.BindException;
 
+import javax.annotation.Nullable;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -20,6 +22,9 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
 
+import com.github.cpburnz.minecraft_prometheus_exporter.collectors.ForgeMinecraftCollector;
+import com.github.cpburnz.minecraft_prometheus_exporter.commands.ForgePrometheusCommand;
+import com.github.cpburnz.minecraft_prometheus_exporter.config.ForgeModConfig;
 import com.github.cpburnz.minecraft_prometheus_exporter.prometheus_exporter.Tags;
 
 /**
@@ -35,6 +40,12 @@ import com.github.cpburnz.minecraft_prometheus_exporter.prometheus_exporter.Tags
 public class PrometheusExporterMod {
 
 	/**
+	 * The mod instance.
+	 */
+	@Mod.Instance
+	public static PrometheusExporterMod INSTANCE;
+
+	/**
 	 * The logger to use.
 	 */
 	public static final Logger LOG = LogManager.getLogger(Tags.MODID);
@@ -47,12 +58,17 @@ public class PrometheusExporterMod {
 	/**
 	 * The HTTP server.
 	 */
-	private HTTPServer http_server;
+	private @Nullable HTTPServer http_server;
+
+	/**
+	 * Whether the exporter is running.
+	 */
+	private boolean is_running;
 
 	/**
 	 * The Minecraft metrics collector.
 	 */
-	private ForgeMinecraftCollector mc_collector;
+	private @Nullable ForgeMinecraftCollector mc_collector;
 
 	/**
 	 * The Minecraft server.
@@ -60,11 +76,19 @@ public class PrometheusExporterMod {
 	private MinecraftServer mc_server;
 
 	/**
+	 * Constructs the instance.
+	 */
+	public PrometheusExporterMod() {
+		// Nothing to do.
+	}
+
+	/**
 	 * Unregister the metrics collectors.
 	 */
 	private void closeCollectors() {
 		// Unregister all collectors.
 		CollectorRegistry.defaultRegistry.clear();
+		this.mc_collector = null;
 	}
 
 	/**
@@ -74,7 +98,10 @@ public class PrometheusExporterMod {
 		// WARNING: Remember to stop the HTTP server. Otherwise, the Minecraft
 		// client will crash because the TCP port will already be in use when trying
 		// to load a second saved world.
-		this.http_server.close();
+		if (this.http_server != null) {
+			this.http_server.close();
+			this.http_server = null;
+		}
 	}
 
 	/**
@@ -83,7 +110,7 @@ public class PrometheusExporterMod {
 	private void initCollectors() {
 		// Collect JVM stats.
 		if (this.config.collector_jvm) {
-			DefaultExports.initialize();
+			DefaultExports.register(CollectorRegistry.defaultRegistry);
 		}
 
 		// Collect Minecraft stats.
@@ -95,6 +122,9 @@ public class PrometheusExporterMod {
 
 	/**
 	 * Start the HTTP server.
+	 *
+	 * @throws IOException When an I/O error occurs while starting the HTTP
+	 * server.
 	 */
 	private void initHttpServer() throws IOException {
 		// WARNING: Make sure the HTTP server thread is daemonized, otherwise the
@@ -105,11 +135,17 @@ public class PrometheusExporterMod {
 			this.http_server = new HTTPServer(address, port, true);
 			LOG.info("Listening on {}:{}", address, port);
 		} catch (BindException e) {
-			LOG.error(
-				"Failed to start prometheus exporter, port {} already in use.",
-				port
-			);
+			LOG.error("Failed to start HTTP server, port {} already in use.", port);
 		}
+	}
+
+	/**
+	 * Check whether the exporter is running.
+	 *
+	 * @return Whether the exporter is running.
+	 */
+	public boolean isExporterRunning() {
+		return this.is_running;
 	}
 
 	/**
@@ -148,15 +184,13 @@ public class PrometheusExporterMod {
 	 * Called when the server has started.
 	 *
 	 * @param event The event.
-	 * @throws IOException
+	 *
+	 * @throws IOException When an I/O error occurs while starting the HTTP
+	 * server.
 	 */
 	@Mod.EventHandler
 	public void onServerStarted(FMLServerStartedEvent event) throws IOException {
-		// Initialize HTTP server.
-		this.initHttpServer();
-
-		// Initialize collectors.
-		this.initCollectors();
+		this.startExporter();
 	}
 
 	/**
@@ -167,6 +201,7 @@ public class PrometheusExporterMod {
 	@Mod.EventHandler
 	public void onServerStarting(FMLServerStartingEvent event) {
 		// Register server commands in this event handler.
+		event.registerServerCommand(new ForgePrometheusCommand());
 
 		// Record the Minecraft server.
 		this.mc_server = event.getServer();
@@ -179,11 +214,8 @@ public class PrometheusExporterMod {
 	 */
 	@Mod.EventHandler
 	public void onServerStopped(FMLServerStoppedEvent event) {
-		// Close collectors.
-		this.closeCollectors();
-
-		// Stop HTTP server.
-		this.closeHttpServer();
+		this.stopExporter();
+		this.mc_server = null;
 	}
 
 	/**
@@ -201,5 +233,47 @@ public class PrometheusExporterMod {
 				this.mc_collector.stopServerTick();
 			}
 		}
+	}
+
+	/**
+	 * Start the exporter by starting the HTTP server and registering the
+	 * metric collectors.
+	 *
+	 * @throws IOException When an I/O error occurs while starting the HTTP
+	 * server.
+	 * @throws IllegalStateException When the exporter is already running.
+	 */
+	public void startExporter() throws IOException {
+		if (this.is_running) {
+			throw new IllegalStateException("Exporter is already running.");
+		}
+
+		// Start HTTP server.
+		this.initHttpServer();
+
+		// Register collectors.
+		this.initCollectors();
+
+		this.is_running = true;
+	}
+
+	/**
+	 * Stop the exporter by stopping the HTTP server and unregistering the metric
+	 * collectors.
+	 *
+	 * @throws IllegalStateException When the exporter is not running.
+	 */
+	public void stopExporter() {
+		if (!this.is_running) {
+			throw new IllegalStateException("Exporter is not running.");
+		}
+
+		// Close collectors.
+		this.closeCollectors();
+
+		// Stop HTTP server.
+		this.closeHttpServer();
+
+		this.is_running = false;
 	}
 }

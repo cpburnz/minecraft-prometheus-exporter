@@ -1,4 +1,4 @@
-package com.github.cpburnz.minecraft_prometheus_exporter;
+package com.github.cpburnz.minecraft_prometheus_exporter.config;
 
 /**
  * The ModConfig class defines the base mod config. This is used to store
