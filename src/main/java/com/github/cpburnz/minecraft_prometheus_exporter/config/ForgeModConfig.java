@@ -44,14 +44,23 @@ public class ForgeModConfig extends ModConfig {
 		// Get config values.
 		this.collector_jvm = this.internal_spec.collector_jvm.getBoolean();
 		this.collector_mc = this.internal_spec.collector_mc.getBoolean();
-		this.collector_mc_entities = this.internal_spec.collector_mc_entities.getBoolean();
+		this.collector_mc_entities = (
+			this.internal_spec.collector_mc_entities.getBoolean()
+		);
+		this.collector_mc_player_stats = (
+			this.internal_spec.collector_mc_player_stats.getBoolean()
+		);
 		this.web_listen_address = this.internal_spec.web_listen_address.getString();
 		this.web_listen_port = this.internal_spec.web_listen_port.getInt();
 
 		// Parse tick errors value.
-		String raw_tick_errors = this.internal_spec.collector_mc_dimension_tick_errors.getString();
+		String raw_tick_errors = (
+			this.internal_spec.collector_mc_dimension_tick_errors.getString()
+		);
 		try {
-			this.collector_mc_dimension_tick_errors = TickErrorPolicy.valueOf(raw_tick_errors);
+			this.collector_mc_dimension_tick_errors = (
+				TickErrorPolicy.valueOf(raw_tick_errors)
+			);
 		} catch (IllegalArgumentException e) {
 			this.collector_mc_dimension_tick_errors = TickErrorPolicy.LOG;
 			LOG.debug(
@@ -72,6 +81,7 @@ public class ForgeModConfig extends ModConfig {
 			this.collector_mc_dimension_tick_errors
 		);
 		LOG.debug("collector.mc_entities: {}", this.collector_mc_entities);
+		LOG.debug("collector.mc_player_stats: {}", this.collector_mc_player_stats);
 		LOG.debug("web.listen_address: {}", this.web_listen_address);
 		LOG.debug("web.listen_port: {}", this.web_listen_port);
 	}
@@ -108,6 +118,7 @@ public class ForgeModConfig extends ModConfig {
 		public final Property collector_mc;
 		public final Property collector_mc_dimension_tick_errors;
 		public final Property collector_mc_entities;
+		public final Property collector_mc_player_stats;
 		public final Property web_listen_address;
 		public final Property web_listen_port;
 
@@ -155,6 +166,12 @@ public class ForgeModConfig extends ModConfig {
 			this.collector_mc_entities.comment = (
 				"Enable collecting metrics about the entities in each dimension "
 				+ "(world)."
+			);
+
+			this.collector_mc_player_stats = config
+				.get("collector", "mc_player_stats", true);
+			this.collector_mc_player_stats.comment = (
+				"Enable collecting metrics about general player stats."
 			);
 
 			config.getCategory("web")

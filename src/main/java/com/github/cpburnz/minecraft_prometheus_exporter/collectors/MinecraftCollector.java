@@ -5,10 +5,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
-import com.github.cpburnz.minecraft_prometheus_exporter.config.ModConfig;
+import gnu.trove.map.hash.THashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,15 +17,27 @@ import io.prometheus.client.Collector;
 import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.Histogram;
 
+import com.github.cpburnz.minecraft_prometheus_exporter.config.ModConfig;
+
 /**
  * This class collects stats from the Minecraft server for export.
  */
 public abstract class MinecraftCollector extends Collector implements Collector.Describable {
 
 	/**
+	 * The initial capacity for the dimensions ticks map.
+	 */
+	private static final int DIM_INIT = 3;
+
+	/**
 	 * The logger to use.
 	 */
 	private static final Logger LOG = LogManager.getLogger();
+
+	/**
+	 * The initial capacity for the player ids map. This is arbitrary.
+	 */
+	private static final int PLAYER_IDS_INIT = 20;
 
 	/**
 	 * The histogram buckets to use for ticks.
@@ -61,6 +74,12 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	private final ConcurrentHashMap<Integer, Histogram.Timer> dim_tick_timers;
 
 	/**
+	 * Maps each player name to his id. This is needed to indicate the player id
+	 * for stats.
+	 */
+	protected final THashMap<String, UUID> player_ids;
+
+	/**
 	 * Histogram metrics for server tick timing.
 	 */
 	private final Histogram server_tick_seconds;
@@ -78,7 +97,8 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 */
 	public MinecraftCollector(ModConfig config) {
 		this.config = config;
-		this.dim_tick_timers = new ConcurrentHashMap<>(3);
+		this.dim_tick_timers = new ConcurrentHashMap<>(DIM_INIT);
+		this.player_ids = new THashMap<>(PLAYER_IDS_INIT);
 
 		// Setup server metrics.
 		this.server_tick_seconds = Histogram.build()
@@ -109,11 +129,20 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 			MetricFamilySamples dim_chunks_loaded = this.collectDimensionChunksLoaded();
 			List<MetricFamilySamples> dim_ticks = this.dim_tick_seconds.collect();
 
+			// Collect entity metrics.
 			MetricFamilySamples entities = null;
 			int entities_init = 0;
 			if (this.config.collector_mc_entities) {
 				entities = collectEntitiesTotal();
 				entities_init = 1;
+			}
+
+			// Collect player stats metrics.
+			MetricFamilySamples stats = null;
+			int stats_init = 0;
+			if (this.config.collector_mc_player_stats) {
+				stats = this.collectPlayerStats();
+				stats_init = 1;
 			}
 
 			// Aggregate metrics.
@@ -123,6 +152,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 				+ server_tick.size()
 				+ 1 /* dim_chunks_loaded */
 				+ dim_ticks.size()
+				+ stats_init
 			);
 			metrics.add(player_list);
 			if (entities != null) {
@@ -131,6 +161,9 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 			metrics.addAll(server_tick);
 			metrics.add(dim_chunks_loaded);
 			metrics.addAll(dim_ticks);
+			if (stats != null) {
+				metrics.add(stats);
+			}
 
 			return metrics;
 		} catch (Exception e) {
@@ -159,6 +192,13 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 * @return The player list metric.
 	 */
 	protected abstract GaugeMetricFamily collectPlayerList();
+
+	/**
+	 * Get the general player stats.
+	 *
+	 * @return The player stats metric.
+	 */
+	protected abstract GaugeMetricFamily collectPlayerStats();
 
 	/**
 	 * Return all metric descriptions for the collector.
@@ -215,6 +255,24 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 			"mc_player_list",
 			"The players connected to the server.",
 			Arrays.asList("id", "name")
+		);
+	}
+
+	/**
+	 * Create a new metric for the player stats.
+	 *
+	 * @return The general player stats metric.
+	 */
+	protected static GaugeMetricFamily newPlayerStatsMetric() {
+		return new GaugeMetricFamily(
+			"mc_player_stats",
+			"The general stats about players.",
+			Arrays.asList(
+				"code",
+				"name",
+				"player_id",
+				"player_name"
+			)
 		);
 	}
 

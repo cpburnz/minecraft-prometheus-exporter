@@ -3,6 +3,8 @@ package com.github.cpburnz.minecraft_prometheus_exporter.collectors;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import javax.annotation.Nullable;
 
 import com.mojang.authlib.GameProfile;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -11,6 +13,9 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.scoreboard.Score;
+import net.minecraft.scoreboard.ScoreObjective;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
@@ -29,9 +34,20 @@ import com.github.cpburnz.minecraft_prometheus_exporter.config.ModConfig;
 public class ForgeMinecraftCollector extends MinecraftCollector {
 
 	/**
+	 * The initial capacity to use for the entities total map. This is arbitrary.
+	 */
+	private static final int ENTITIES_TOTAL_INIT = 20;
+
+	/**
 	 * The logger to use.
 	 */
 	private static final Logger LOG = LogManager.getLogger();
+
+	/**
+	 * The number of total entities collected last time. This is used to set the
+	 * initial capacity of the map.
+	 */
+	private int last_entities_total = ENTITIES_TOTAL_INIT;
 
 	/**
 	 * The Minecraft server.
@@ -74,7 +90,9 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	@Override
 	protected GaugeMetricFamily collectEntitiesTotal() {
 		// Aggregate stats.
-		TObjectIntHashMap<EntityKey> entity_totals = new TObjectIntHashMap<>();
+		TObjectIntHashMap<EntityKey> entity_totals = new TObjectIntHashMap<>(
+			this.last_entities_total
+		);
 		for (WorldServer world : this.mc_server.worldServers) {
 			// Get world info.
 			int dim_id = getDimensionId(world.provider);
@@ -109,6 +127,9 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 			}
 		}
 
+		// Record the number of entities collected.
+		this.last_entities_total = entity_totals.size();
+
 		// Record metrics.
 		GaugeMetricFamily metric = newEntitiesTotalMetric();
 		for (EntityKey entity_key : entity_totals.keySet()) {
@@ -140,6 +161,58 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 			String id_str = Objects.toString(profile.getId(), "");
 			String name = ObjectUtils.defaultIfNull(profile.getName(), "");
 			metric.addMetric(Arrays.asList(id_str, name), 1);
+		}
+		return metric;
+	}
+
+	/**
+	 * Get the general player stats.
+	 *
+	 * @return The player stats metric.
+	 */
+	@Override
+	protected GaugeMetricFamily collectPlayerStats() {
+		// Record player ids.
+		for (EntityPlayerMP player : this.mc_server.getConfigurationManager().playerEntityList) {
+			// Get player profile.
+			GameProfile profile = player.getGameProfile();
+
+			// Get player info.
+			// - WARNING: Either "id" or "name" can be null in Minecraft 1.19 and
+			//   earlier.
+			@Nullable UUID player_id = profile.getId();
+			@Nullable String player_name = profile.getName();
+
+			// Record player id.
+			if (player_id != null && player_name != null && !player_name.isEmpty()) {
+				this.player_ids.put(player_name, player_id);
+			}
+		}
+
+		// Collect stats.
+		GaugeMetricFamily metric = newPlayerStatsMetric();
+		Scoreboard scoreboard = this.mc_server.getEntityWorld().getScoreboard();
+		// TODO: Are there non-player objectives?
+		for (String player_name : scoreboard.getObjectiveNames()) {
+			// Get player info.
+			@Nullable UUID player_id = this.player_ids.get(player_name);
+			String player_id_str = Objects.toString(player_id, "");
+
+			for (Score score : scoreboard.func_96510_d(player_name).values()) {
+				// Get stat info.
+				int stat_val = score.getScorePoints();
+				ScoreObjective stat_obj = score.func_96645_d();
+				String stat_code = stat_obj.getName();
+				String stat_name = stat_obj.getDisplayName();
+
+				// record score.
+				metric.addMetric(Arrays.asList(
+					stat_code,
+					stat_name,
+					player_id_str,
+					player_name
+				), stat_val);
+			}
 		}
 		return metric;
 	}

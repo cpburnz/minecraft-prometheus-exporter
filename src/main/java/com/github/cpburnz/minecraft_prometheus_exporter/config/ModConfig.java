@@ -7,12 +7,12 @@ package com.github.cpburnz.minecraft_prometheus_exporter.config;
 public abstract class ModConfig {
 
 	/**
-	 * Whether collecting metrics about the JVM process is enabled.
+	 * Whether to collect metrics about the JVM process.
 	 */
 	public boolean collector_jvm;
 
 	/**
-	 * Whether collecting metrics about the Minecraft server is enabled.
+	 * Whether to collect metrics about the Minecraft server.
 	 */
 	public boolean collector_mc;
 
@@ -22,10 +22,14 @@ public abstract class ModConfig {
 	public TickErrorPolicy collector_mc_dimension_tick_errors;
 
 	/**
-	 * Whether collecting metrics about the entities in each dimension (world) is
-	 * enabled.
+	 * Whether to collect metrics about the entities in each dimension (world).
 	 */
 	public boolean collector_mc_entities;
+
+	/**
+	 * Whether to collect metrics about general player stats.
+	 */
+	public boolean collector_mc_player_stats;
 
 	/**
 	 * Whether the config has been loaded.

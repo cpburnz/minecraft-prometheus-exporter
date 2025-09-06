@@ -1,7 +1,6 @@
 package com.github.cpburnz.minecraft_prometheus_exporter.commands;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -31,10 +30,7 @@ public class ForgePrometheusCommand extends CommandBase implements PrometheusCom
 		}
 
 		// Check subcommands matching arg.
-		String[] cmds = Arrays.stream(CommandArg.values())
-			.map(CommandArg::getValue)
-			.toArray(String[]::new);
-		return getListOfStringsMatchingLastWord(args, cmds);
+		return getListOfStringsMatchingLastWord(args, CommandArg.ARG_VALUES);
 	}
 
 	/**
@@ -137,7 +133,7 @@ public class ForgePrometheusCommand extends CommandBase implements PrometheusCom
 		// Parse subcommand.
 		CommandArg cmd;
 		try {
-			cmd = CommandArg.valueOf(args[0].toUpperCase());
+			cmd = CommandArg.from(args[0]);
 		} catch (IllegalArgumentException e) {
 			throw new WrongUsageException("commands.prometheus.usage");
 		}
