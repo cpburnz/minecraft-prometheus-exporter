@@ -74,6 +74,11 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	private final ConcurrentHashMap<Integer, Histogram.Timer> dim_tick_timers;
 
 	/**
+	 * Whether there have been any server ticks.
+	 */
+	private boolean has_server_ticked;
+
+	/**
 	 * Maps each player name to his id. This is needed to indicate the player id
 	 * for stats.
 	 */
@@ -216,6 +221,9 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		descs.addAll(this.server_tick_seconds.describe());
 		descs.add(newDimensionChunksLoadedMetric());
 		descs.addAll(this.dim_tick_seconds.describe());
+		if (this.config.collector_mc_player_stats) {
+			descs.add(newPlayerStatsMetric());
+		}
 		return descs;
 	}
 
@@ -265,7 +273,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 */
 	protected static GaugeMetricFamily newPlayerStatsMetric() {
 		return new GaugeMetricFamily(
-			"mc_player_stats",
+			"mc_player_stat",
 			"The general stats about players.",
 			Arrays.asList(
 				"code",
@@ -319,6 +327,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 			));
 		}
 
+		this.has_server_ticked = true;
 		this.server_tick_timer = this.server_tick_seconds.startTimer();
 	}
 
@@ -356,6 +365,11 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 */
 	public void stopServerTick() {
 		if (this.server_tick_timer == null) {
+			if (!this.has_server_ticked) {
+				// WARNING: After restarting the collector, we may start during a server
+				// tick. Do not fail in this scenario.
+				return;
+			}
 			throw new IllegalStateException(
 				"Server tick stopped without an active tick."
 			);

@@ -13,10 +13,10 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.scoreboard.Score;
-import net.minecraft.scoreboard.ScoreObjective;
-import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.stats.StatBase;
+import net.minecraft.stats.StatList;
+import net.minecraft.stats.StatisticsFile;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
 import org.apache.commons.lang3.ObjectUtils;
@@ -173,6 +173,7 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	@Override
 	protected GaugeMetricFamily collectPlayerStats() {
 		// Record player ids.
+		GaugeMetricFamily metric = newPlayerStatsMetric();
 		for (EntityPlayerMP player : this.mc_server.getConfigurationManager().playerEntityList) {
 			// Get player profile.
 			GameProfile profile = player.getGameProfile();
@@ -182,35 +183,23 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 			//   earlier.
 			@Nullable UUID player_id = profile.getId();
 			@Nullable String player_name = profile.getName();
-
-			// Record player id.
-			if (player_id != null && player_name != null && !player_name.isEmpty()) {
-				this.player_ids.put(player_name, player_id);
-			}
-		}
-
-		// Collect stats.
-		GaugeMetricFamily metric = newPlayerStatsMetric();
-		Scoreboard scoreboard = this.mc_server.getEntityWorld().getScoreboard();
-		// TODO: Are there non-player objectives?
-		for (String player_name : scoreboard.getObjectiveNames()) {
-			// Get player info.
-			@Nullable UUID player_id = this.player_ids.get(player_name);
 			String player_id_str = Objects.toString(player_id, "");
+			String player_name_str = ObjectUtils.defaultIfNull(player_name, "");
 
-			for (Score score : scoreboard.func_96510_d(player_name).values()) {
-				// Get stat info.
-				int stat_val = score.getScorePoints();
-				ScoreObjective stat_obj = score.func_96645_d();
-				String stat_code = stat_obj.getName();
-				String stat_name = stat_obj.getDisplayName();
+			StatisticsFile stats_file = player.func_147099_x();
+			for (StatBase stat : StatList.generalStats) {
+				// Get stat value.
+				// - NOTICE: Despite its name, this reads the value.
+				int stat_val = stats_file.writeStat(stat);
+				String stat_code = stat.statId;
+				String stat_name = stat.func_150951_e().getUnformattedText(); // TODO: Cache this.
 
-				// record score.
+				// Record score.
 				metric.addMetric(Arrays.asList(
 					stat_code,
 					stat_name,
 					player_id_str,
-					player_name
+					player_name_str
 				), stat_val);
 			}
 		}
