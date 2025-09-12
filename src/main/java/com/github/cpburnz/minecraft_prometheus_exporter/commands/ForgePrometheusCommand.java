@@ -56,9 +56,9 @@ public class ForgePrometheusCommand extends CommandBase implements PrometheusCom
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-			this.sendAdminMessage(sender, "commands.prometheus.start.success");
+			this.sendAdminMessage(sender, MSG_START_SUCCESS);
 		} else {
-			this.sendChatMessage(sender, "commands.prometheus.start.invalid");
+			this.sendChatMessage(sender, MSG_START_INVALID);
 		}
 	}
 
@@ -71,9 +71,9 @@ public class ForgePrometheusCommand extends CommandBase implements PrometheusCom
 		PrometheusExporterMod mod = PrometheusExporterMod.INSTANCE;
 		if (mod.isExporterRunning()) {
 			mod.stopExporter();
-			this.sendAdminMessage(sender, "commands.prometheus.stop.success");
+			this.sendAdminMessage(sender, MSG_STOP_SUCCESS);
 		} else {
-			this.sendChatMessage(sender, "commands.prometheus.stop.invalid");
+			this.sendChatMessage(sender, MSG_STOP_INVALID);
 		}
 	}
 
@@ -105,7 +105,7 @@ public class ForgePrometheusCommand extends CommandBase implements PrometheusCom
 	 */
 	@Override
 	public String getCommandUsage(ICommandSender sender) {
-		return USAGE;
+		return MSG_USAGE;
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class ForgePrometheusCommand extends CommandBase implements PrometheusCom
 	@Override
 	public void processCommand(ICommandSender sender, String[] args) {
 		if (args.length != 1) {
-			throw new WrongUsageException("commands.prometheus.usage");
+			throw new WrongUsageException(MSG_USAGE);
 		}
 
 		// Parse subcommand.
@@ -135,7 +135,7 @@ public class ForgePrometheusCommand extends CommandBase implements PrometheusCom
 		try {
 			cmd = CommandArg.from(args[0]);
 		} catch (IllegalArgumentException e) {
-			throw new WrongUsageException("commands.prometheus.usage");
+			throw new WrongUsageException(MSG_USAGE);
 		}
 
 		switch (cmd) {
@@ -149,21 +149,21 @@ public class ForgePrometheusCommand extends CommandBase implements PrometheusCom
 	 * Send the message to admins.
 	 *
 	 * @param sender The sender.
-	 * @param msgKey The message translation key.
+	 * @param msgFormat The message format.
 	 * @param msgParams The message parameters.
 	 */
-	private void sendAdminMessage(ICommandSender sender, String msgKey, Object... msgParams) {
-		func_152373_a(sender, this, msgKey, msgParams);
+	private void sendAdminMessage(ICommandSender sender, String msgFormat, Object... msgParams) {
+		func_152373_a(sender, this, msgFormat, msgParams);
 	}
 
 	/**
 	 * Send the message to the user.
 	 *
 	 * @param sender The sender.
-	 * @param msgKey The message translation key.
+	 * @param msgFormat The message format.
 	 * @param msgParams The message parameters.
 	 */
-	private void sendChatMessage(ICommandSender sender, String msgKey, Object... msgParams) {
-		sender.addChatMessage(new ChatComponentTranslation(msgKey, msgParams));
+	private void sendChatMessage(ICommandSender sender, String msgFormat, Object... msgParams) {
+		sender.addChatMessage(new ChatComponentTranslation(msgFormat, msgParams));
 	}
 }

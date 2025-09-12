@@ -17,6 +17,31 @@ public interface PrometheusCommand {
 	List<String> ALIASES = Arrays.asList("prom");
 
 	/**
+	 * The message for command usage.
+	 */
+	String MSG_USAGE = "/prometheus <start|stop|restart>";
+
+	/**
+	 * The message for when starting the exporter is invalid.
+	 */
+	String MSG_START_INVALID = "Prometheus exporter is already running.";
+
+	/**
+	 * The message for when starting the exporter succeeded.
+	 */
+	String MSG_START_SUCCESS = "Prometheus exporter started.";
+
+	/**
+	 * The message for when stopping the exporter is invalid.
+	 */
+	String MSG_STOP_INVALID = "Prometheus exporter is already stopped.";
+
+	/**
+	 * The message for when stopping the exporter succeeded.
+	 */
+	String MSG_STOP_SUCCESS = "Prometheus exporter stopped.";
+
+	/**
 	 * The command name.
 	 */
 	String NAME = "prometheus";
@@ -26,11 +51,6 @@ public interface PrometheusCommand {
 	 * "op".
 	 */
 	int PERMISSION_LEVEL = 2;
-
-	/**
-	 * The command usage.
-	 */
-	String USAGE = "commands.prometheus.usage";
 
 	/**
 	 * The CommandArg enum defines the subcommands.

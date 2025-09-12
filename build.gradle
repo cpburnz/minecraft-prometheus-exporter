@@ -754,7 +754,14 @@ if (usesMixins.toBoolean()) {
     }
 }
 
-tasks.named("processResources", ProcessResources).configure {
+processResources {
+    var replaceProperties = [
+        "minecraftVersion": minecraftVersion,
+        "modId": modId,
+        "modName": modName,
+        "modVersion": modVersion,
+    ]
+
     // this will ensure that this task is redone when the versions change.
     // MODIFIED: Fix Minecraft version because it is not properly pulled from
     // "gradle.properties".
@@ -763,11 +770,8 @@ tasks.named("processResources", ProcessResources).configure {
     exclude("spotless.gradle")
 
     // replace stuff in mcmod.info, nothing else. replaces ${key} with value in text
-    filesMatching("mcmod.info")  {
-        expand "minecraftVersion": minecraftVersion,
-            "modVersion": modVersion,
-            "modId": modId,
-            "modName": modName
+    filesMatching("mcmod.info") {
+        expand replaceProperties
     }
 
     if (usesMixins.toBoolean()) {

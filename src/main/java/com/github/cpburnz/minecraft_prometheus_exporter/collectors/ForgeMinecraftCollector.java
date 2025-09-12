@@ -2,11 +2,13 @@ package com.github.cpburnz.minecraft_prometheus_exporter.collectors;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.mojang.authlib.GameProfile;
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -44,6 +46,12 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	private static final Logger LOG = LogManager.getLogger();
 
 	/**
+	 * The initial capacity to use for the stat names map. This was counted from
+	 * StatList.
+	 */
+	private static final int STATS_INIT = 23;
+
+	/**
 	 * The number of total entities collected last time. This is used to set the
 	 * initial capacity of the map.
 	 */
@@ -55,6 +63,17 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	private final MinecraftServer mc_server;
 
 	/**
+	 * Maps each player id to his name and stats. This is used to persist player
+	 * stats after sign-out.
+	 */
+	private final THashMap<UUID, PlayerInfo> players;
+
+	/**
+	 * Maps each stat to its name. This is used to cache stat names.
+	 */
+	private final THashMap<StatBase, String> stat_names;
+
+	/**
 	 * Constructs the instance.
 	 *
 	 * @param config The mod configuration.
@@ -63,6 +82,8 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	public ForgeMinecraftCollector(ModConfig config, MinecraftServer mc_server) {
 		super(config);
 		this.mc_server = mc_server;
+		this.players = new THashMap<>(PLAYERS_INIT);
+		this.stat_names = new THashMap<>(STATS_INIT);
 	}
 
 	/**
@@ -172,8 +193,7 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	 */
 	@Override
 	protected GaugeMetricFamily collectPlayerStats() {
-		// Record player ids.
-		GaugeMetricFamily metric = newPlayerStatsMetric();
+		// Cache player list and stats.
 		for (EntityPlayerMP player : this.mc_server.getConfigurationManager().playerEntityList) {
 			// Get player profile.
 			GameProfile profile = player.getGameProfile();
@@ -183,23 +203,45 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 			//   earlier.
 			@Nullable UUID player_id = profile.getId();
 			@Nullable String player_name = profile.getName();
-			String player_id_str = Objects.toString(player_id, "");
-			String player_name_str = ObjectUtils.defaultIfNull(player_name, "");
 
-			StatisticsFile stats_file = player.func_147099_x();
+			if (player_id != null && player_name != null) {
+				StatisticsFile stats = player.func_147099_x();
+				@Nullable PlayerInfo player_info = this.players.get(player_id);
+				if (player_info != null) {
+					player_info.name = player_name;
+					player_info.stats = stats;
+				} else {
+					player_info = new PlayerInfo(player_id, player_name, stats);
+					this.players.put(player_id, player_info);
+				}
+			}
+		}
+
+		// Collect player stats.
+		GaugeMetricFamily metric = newPlayerStatsMetric();
+		for (PlayerInfo player_info : this.players.values()) {
+			String player_id_str = player_info.id.toString();
+			String player_name = player_info.name;
+			StatisticsFile stats = player_info.stats;
+
 			for (StatBase stat : StatList.generalStats) {
 				// Get stat value.
 				// - NOTICE: Despite its name, this reads the value.
-				int stat_val = stats_file.writeStat(stat);
+				int stat_val = stats.writeStat(stat);
 				String stat_code = stat.statId;
-				String stat_name = stat.func_150951_e().getUnformattedText(); // TODO: Cache this.
+				@Nullable String stat_name = this.stat_names.get(stat);
+				if (stat_name == null) {
+					// Cache stat name.
+					stat_name = stat.func_150951_e().getUnformattedText();
+					this.stat_names.put(stat, stat_name);
+				}
 
 				// Record score.
 				metric.addMetric(Arrays.asList(
 					stat_code,
 					stat_name,
 					player_id_str,
-					player_name_str
+					player_name
 				), stat_val);
 			}
 		}
@@ -249,5 +291,39 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 		int dim_id = getDimensionId(dim);
 
 		super.stopDimensionTick(dim_id);
+	}
+
+	/**
+	 * The PlayerInfo class contains the player name and stats.
+	 */
+	private static class PlayerInfo {
+
+		/**
+		 * The player id.
+		 */
+		final UUID id;
+
+		/**
+		 * The player name,
+		 */
+		String name;
+
+		/**
+		 * The statistics file.
+		 */
+		StatisticsFile stats;
+
+		/**
+		 * Constructs the PlayerInfo instance.
+		 *
+		 * @param id The player id.
+		 * @param name The player name.
+		 * @param stats The statistics file.
+		 */
+		PlayerInfo(UUID id, String name, StatisticsFile stats) {
+			this.id = id;
+			this.name = name;
+			this.stats = stats;
+		}
 	}
 }

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
@@ -35,9 +34,9 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	private static final Logger LOG = LogManager.getLogger();
 
 	/**
-	 * The initial capacity for the player ids map. This is arbitrary.
+	 * The initial capacity for the players map. This is arbitrary.
 	 */
-	private static final int PLAYER_IDS_INIT = 20;
+	protected static final int PLAYERS_INIT = 20;
 
 	/**
 	 * The histogram buckets to use for ticks.
@@ -74,15 +73,14 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	private final ConcurrentHashMap<Integer, Histogram.Timer> dim_tick_timers;
 
 	/**
-	 * Whether there have been any server ticks.
+	 * Maps each dimension id to whether it there have been any dimension ticks.
 	 */
-	private boolean has_server_ticked;
+	private final ConcurrentHashMap.KeySetView<Integer, Boolean> dims_have_ticked;
 
 	/**
-	 * Maps each player name to his id. This is needed to indicate the player id
-	 * for stats.
+	 * Whether there have been any server ticks.
 	 */
-	protected final THashMap<String, UUID> player_ids;
+	private boolean server_has_ticked;
 
 	/**
 	 * Histogram metrics for server tick timing.
@@ -103,7 +101,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	public MinecraftCollector(ModConfig config) {
 		this.config = config;
 		this.dim_tick_timers = new ConcurrentHashMap<>(DIM_INIT);
-		this.player_ids = new THashMap<>(PLAYER_IDS_INIT);
+		this.dims_have_ticked = ConcurrentHashMap.newKeySet(DIM_INIT);
 
 		// Setup server metrics.
 		this.server_tick_seconds = Histogram.build()
@@ -315,6 +313,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		String id_str = Integer.toString(dim_id);
 		timer = this.dim_tick_seconds.labels(id_str, dim).startTimer();
 		this.dim_tick_timers.put(dim_id, timer);
+		this.dims_have_ticked.add(dim_id);
 	}
 
 	/**
@@ -327,8 +326,8 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 			));
 		}
 
-		this.has_server_ticked = true;
 		this.server_tick_timer = this.server_tick_seconds.startTimer();
+		this.server_has_ticked = true;
 	}
 
 	/**
@@ -340,6 +339,12 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		// Get active timer.
 		Histogram.Timer timer = this.dim_tick_timers.remove(dim_id);
 		if (timer == null) {
+			if (!this.dims_have_ticked.contains(dim_id)) {
+				// WARNING: After restarting the collector, we may start during a
+				// dimension tick. Do not fail in this scenario.
+				return;
+			}
+
 			switch (this.config.collector_mc_dimension_tick_errors) {
 				case IGNORE -> {} // Ignore error.
 
@@ -365,7 +370,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 */
 	public void stopServerTick() {
 		if (this.server_tick_timer == null) {
-			if (!this.has_server_ticked) {
+			if (!this.server_has_ticked) {
 				// WARNING: After restarting the collector, we may start during a server
 				// tick. Do not fail in this scenario.
 				return;
