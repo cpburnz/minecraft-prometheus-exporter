@@ -2,19 +2,34 @@ package com.github.cpburnz.minecraft_prometheus_exporter.commands;
 
 import java.io.IOException;
 import java.util.List;
-
 import javax.annotation.Nullable;
 
-import com.github.cpburnz.minecraft_prometheus_exporter.PrometheusExporterMod;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.util.ChatComponentTranslation;
 
+import com.github.cpburnz.minecraft_prometheus_exporter.PrometheusExporterMod;
+import com.github.cpburnz.minecraft_prometheus_exporter.config.ModConfig;
+
 /**
  * The ForgePrometheusCommand class defines the "prometheus" command for Forge.
  */
 public class ForgePrometheusCommand extends CommandBase implements PrometheusCommand {
+
+	/**
+	 * The mod configuration.
+	 */
+	private final ModConfig config;
+
+	/**
+	 * Constructs the instance.
+	 *
+	 * @param config The mod configuration.
+	 */
+	public ForgePrometheusCommand(ModConfig config) {
+		this.config = config;
+	}
 
 	/**
 	 * Get the available options for tab completion given the arguments.
@@ -115,7 +130,7 @@ public class ForgePrometheusCommand extends CommandBase implements PrometheusCom
 	 */
 	@Override
 	public int getRequiredPermissionLevel() {
-		return PERMISSION_LEVEL;
+		return this.config.command_permission_level;
 	}
 
 	/**

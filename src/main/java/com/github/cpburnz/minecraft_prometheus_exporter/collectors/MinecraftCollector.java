@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
-import gnu.trove.map.hash.THashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -144,7 +143,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 			MetricFamilySamples stats = null;
 			int stats_init = 0;
 			if (this.config.collector_mc_player_stats) {
-				stats = this.collectPlayerStats();
+				stats = this.collectPlayerStatsTotal();
 				stats_init = 1;
 			}
 
@@ -201,7 +200,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 *
 	 * @return The player stats metric.
 	 */
-	protected abstract GaugeMetricFamily collectPlayerStats();
+	protected abstract GaugeMetricFamily collectPlayerStatsTotal();
 
 	/**
 	 * Return all metric descriptions for the collector.
@@ -220,7 +219,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		descs.add(newDimensionChunksLoadedMetric());
 		descs.addAll(this.dim_tick_seconds.describe());
 		if (this.config.collector_mc_player_stats) {
-			descs.add(newPlayerStatsMetric());
+			descs.add(newPlayerStatsTotalMetric());
 		}
 		return descs;
 	}
@@ -269,9 +268,9 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 *
 	 * @return The general player stats metric.
 	 */
-	protected static GaugeMetricFamily newPlayerStatsMetric() {
+	protected static GaugeMetricFamily newPlayerStatsTotalMetric() {
 		return new GaugeMetricFamily(
-			"mc_player_stat",
+			"mc_player_stat_total",
 			"The general stats about players.",
 			Arrays.asList(
 				"code",

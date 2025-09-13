@@ -1,23 +1,11 @@
 This mod provides a Prometheus exporter for Minecraft. It exports metrics
 related to the Minecraft server and the JVM for consumption by the open-source
 systems monitoring toolkit, [Prometheus]. The mod is intended for server-side
-use, and does not need to be installed client-side. This currently has builds
-for the following versions:
+use, and does not need to be installed client-side. You can find the latest
+builds for various versions of Minecraft and mod loaders in [Releases].
 
-- Minecraft 1.20.2 with Forge 48.1.0.
-- Minecraft 1.20.1 with Forge 47.1.0.
-- Minecraft 1.19.3 with Forge 44.1.0.
-- Minecraft 1.19.2 with Forge 43.0.0.
-- Minecraft 1.18.2 with Forge 40.2.0.
-- Minecraft 1.18.1 with Forge 39.0.0.
-- Minecraft 1.16.5 with Forge 36.2.0.
-- Minecraft 1.15.2 with Forge 21.2.0.
-- Minecraft 1.14.4 with Forge 28.1.0.
-- Minecraft 1.12.2 with Forge 14.23.0.
-- Minecraft 1.7.10 with Forge 10.13.4.
-
-Is there a newer version of Minecraft not listed? Let me know by opening an
-[issue on GitHub].
+Is there a newer version of Minecraft not listed? Is the mod outdated for one of
+the listed Minecraft versions? Let me know by opening an [issue on GitHub].
 
 
 Installation
@@ -56,6 +44,7 @@ Known compatible Grafana dashboards are listed in [dashboards.md].
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
 [Prometheus]: https://prometheus.io/
+[Releases]: https://github.com/cpburnz/minecraft-prometheus-exporter/wiki/Releases
 [dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.7.10/dashboards.md
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
 [metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.7.10/metrics.md

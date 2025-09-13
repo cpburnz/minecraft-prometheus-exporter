@@ -49,6 +49,9 @@ public class ForgeModConfig extends ModConfig {
 		this.collector_mc_player_stats = (
 			this.internal_spec.collector_mc_player_stats.getBoolean()
 		);
+		this.command_permission_level = (
+			this.internal_spec.command_permission_level.getInt()
+		);
 		this.web_listen_address = this.internal_spec.web_listen_address.getString();
 		this.web_listen_port = this.internal_spec.web_listen_port.getInt();
 
@@ -81,6 +84,7 @@ public class ForgeModConfig extends ModConfig {
 		);
 		LOG.debug("collector.mc_entities: {}", this.collector_mc_entities);
 		LOG.debug("collector.mc_player_stats: {}", this.collector_mc_player_stats);
+		LOG.debug("command.permission_level: {}", this.command_permission_level);
 		LOG.debug("web.listen_address: {}", this.web_listen_address);
 		LOG.debug("web.listen_port: {}", this.web_listen_port);
 	}
@@ -97,11 +101,26 @@ public class ForgeModConfig extends ModConfig {
 		private static final String DEFAULT_ADDRESS = "0.0.0.0";
 
 		/**
+		 * The default required permission level to execute commands.
+		 */
+		private static final int DEFAULT_PERMISSION_LEVEL = 4;
+
+		/**
 		 * The default TCP port ot use. This is completely arbitrary. It was derived
 		 * from the Minecraft port (25565) and the Prometheus exporter ports
 		 * (9100+).
 		 */
 		private static final int DEFAULT_PORT = 19565;
+
+		/**
+		 * The minimum permission level.
+		 */
+		private static final int PERMISSION_LEVEL_MIN = 0;
+
+		/**
+		 * The maximum permission level.
+		 */
+		private static final int PERMISSION_LEVEL_MAX = 4;
 
 		/**
 		 * The maximum TCP port.
@@ -118,6 +137,7 @@ public class ForgeModConfig extends ModConfig {
 		public final Property collector_mc_dimension_tick_errors;
 		public final Property collector_mc_entities;
 		public final Property collector_mc_player_stats;
+		public final Property command_permission_level;
 		public final Property web_listen_address;
 		public final Property web_listen_port;
 
@@ -173,6 +193,22 @@ public class ForgeModConfig extends ModConfig {
 				"Enable collecting metrics about general player stats."
 			);
 
+			config.getCategory("command")
+				.setComment("Command settings.");
+
+			this.command_permission_level = config.get(
+				"command", "permission_level", DEFAULT_PERMISSION_LEVEL
+			).setMinValue(PERMISSION_LEVEL_MIN)
+				.setMaxValue(PERMISSION_LEVEL_MAX);
+			this.command_permission_level.comment = (
+				"The permission level required to run the \"/prometheus\" command. "
+				+ "Range is " + PERMISSION_LEVEL_MIN + "-" + PERMISSION_LEVEL_MAX + "."
+				+ "\n"
+				+ "  0: Any player."
+				+ "\n"
+				+ "  1-4: Varying levels of \"op\". The default permission for op is 4."
+			);
+
 			config.getCategory("web")
 				.setComment("Web server settings.");
 
@@ -189,7 +225,7 @@ public class ForgeModConfig extends ModConfig {
 			this.web_listen_port.comment = (
 				"The TCP port to listen on. Ports 1-1023 will not work unless "
 				+ "Minecraft is run as root which is not recommended. Range is "
-				+ TCP_PORT_MIN + "-" + TCP_PORT_MAX
+				+ TCP_PORT_MIN + "-" + TCP_PORT_MAX + "."
 			);
 
 			if (config.hasChanged()) {

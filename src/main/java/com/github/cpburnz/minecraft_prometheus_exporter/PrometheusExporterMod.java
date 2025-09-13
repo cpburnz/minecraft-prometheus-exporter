@@ -2,7 +2,6 @@ package com.github.cpburnz.minecraft_prometheus_exporter;
 
 import java.io.IOException;
 import java.net.BindException;
-
 import javax.annotation.Nullable;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -201,7 +200,7 @@ public class PrometheusExporterMod {
 	@Mod.EventHandler
 	public void onServerStarting(FMLServerStartingEvent event) {
 		// Register server commands in this event handler.
-		event.registerServerCommand(new ForgePrometheusCommand());
+		event.registerServerCommand(new ForgePrometheusCommand(this.config));
 
 		// Record the Minecraft server.
 		this.mc_server = event.getServer();

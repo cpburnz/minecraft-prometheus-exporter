@@ -2,13 +2,14 @@ Change History
 ==============
 
 
-TODO: 1.3.0 for Minecraft 1.7.10 with Forge 10.13.0 (Unreleased)
----------------------------------------------------------
+1.3.0 for Minecraft 1.7.10 with Forge 10.13.0 (2025-09-13)
+----------------------------------------------------------
 
 New features:
 
-- TODO: Restart prometheus exporter command.
-- TODO: Add player_playtime metric.
+- [Issue #38](https://github.com/cpburnz/minecraft-prometheus-exporter/issues/38): The exporter can now be managed with the commands "/prometheus start", "/prometheus stop", and "/prometheus restart". The player requires op or level 4 permissions which can be configured by the "command.permission_level" setting.
+
+- [Issue #39](https://github.com/cpburnz/minecraft-prometheus-exporter/issues/39)/[Issue #40](https://github.com/cpburnz/minecraft-prometheus-exporter/issues/40): Added player stats in the new "mc_player_stat_total" metric. These can be disabled by setting the "collector.mc_player_stats" setting to false.
 
 
 1.2.1 for Minecraft 1.7.10 with Forge 10.13.0 (Unreleased)

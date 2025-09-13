@@ -16,6 +16,9 @@ public interface PrometheusCommand {
 	@SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
 	List<String> ALIASES = Arrays.asList("prom");
 
+	// TODO: I can't get ChatComponentTranslation to work with strings defined in
+	// "assets/prometheus_exporter/lang/en_us.json".
+
 	/**
 	 * The message for command usage.
 	 */
@@ -45,12 +48,6 @@ public interface PrometheusCommand {
 	 * The command name.
 	 */
 	String NAME = "prometheus";
-
-	/**
-	 * The required permission level to use this command. This is restricted to
-	 * "op".
-	 */
-	int PERMISSION_LEVEL = 2;
 
 	/**
 	 * The CommandArg enum defines the subcommands.

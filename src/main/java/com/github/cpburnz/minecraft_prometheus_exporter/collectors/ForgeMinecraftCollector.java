@@ -2,7 +2,6 @@ package com.github.cpburnz.minecraft_prometheus_exporter.collectors;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -192,7 +191,7 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	 * @return The player stats metric.
 	 */
 	@Override
-	protected GaugeMetricFamily collectPlayerStats() {
+	protected GaugeMetricFamily collectPlayerStatsTotal() {
 		// Cache player list and stats.
 		for (EntityPlayerMP player : this.mc_server.getConfigurationManager().playerEntityList) {
 			// Get player profile.
@@ -218,7 +217,7 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 		}
 
 		// Collect player stats.
-		GaugeMetricFamily metric = newPlayerStatsMetric();
+		GaugeMetricFamily metric = newPlayerStatsTotalMetric();
 		for (PlayerInfo player_info : this.players.values()) {
 			String player_id_str = player_info.id.toString();
 			String player_name = player_info.name;
