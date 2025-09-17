@@ -5,9 +5,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.annotation.Nullable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.mojang.authlib.GameProfile;
+
+import io.prometheus.client.Collector;
+import io.prometheus.client.GaugeMetricFamily;
+import io.prometheus.client.Histogram;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -16,12 +24,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import io.prometheus.client.Collector;
-import io.prometheus.client.GaugeMetricFamily;
-import io.prometheus.client.Histogram;
 
 /**
  * The MinecraftCollector class collects stats from the Minecraft server for
@@ -120,6 +122,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		try {
 			// Collect metrics.
 			MetricFamilySamples player_list = this.collectPlayerList();
+			MetricFamilySamples position_x_list = this.collectPlayerPositionXList();
+			MetricFamilySamples position_y_list = this.collectPlayerPositionYList();
+			MetricFamilySamples position_z_list = this.collectPlayerPositionZList();
 			List<MetricFamilySamples> server_ticks = this.server_tick_seconds.collect();
 			MetricFamilySamples dim_chunks_loaded = this.collectDimensionChunksLoaded();
 			List<MetricFamilySamples> dim_ticks = this.dim_tick_seconds.collect();
@@ -140,6 +145,18 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 				+ dim_ticks.size()
 			);
 			metrics.add(player_list);
+			if (entities != null) {
+				metrics.add(entities);
+			}
+			metrics.add(position_x_list);
+			if (entities != null) {
+				metrics.add(entities);
+			}
+			metrics.add(position_y_list);
+			if (entities != null) {
+				metrics.add(entities);
+			}
+			metrics.add(position_z_list);
 			if (entities != null) {
 				metrics.add(entities);
 			}
@@ -239,6 +256,72 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	}
 
 	/**
+	 * Get player x positon.
+	 *
+	 * @return The positon list metric.
+	 */
+	private GaugeMetricFamily collectPlayerPositionXList() {
+		GaugeMetricFamily metric = newPlayerPositionXMetric();
+		for (ServerPlayer player : this.mc_server.getPlayerList().getPlayers()) {
+			// Get player profile.
+			GameProfile profile = player.getGameProfile();
+
+			// Get player info.
+			// - NOTICE: Both "id" and "name" are required to be non-null, unlike in
+			//   Minecraft 1.19 and earlier.
+			String id_str = profile.getId().toString();
+			String name = profile.getName();
+
+			metric.addMetric(List.of(id_str, name), player.position().x());
+		}
+		return metric;
+	}
+
+	/**
+	 * Get player y positon.
+	 *
+	 * @return The positon list metric.
+	 */
+	private GaugeMetricFamily collectPlayerPositionYList() {
+		GaugeMetricFamily metric = newPlayerPositionYMetric();
+		for (ServerPlayer player : this.mc_server.getPlayerList().getPlayers()) {
+			// Get player profile.
+			GameProfile profile = player.getGameProfile();
+
+			// Get player info.
+			// - NOTICE: Both "id" and "name" are required to be non-null, unlike in
+			//   Minecraft 1.19 and earlier.
+			String id_str = profile.getId().toString();
+			String name = profile.getName();
+
+			metric.addMetric(List.of(id_str, name), player.position().y());
+		}
+		return metric;
+	}
+
+	/**
+	 * Get player z positon.
+	 *
+	 * @return The positon list metric.
+	 */
+	private GaugeMetricFamily collectPlayerPositionZList() {
+		GaugeMetricFamily metric = newPlayerPositionZMetric();
+		for (ServerPlayer player : this.mc_server.getPlayerList().getPlayers()) {
+			// Get player profile.
+			GameProfile profile = player.getGameProfile();
+
+			// Get player info.
+			// - NOTICE: Both "id" and "name" are required to be non-null, unlike in
+			//   Minecraft 1.19 and earlier.
+			String id_str = profile.getId().toString();
+			String name = profile.getName();
+
+			metric.addMetric(List.of(id_str, name), player.position().z());
+		}
+		return metric;
+	}
+
+	/**
 	 * Return all metric descriptions for the collector.
 	 *
 	 * @return The collector metric descriptions.
@@ -316,6 +399,45 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		return new GaugeMetricFamily(
 			"mc_player_list",
 			"The players connected to the server.",
+			List.of("id", "name")
+		);
+	}
+
+	/**
+	 * Create a new metric for the player positon.
+	 *
+	 * @return The player list metric.
+	 */
+	private static GaugeMetricFamily newPlayerPositionXMetric() {
+		return new GaugeMetricFamily(
+			"mc_player_positon_x",
+			"X position of players.",
+			List.of("id", "name")
+		);
+	}
+
+	/**
+	 * Create a new metric for the player positon.
+	 *
+	 * @return The player list metric.
+	 */
+	private static GaugeMetricFamily newPlayerPositionYMetric() {
+		return new GaugeMetricFamily(
+			"mc_player_positon_y",
+			"Y position of players.",
+			List.of("id", "name")
+		);
+	}
+
+	/**
+	 * Create a new metric for the player positon.
+	 *
+	 * @return The player list metric.
+	 */
+	private static GaugeMetricFamily newPlayerPositionZMetric() {
+		return new GaugeMetricFamily(
+			"mc_player_positon_z",
+			"Z position of players.",
 			List.of("id", "name")
 		);
 	}
