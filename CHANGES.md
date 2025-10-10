@@ -6,10 +6,10 @@ Change History
 
 New features:
 
-- Separate the Collectors out into individual files, located in collectors/
+- Separated the Collectors out into individual files, located in collectors/
 - Added new collectors for metrics as driven by ServerUtilities (FTBTeams)
-- Added a new collector for TileEntites, per dim & indentifier
-- Genereally user newer 1.7.10 mod format & try to unify both
+- Added a new collector for TileEntities, per dim & identifier
+- Generally user newer 1.7.10 mod format & try to unify both
 
 1.3.0 for Minecraft 1.7.10 with Forge 10.13.0 (2025-09-13)
 ----------------------------------------------------------
