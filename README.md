@@ -4,7 +4,21 @@ systems monitoring toolkit, [Prometheus](https://prometheus.io/). The mod is int
 use, and does not need to be installed client-side. This currently has builds
 for the following versions:
 
+- Minecraft 1.20.2 with Forge 48.1.0.
+- Minecraft 1.20.1 with Forge 47.1.0.
+- Minecraft 1.19.3 with Forge 44.1.0.
+- Minecraft 1.19.2 with Forge 43.0.0.
+- Minecraft 1.18.2 with Forge 40.2.0.
+- Minecraft 1.18.1 with Forge 39.0.0.
+- Minecraft 1.16.5 with Forge 36.2.0.
+- Minecraft 1.15.2 with Forge 21.2.0.
+- Minecraft 1.14.4 with Forge 28.1.0.
+- Minecraft 1.12.2 with Forge 14.23.0.
 - Minecraft 1.7.10 with Forge 10.13.4.
+
+Is there a newer version of Minecraft not listed? Let me know by opening an
+[issue on GitHub].
+
 
 Installation
 ------------
@@ -17,12 +31,12 @@ version.
 Migrating
 ---------
 
-If you are coming from the upstream repo, the old config file will transfer the following configs:
+If you are upgrading from an older version, the old config file will transfer the following configs:
 - listen_address
 - listen_port
 - jwm_collector
 
-The following changes occured that may require panel adjustments from coming from upstream:
+The following changes occured that may require panel adjustments:
 - mc_player_list: current dimension added
 
 Configuration
@@ -43,3 +57,10 @@ Dashboards
 ----------
 
 Known compatible Grafana dashboards are listed in [dashboards.md].
+
+[Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
+[GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
+[Prometheus]: https://prometheus.io/
+[issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
+[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.7.10/metrics.md
+[prometheus_exporter.cfg]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.7.10/examples/prometheus_exporter.cfg
