@@ -150,14 +150,14 @@ public class PrometheusExporterMod {
      */
     @Mod.EventHandler
     public void onPreInitialization(FMLPreInitializationEvent event) {
-        if (event.getSide() == Side.CLIENT) return;
-
         // Register the server config.
         try {
             ConfigurationManager.registerConfig(ExporterConfig.class);
         } catch (ConfigException e) {
             throw new RuntimeException(e);
         }
+
+        if (event.getSide() == Side.CLIENT) return;
 
         // Register event handlers.
         FMLCommonHandler.instance()
