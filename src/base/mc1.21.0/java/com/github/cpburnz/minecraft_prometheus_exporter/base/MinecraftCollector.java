@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
+import io.prometheus.client.Gauge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,6 +24,36 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 * The logger to use.
 	 */
 	private static final Logger LOG = LogManager.getLogger();
+
+	/**
+	 * The name of the dimeision chunks loaded metric.
+	 */
+	protected static final String NAME_DIMENSION_CHUNKS_LOADED = "mc_dimension_chunks_loaded";
+
+	/**
+	 * The name of the dimension ticks seconds metric.
+	 */
+	private static final String NAME_DIMENSION_TICK_SECONDS = "mc_dimension_tick_seconds";
+
+	/**
+	 * The name of the entities total metric.
+	 */
+	protected static final String NAME_ENTITIES_TOTAL = "mc_entities_total";
+
+	/**
+	 * The name of the player list metric.
+	 */
+	protected static final String NAME_PLAYER_LIST = "mc_player_list";
+
+	/**
+	 * The name of the scrape duration seconds metric.
+	 */
+	private static final String NAME_SCRAPE_DURATION_SECONDS = "mc_scrape_duration_seconds";
+
+	/**
+	 * The name of the server tick seconds metric.
+	 */
+	private static final String NAME_SERVER_TICK_SECONDS = "mc_server_tick_seconds";
 
 	/**
 	 * The histogram buckets to use for ticks.
@@ -59,6 +90,11 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	private final ConcurrentHashMap<String, Histogram.Timer> dim_tick_timers;
 
 	/**
+	 * Gauge metric for recording scrape durations.
+	 */
+	private final Gauge scrape_duration;
+
+	/**
 	 * Histogram metrics for server tick timing.
 	 */
 	private final Histogram server_tick_seconds;
@@ -78,16 +114,23 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		this.config = config;
 		this.dim_tick_timers = new ConcurrentHashMap<>(3);
 
+		// Setup scrape metrics.
+		this.scrape_duration = Gauge.build()
+			.name(NAME_SCRAPE_DURATION_SECONDS)
+			.help("How long each metric took to be scraped.")
+			.labelNames("metric")
+			.create();
+
 		// Setup server metrics.
 		this.server_tick_seconds = Histogram.build()
 			.buckets(TICK_BUCKETS)
-			.name("mc_server_tick_seconds")
+			.name(NAME_SERVER_TICK_SECONDS)
 			.help("Stats on server tick times.")
 			.create();
 
 		this.dim_tick_seconds = Histogram.build()
 			.buckets(TICK_BUCKETS)
-			.name("mc_dimension_tick_seconds")
+			.name(NAME_DIMENSION_TICK_SECONDS)
 			.labelNames("id", "name")
 			.help("Stats on dimension tick times.")
 			.create();
@@ -102,10 +145,11 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	public List<MetricFamilySamples> collect() {
 		try {
 			// Collect metrics.
+			this.scrape_duration.clear();
 			MetricFamilySamples player_list = this.collectPlayerList();
-			List<MetricFamilySamples> server_ticks = this.server_tick_seconds.collect();
+			List<MetricFamilySamples> server_ticks = this.collectServerTickSeconds();
 			MetricFamilySamples dim_chunks_loaded = this.collectDimensionChunksLoaded();
-			List<MetricFamilySamples> dim_ticks = this.dim_tick_seconds.collect();
+			List<MetricFamilySamples> dim_ticks = this.collectDimensionTickSeconds();
 
 			MetricFamilySamples entities = null;
 			int entities_init = 0;
@@ -114,6 +158,9 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 				entities_init = 1;
 			}
 
+			// Collect scrape durations last.
+			List<MetricFamilySamples> scrape_durations = this.scrape_duration.collect();
+
 			// Aggregate metrics.
 			ArrayList<MetricFamilySamples> metrics = new ArrayList<>(
 				1 /* player_list */
@@ -121,6 +168,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 				+ server_ticks.size()
 				+ 1 /* dim_chunks_loaded */
 				+ dim_ticks.size()
+				+ scrape_durations.size()
 			);
 			metrics.add(player_list);
 			if (entities != null) {
@@ -129,6 +177,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 			metrics.addAll(server_ticks);
 			metrics.add(dim_chunks_loaded);
 			metrics.addAll(dim_ticks);
+			metrics.addAll(scrape_durations);
 
 			return metrics;
 		} catch (Exception e) {
@@ -138,25 +187,47 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	}
 
 	/**
-	 * Get the number of loaded dimension chunks.
+	 * Collect the metrics for the number of loaded dimension chunks.
 	 *
 	 * @return The dimension chunks loaded metric.
 	 */
 	protected abstract GaugeMetricFamily collectDimensionChunksLoaded();
 
 	/**
-	 * Get the entities per dimension.
+	 * Collect the metrics for the dimension ticks (in seconds).
+	 *
+	 * @return The server tick metrics.
+	 */
+	private List<MetricFamilySamples> collectDimensionTickSeconds() {
+		try (Gauge.Timer timer = this.startScrapeTimer(NAME_DIMENSION_TICK_SECONDS)) {
+			return this.dim_tick_seconds.collect();
+		}
+	}
+
+	/**
+	 * Collect the metrics for the entities per dimension.
 	 *
 	 * @return The entities total metric.
 	 */
 	protected abstract GaugeMetricFamily collectEntitiesTotal();
 
 	/**
-	 * Get the active players.
+	 * Collect the metrics for the active players.
 	 *
 	 * @return The player list metric.
 	 */
 	protected abstract GaugeMetricFamily collectPlayerList();
+
+	/**
+	 * Collect the metrics for the server ticks (in seconds).
+	 *
+	 * @return The server tick metrics.
+	 */
+	private List<MetricFamilySamples> collectServerTickSeconds() {
+		try (Gauge.Timer timer = this.startScrapeTimer(NAME_SERVER_TICK_SECONDS)) {
+			return this.server_tick_seconds.collect();
+		}
+	}
 
 	/**
 	 * Return all metric descriptions for the collector.
@@ -184,7 +255,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 */
 	protected static GaugeMetricFamily newDimensionChunksLoadedMetric() {
 		return new GaugeMetricFamily(
-			"mc_dimension_chunks_loaded",
+			NAME_DIMENSION_CHUNKS_LOADED,
 			"The number of loaded dimension chunks.",
 			List.of("id", "name")
 		);
@@ -197,7 +268,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 */
 	protected static GaugeMetricFamily newEntitiesTotalMetric() {
 		return new GaugeMetricFamily(
-			"mc_entities_total",
+			NAME_ENTITIES_TOTAL,
 			"The number of entities in each dimension by type.",
 			List.of("dim", "dim_id", "type")
 		);
@@ -210,7 +281,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 */
 	protected static GaugeMetricFamily newPlayerListMetric() {
 		return new GaugeMetricFamily(
-			"mc_player_list",
+			NAME_PLAYER_LIST,
 			"The players connected to the server.",
 			List.of("id", "name")
 		);
@@ -245,6 +316,17 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		String id_str = Integer.toString(dim_id);
 		timer = this.dim_tick_seconds.labels(id_str, dim).startTimer();
 		this.dim_tick_timers.put(dim, timer);
+	}
+
+	/**
+	 * Start a new timer for a scrape duration.
+	 *
+	 * @param name The metric name.
+	 *
+	 * @return The timer.
+	 */
+	protected Gauge.Timer startScrapeTimer(String name) {
+		return this.scrape_duration.labels(name).startTimer();
 	}
 
 	/**
