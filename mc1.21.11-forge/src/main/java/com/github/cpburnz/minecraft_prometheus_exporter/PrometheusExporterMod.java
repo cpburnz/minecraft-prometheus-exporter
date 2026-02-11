@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
@@ -23,6 +24,7 @@ import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
 
 import com.github.cpburnz.minecraft_prometheus_exporter.forge.ForgeMinecraftCollector;
+import com.github.cpburnz.minecraft_prometheus_exporter.forge.ForgePrometheusCommand;
 import com.github.cpburnz.minecraft_prometheus_exporter.forge.ForgeServerConfig;
 
 /**
@@ -30,6 +32,11 @@ import com.github.cpburnz.minecraft_prometheus_exporter.forge.ForgeServerConfig;
  */
 @Mod(PrometheusExporterMod.MOD_ID)
 public class PrometheusExporterMod {
+
+	/**
+	 * The mod instance.
+	 */
+	public static PrometheusExporterMod INSTANCE;
 
 	/**
 	 * The logger to use.
@@ -53,6 +60,11 @@ public class PrometheusExporterMod {
 	private HTTPServer http_server;
 
 	/**
+	 * Whether the exporter is running.
+	 */
+	private boolean is_running;
+
+	/**
 	 * The Minecraft metrics collector.
 	 */
 	@Nullable
@@ -70,6 +82,9 @@ public class PrometheusExporterMod {
 	 * @param context The mod loading context.
 	 */
 	public PrometheusExporterMod(FMLJavaModLoadingContext context) {
+		// Record instance.
+		INSTANCE = this;
+
 		// Register to receive events.
 		MinecraftForge.EVENT_BUS.register(this);
 
@@ -132,6 +147,15 @@ public class PrometheusExporterMod {
 	}
 
 	/**
+	 * Check whether the exporter is running.
+	 *
+	 * @return Whether the exporter is running.
+	 */
+	public boolean isExporterRunning() {
+		return this.is_running;
+	}
+
+	/**
 	 * Called before a dimension tick.
 	 *
 	 * @param event The event.
@@ -162,6 +186,16 @@ public class PrometheusExporterMod {
 	}
 
 	/**
+	 * Called when commands should be registered.
+	 *
+	 * @param event The event.
+	 */
+	@SubscribeEvent
+	public void onRegisterCommands(RegisterCommandsEvent event) {
+		ForgePrometheusCommand.register(event.getDispatcher(), this.config);
+	}
+
+	/**
 	 * Called before the server begins loading anything.
 	 *
 	 * @param event The event.
@@ -177,7 +211,9 @@ public class PrometheusExporterMod {
 	 * Called when the server has started.
 	 *
 	 * @param event The event.
-	 * @throws IOException
+	 *
+	 * @throws IOException When an I/O error occurs while starting the HTTP
+	 * server.
 	 */
 	@SubscribeEvent
 	public void onServerStarted(ServerStartedEvent event) throws IOException {
@@ -229,5 +265,47 @@ public class PrometheusExporterMod {
 		if (this.mc_collector != null) {
 			this.mc_collector.stopServerTick();
 		}
+	}
+
+	/**
+	 * Start the exporter by starting the HTTP server and registering the
+	 * metric collectors.
+	 *
+	 * @throws IOException When an I/O error occurs while starting the HTTP
+	 * server.
+	 * @throws IllegalStateException When the exporter is already running.
+	 */
+	public void startExporter() throws IOException {
+		if (this.is_running) {
+			throw new IllegalStateException("Exporter is already running.");
+		}
+
+		// Start HTTP server.
+		this.initHttpServer();
+
+		// Register collectors.
+		this.initCollectors();
+
+		this.is_running = true;
+	}
+
+	/**
+	 * Stop the exporter by stopping the HTTP server and unregistering the metric
+	 * collectors.
+	 *
+	 * @throws IllegalStateException When the exporter is not running.
+	 */
+	public void stopExporter() {
+		if (!this.is_running) {
+			throw new IllegalStateException("Exporter is not running.");
+		}
+
+		// Close collectors.
+		this.closeCollectors();
+
+		// Stop HTTP server.
+		this.closeHttpServer();
+
+		this.is_running = false;
 	}
 }

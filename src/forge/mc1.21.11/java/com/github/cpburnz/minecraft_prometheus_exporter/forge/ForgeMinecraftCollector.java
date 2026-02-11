@@ -154,6 +154,8 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	 * dimension name.</p>
 	 *
 	 * @param dim The dimension.
+	 *
+	 * @return The dimension id.
 	 */
 	private static int getDimensionId(ResourceKey<Level> dim) {
 		if (dim.equals(Level.OVERWORLD)) {

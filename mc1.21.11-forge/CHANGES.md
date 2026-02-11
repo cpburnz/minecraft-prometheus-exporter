@@ -3,7 +3,7 @@ Change History
 
 
 - TODO: 1.21.11
-- TODO: Implement commands
+- TODO: Test commands
 - TODO: Document mc_scrape_duration_seconds metric.
 
 

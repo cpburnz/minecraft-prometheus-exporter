@@ -26,7 +26,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	private static final Logger LOG = LogManager.getLogger();
 
 	/**
-	 * The name of the dimeision chunks loaded metric.
+	 * The name of the dimension chunks loaded metric.
 	 */
 	protected static final String NAME_DIMENSION_CHUNKS_LOADED = "mc_dimension_chunks_loaded";
 

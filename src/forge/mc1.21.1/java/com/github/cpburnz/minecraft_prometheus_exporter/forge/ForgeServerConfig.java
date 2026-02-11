@@ -1,5 +1,6 @@
 package com.github.cpburnz.minecraft_prometheus_exporter.forge;
 
+import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -53,6 +54,9 @@ public class ForgeServerConfig extends ServerConfig {
 			this.internal_spec.collector_mc_dimension_tick_errors.get()
 		);
 		this.collector_mc_entities = this.internal_spec.collector_mc_entities.get();
+		this.command_permission_level = (
+			this.internal_spec.command_permission_level.get()
+		);
 		this.web_listen_address = this.internal_spec.web_listen_address.get();
 		this.web_listen_port = this.internal_spec.web_listen_port.get();
 
@@ -66,6 +70,7 @@ public class ForgeServerConfig extends ServerConfig {
 			this.collector_mc_dimension_tick_errors
 		);
 		LOG.debug("collector.mc_entities: {}", this.collector_mc_entities);
+		LOG.debug("command.permission_level: {}", this.command_permission_level);
 		LOG.debug("web.listen_address: {}", this.web_listen_address);
 		LOG.debug("web.listen_port: {}", this.web_listen_port);
 	}
@@ -92,11 +97,26 @@ public class ForgeServerConfig extends ServerConfig {
 		private static final String DEFAULT_ADDRESS = "0.0.0.0";
 
 		/**
+		 * The default required permission level to execute commands.
+		 */
+		private static final int DEFAULT_PERMISSION_LEVEL = PermissionLevel.OWNERS.id();
+
+		/**
 		 * The default TCP port ot use. This is completely arbitrary. It was derived
 		 * from the Minecraft port (25565) and the Prometheus exporter ports
 		 * (9100+).
 		 */
 		private static final int DEFAULT_PORT = 19565;
+
+		/**
+		 * The minimum permission level.
+		 */
+		private static final int PERMISSION_LEVEL_MIN = PermissionLevel.ALL.id();
+
+		/**
+		 * The maximum permission level.
+		 */
+		private static final int PERMISSION_LEVEL_MAX = PermissionLevel.OWNERS.id();
 
 		/**
 		 * The maximum TCP port.
@@ -112,6 +132,7 @@ public class ForgeServerConfig extends ServerConfig {
 		public final ForgeConfigSpec.BooleanValue collector_mc;
 		public final ForgeConfigSpec.EnumValue<TickErrorPolicy> collector_mc_dimension_tick_errors;
 		public final ForgeConfigSpec.BooleanValue collector_mc_entities;
+		public final ForgeConfigSpec.IntValue command_permission_level;
 		public final ForgeConfigSpec.ConfigValue<String> web_listen_address;
 		public final ForgeConfigSpec.IntValue web_listen_port;
 
@@ -163,6 +184,28 @@ public class ForgeServerConfig extends ServerConfig {
 					+ "(world)."
 				)
 				.define("mc_entities", true);
+
+			builder.pop();
+			builder
+				.comment("Command settings.")
+				.push("command");
+
+			this.command_permission_level = builder
+				.comment(
+					(
+						"The permission level required to run the \"/prometheus\" command. "
+						+ "Range is " + PERMISSION_LEVEL_MIN + "-" + PERMISSION_LEVEL_MAX
+						+ "."
+					),
+					"  0: Any player.",
+					"  1-4: Varying levels of \"op\". The default permission for op is 4."
+				)
+				.defineInRange(
+					"permission_level",
+					DEFAULT_PERMISSION_LEVEL,
+					PERMISSION_LEVEL_MIN,
+					PERMISSION_LEVEL_MAX
+				);
 
 			builder.pop();
 			builder

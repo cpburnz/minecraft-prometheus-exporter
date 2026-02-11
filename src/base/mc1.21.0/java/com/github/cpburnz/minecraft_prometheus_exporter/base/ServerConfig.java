@@ -27,6 +27,11 @@ public abstract class ServerConfig {
 	public boolean collector_mc_entities;
 
 	/**
+	 * The permission level required to execute commands.
+	 */
+	public int command_permission_level;
+
+	/**
 	 * Whether the config has been loaded.
 	 */
 	private boolean is_loaded;
