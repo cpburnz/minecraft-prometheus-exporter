@@ -1,9 +1,6 @@
 package com.github.cpburnz.minecraft_prometheus_exporter.forge;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -16,14 +13,27 @@ import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionCheck;
 import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraft.server.permissions.PermissionSetSupplier;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.github.cpburnz.minecraft_prometheus_exporter.PrometheusExporterMod;
 import com.github.cpburnz.minecraft_prometheus_exporter.base.PrometheusCommand;
 import com.github.cpburnz.minecraft_prometheus_exporter.base.ServerConfig;
+
 /**
  * The ForgePrometheusCommand class defines the "prometheus" command for Forge.
  */
 public class ForgePrometheusCommand implements PrometheusCommand {
+
+	/**
+	 * The value indicating the command failed.
+	 */
+	private static final int COMMAND_FAILURE = 0;
+
+	/**
+	 * The logger to use.
+	 */
+	private static final Logger LOG = LogManager.getLogger();
 
 	/**
 	 * The server configuration.
@@ -44,12 +54,11 @@ public class ForgePrometheusCommand implements PrometheusCommand {
 	 *
 	 * @param context The command context.
 	 *
-	 * @return Success.
+	 * @return Success (1) or failure (0).
 	 */
 	private int execRestart(CommandContext<CommandSourceStack> context) {
 		this.execStop(context);
-		this.execStart(context);
-		return Command.SINGLE_SUCCESS;
+		return this.execStart(context);
 	}
 
 	/**
@@ -57,15 +66,16 @@ public class ForgePrometheusCommand implements PrometheusCommand {
 	 *
 	 * @param context The command context.
 	 *
-	 * @return Success.
+	 * @return Success (1) or failure (0).
 	 */
 	private int execStart(CommandContext<CommandSourceStack> context) {
-		PrometheusExporterMod mod = PrometheusExporterMod.INSTANCE;
+		PrometheusExporterMod mod = PrometheusExporterMod.instance();
 		if (!mod.isExporterRunning()) {
 			try {
 				mod.startExporter();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+			} catch (Exception e) {
+				LOG.error("Failed to start exporter.", e);
+				return COMMAND_FAILURE;
 			}
 			this.sendAdminMessage(context, MSG_START_SUCCESS);
 		} else {
@@ -79,12 +89,17 @@ public class ForgePrometheusCommand implements PrometheusCommand {
 	 *
 	 * @param context The command context.
 	 *
-	 * @return Success.
+	 * @return Success (1) or failure (0).
 	 */
 	private int execStop(CommandContext<CommandSourceStack> context) {
-		PrometheusExporterMod mod = PrometheusExporterMod.INSTANCE;
+		PrometheusExporterMod mod = PrometheusExporterMod.instance();
 		if (mod.isExporterRunning()) {
-			mod.stopExporter();
+			try {
+				mod.stopExporter();
+			} catch (Exception e) {
+				LOG.error("Failed to stop exporter.", e);
+				return COMMAND_FAILURE;
+			}
 			this.sendAdminMessage(context, MSG_STOP_SUCCESS);
 		} else {
 			this.sendChatMessage(context, MSG_STOP_INVALID);
@@ -135,17 +150,15 @@ public class ForgePrometheusCommand implements PrometheusCommand {
 	 * @param dispatcher The command dispatcher.
 	 */
 	private void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-		Stream.of(List.of(NAME), ALIASES).flatMap(List::stream).forEach((name) -> {
-			LiteralArgumentBuilder<CommandSourceStack> builder = Commands
-				.literal(name)
-				.requires(permissionLevel());
+		LiteralArgumentBuilder<CommandSourceStack> builder = Commands
+			.literal(NAME)
+			.requires(permissionLevel());
 
-			builder.then(literal(CommandArg.RESTART).executes(this::execRestart));
-			builder.then(literal(CommandArg.START).executes(this::execStart));
-			builder.then(literal(CommandArg.STOP).executes(this::execStop));
+		builder.then(literal(CommandArg.RESTART).executes(this::execRestart));
+		builder.then(literal(CommandArg.START).executes(this::execStart));
+		builder.then(literal(CommandArg.STOP).executes(this::execStop));
 
-			dispatcher.register(builder);
-		});
+		dispatcher.register(builder);
 	}
 
 	/**

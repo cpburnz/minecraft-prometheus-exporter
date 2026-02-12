@@ -79,9 +79,32 @@ The players connected to the server.
 | name   | The player name. |
 
 
+### mc_player_stat_total {code, name, player_id, player_name}
+
+The general player stats. These are persisted after player sign-out. Achievements and item stats are not currently recorded.
+
+| Label       | Meaning                |
+|-------------|------------------------|
+| code        | The stat code name.    |
+| name        | The stat display name. |
+| player_id   | The player UUID.       |
+| player_name | The player name.       |
+
+See [examples/output.txt](https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.11/examples/output.txt) for the list of general stats.
+
+
+### mc_scrape_duration_seconds
+
+How long each metric took to be scraped.
+
+| Label  | Meaning          |
+|--------|------------------|
+| metric | The metric name. |
+
+
 ### mc_server_tick_seconds
 
- A histogram of the server tick times (in seconds).
+A histogram of the server tick times (in seconds).
 
 
 #### mc_server_tick_seconds_bucket {le}

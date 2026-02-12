@@ -2,25 +2,41 @@ Change History
 ==============
 
 
-- TODO: 1.21.11
-- TODO: Test commands
-- TODO: Document mc_scrape_duration_seconds metric.
+1.4.0 for Minecraft 1.21.11 with Forge 61.0.0 (TBD)
+----------------------------------------------------------
 
+TODO:
 
-1.2.1 for Minecraft 1.21.8 with Forge 58.0.0 (2025-07-30)
----------------------------------------------------------
+- Update example output.
+- Update example config.
+- Implement "mc_player_stat_total" metric.
 
 New features:
 
-- Support Minecraft 1.21.8 with Forge.
+- Support Minecraft 1.21.11 with Forge.
+- Added scrape stats in the new "mc_scrape_duration_seconds" metric.
+
+
+1.3.0 for Minecraft 1.21.11 with Forge 61.0.0 (2025-09-13)
+----------------------------------------------------------
+
+New features:
+
+- [Issue #38](https://github.com/cpburnz/minecraft-prometheus-exporter/issues/38): The exporter can now be managed with the commands "/prometheus start", "/prometheus stop", and "/prometheus restart". The player requires op or level 4 permissions which can be configured by the "command.permission_level" setting.
+
+- [Issue #39](https://github.com/cpburnz/minecraft-prometheus-exporter/issues/39)/[Issue #40](https://github.com/cpburnz/minecraft-prometheus-exporter/issues/40): Added player stats in the new "mc_player_stat_total" metric. These can be disabled by setting the "collector.mc_player_stats" setting to false.
+
+
+1.2.1 for Minecraft 1.21.11 with Forge 61.0.0 (Unreleased)
+----------------------------------------------------------
 
 Bug fixes:
 
 - Prevent possible crash on bad start-up.
 
 
-1.2.0 for Minecraft 1.21.8 with Forge 58.0.0 (Unreleased)
----------------------------------------------------------
+1.2.0 for Minecraft 1.21.11 with Forge 61.0.0 (Unreleased)
+----------------------------------------------------------
 
 New features:
 
@@ -37,8 +53,8 @@ Miscellaneous:
 - Minor documentation.
 
 
-1.1.0 for Minecraft 1.21.8 with Forge 58.0.0 (Unreleased)
----------------------------------------------------------
+1.1.0 for Minecraft 1.21.11 with Forge 61.0.0 (Unreleased)
+----------------------------------------------------------
 
 New features:
 

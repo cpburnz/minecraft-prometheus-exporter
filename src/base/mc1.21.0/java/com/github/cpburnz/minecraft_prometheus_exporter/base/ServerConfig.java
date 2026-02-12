@@ -27,6 +27,11 @@ public abstract class ServerConfig {
 	public boolean collector_mc_entities;
 
 	/**
+	 * Whether to collect metrics about general player stats.
+	 */
+	public boolean collector_mc_player_stats;
+
+	/**
 	 * The permission level required to execute commands.
 	 */
 	public int command_permission_level;

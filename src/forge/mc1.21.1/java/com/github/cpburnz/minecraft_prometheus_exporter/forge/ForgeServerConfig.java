@@ -54,6 +54,9 @@ public class ForgeServerConfig extends ServerConfig {
 			this.internal_spec.collector_mc_dimension_tick_errors.get()
 		);
 		this.collector_mc_entities = this.internal_spec.collector_mc_entities.get();
+		this.collector_mc_player_stats = (
+			this.internal_spec.collector_mc_player_stats.get()
+		);
 		this.command_permission_level = (
 			this.internal_spec.command_permission_level.get()
 		);
@@ -70,6 +73,7 @@ public class ForgeServerConfig extends ServerConfig {
 			this.collector_mc_dimension_tick_errors
 		);
 		LOG.debug("collector.mc_entities: {}", this.collector_mc_entities);
+		LOG.debug("collector.mc_player_stats: {}", this.collector_mc_player_stats);
 		LOG.debug("command.permission_level: {}", this.command_permission_level);
 		LOG.debug("web.listen_address: {}", this.web_listen_address);
 		LOG.debug("web.listen_port: {}", this.web_listen_port);
@@ -132,6 +136,7 @@ public class ForgeServerConfig extends ServerConfig {
 		public final ForgeConfigSpec.BooleanValue collector_mc;
 		public final ForgeConfigSpec.EnumValue<TickErrorPolicy> collector_mc_dimension_tick_errors;
 		public final ForgeConfigSpec.BooleanValue collector_mc_entities;
+		public final ForgeConfigSpec.BooleanValue collector_mc_player_stats;
 		public final ForgeConfigSpec.IntValue command_permission_level;
 		public final ForgeConfigSpec.ConfigValue<String> web_listen_address;
 		public final ForgeConfigSpec.IntValue web_listen_port;
@@ -184,6 +189,10 @@ public class ForgeServerConfig extends ServerConfig {
 					+ "(world)."
 				)
 				.define("mc_entities", true);
+
+			this.collector_mc_player_stats = builder
+				.comment("Enable collecting metrics about general player stats.")
+				.define("mc_player_stats", true);
 
 			builder.pop();
 			builder

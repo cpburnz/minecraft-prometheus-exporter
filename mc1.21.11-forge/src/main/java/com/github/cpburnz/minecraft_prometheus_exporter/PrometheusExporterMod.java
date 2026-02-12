@@ -1,6 +1,7 @@
 package com.github.cpburnz.minecraft_prometheus_exporter;
 
 import java.io.IOException;
+import java.net.BindException;
 import javax.annotation.Nullable;
 
 import net.minecraft.resources.ResourceKey;
@@ -36,7 +37,7 @@ public class PrometheusExporterMod {
 	/**
 	 * The mod instance.
 	 */
-	public static PrometheusExporterMod INSTANCE;
+	private static PrometheusExporterMod INSTANCE;
 
 	/**
 	 * The logger to use.
@@ -122,7 +123,7 @@ public class PrometheusExporterMod {
 	private void initCollectors() {
 		// Collect JVM stats.
 		if (this.config.collector_jvm) {
-			DefaultExports.initialize();
+			DefaultExports.register(CollectorRegistry.defaultRegistry);
 		}
 
 		// Collect Minecraft stats.
@@ -142,8 +143,21 @@ public class PrometheusExporterMod {
 		// Minecraft server process will not properly terminate.
 		String address = this.config.web_listen_address;
 		int port = this.config.web_listen_port;
-		this.http_server = new HTTPServer(address, port, true);
-		LOG.info("Listening on {}:{}", address, port);
+		try {
+			this.http_server = new HTTPServer(address, port, true);
+			LOG.info("Listening on {}:{}", address, port);
+		} catch (BindException e) {
+			LOG.error("Failed to start HTTP server, port {} already in use.", port);
+		}
+	}
+
+	/**
+	 * Get the mod instance.
+	 *
+	 * @return The instance.
+	 */
+	public static PrometheusExporterMod instance() {
+		return INSTANCE;
 	}
 
 	/**
@@ -220,11 +234,8 @@ public class PrometheusExporterMod {
 		// Record the Minecraft server.
 		this.mc_server = event.getServer();
 
-		// Initialize HTTP server.
-		this.initHttpServer();
-
-		// Initialize collectors.
-		this.initCollectors();
+		// Start the exporter.
+		this.startExporter();
 	}
 
 	/**
@@ -234,11 +245,8 @@ public class PrometheusExporterMod {
 	 */
 	@SubscribeEvent
 	public void onServerStopped(ServerStoppedEvent event) {
-		// Unregister collectors.
-		this.closeCollectors();
-
-		// Stop HTTP server.
-		this.closeHttpServer();
+		this.stopExporter();
+		this.mc_server = null;
 	}
 
 	/**
