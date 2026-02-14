@@ -9,7 +9,6 @@ TODO:
 
 - Update example output.
 - Update example config.
-- Implement "mc_player_stat_total" metric.
 
 New features:
 

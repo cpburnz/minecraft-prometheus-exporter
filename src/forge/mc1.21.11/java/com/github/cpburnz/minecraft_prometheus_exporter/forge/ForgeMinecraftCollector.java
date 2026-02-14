@@ -1,14 +1,21 @@
 package com.github.cpburnz.minecraft_prometheus_exporter.forge;
 
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.UUID;
+import javax.annotation.Nullable;
 
 import com.mojang.authlib.GameProfile;
-import io.prometheus.client.Gauge;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.ServerStatsCounter;
+import net.minecraft.stats.Stat;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -16,10 +23,12 @@ import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import io.prometheus.client.Gauge;
 import io.prometheus.client.GaugeMetricFamily;
 
 import com.github.cpburnz.minecraft_prometheus_exporter.base.MinecraftCollector;
 import com.github.cpburnz.minecraft_prometheus_exporter.base.ServerConfig;
+
 
 /**
  * The ForgeMinecraftCollector class collects stats from the Forge Minecraft
@@ -33,9 +42,29 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	private static final Logger LOG = LogManager.getLogger();
 
 	/**
+	 * The initial capacity to use for the stat names map. This was counted from
+	 * Stats.
+	 */
+	private static final int STATS_INIT = 76;
+
+	/**
 	 * The Minecraft server.
 	 */
 	private final MinecraftServer mc_server;
+
+	/**
+	 * Maps each player id to his name and stats. This is used to persist player
+	 * stats after sign-out.
+	 */
+	private final HashMap<UUID, PlayerInfo> players;
+
+	/**
+	 * Maps each stat id to its name. This is used to cache stat names.
+	 *
+	 * <p>NOTICE: In 1.21.11, StatType uses IdentityHashMap internally to map
+	 * Identity to Stat. Let's do the same.</p>
+	 */
+	private final IdentityHashMap<Identifier, String> stat_names;
 
 	/**
 	 * Constructs the instance.
@@ -49,6 +78,9 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	) {
 		super(config);
 		this.mc_server = mc_server;
+		this.players = new HashMap<>(PLAYERS_INIT);
+		this.stat_names = new IdentityHashMap<>(STATS_INIT);
+
 	}
 
 	/**
@@ -145,6 +177,68 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 	}
 
 	/**
+	 * Get the general player stats.
+	 *
+	 * @return The player stats metric.
+	 */
+	@Override
+	protected GaugeMetricFamily collectPlayerStatsTotal() {
+		try (Gauge.Timer timer = this.startScrapeTimer(NAME_PLAYER_STAT_TOTAL)) {
+			// Cache player list and stats.
+			for (ServerPlayer player : this.mc_server.getPlayerList().getPlayers()) {
+				// Get player profile.
+				GameProfile profile = player.getGameProfile();
+
+				// Get player info.
+				// - NOTICE: Both "id" and "name" are required to be non-null, unlike in
+				//   Minecraft 1.19 and earlier.
+				UUID player_id = profile.id();
+				String player_name = profile.name();
+
+				ServerStatsCounter stats = player.getStats();
+				@Nullable PlayerInfo player_info = this.players.get(player_id);
+				if (player_info != null) {
+					player_info.name = player_name;
+					player_info.stats = stats;
+				} else {
+					player_info = new PlayerInfo(player_id, player_name, stats);
+					this.players.put(player_id, player_info);
+				}
+			}
+
+			// Collect player stats.
+			GaugeMetricFamily metric = newPlayerStatsTotalMetric();
+			for (PlayerInfo player_info : this.players.values()) {
+				String player_id_str = player_info.id.toString();
+				String player_name = player_info.name;
+				ServerStatsCounter stats = player_info.stats;
+
+				for (Stat<Identifier> stat : Stats.CUSTOM) {
+					// Get stat info.
+					int stat_val = stats.getValue(stat);
+					Identifier stat_id = stat.getValue();
+					String stat_code = stat_id.toString();
+
+					// Get stat name.
+					@Nullable String stat_name = this.stat_names.get(stat_id);
+					if (stat_name == null) {
+						// Cache stat name.
+						Component stat_msg = Component.translatable(stat_id.toLanguageKey("stat"));
+						stat_name = stat_msg.getString();
+						this.stat_names.put(stat_id, stat_name);
+					}
+
+					// Record score.
+					metric.addMetric(List.of(
+						stat_code, stat_name, player_id_str, player_name
+					), stat_val);
+				}
+			}
+			return metric;
+		}
+	}
+
+	/**
 	 * Get the dimension id.
 	 *
 	 * <p>With the new version of Minecraft, 1.16, a dimension no longer has an
@@ -204,5 +298,39 @@ public class ForgeMinecraftCollector extends MinecraftCollector {
 		String name = getDimensionName(dim);
 
 		super.stopDimensionTick(name);
+	}
+
+	/**
+	 * The PlayerInfo class contains the player name and stats.
+	 */
+	private static class PlayerInfo {
+
+		/**
+		 * The player id.
+		 */
+		final UUID id;
+
+		/**
+		 * The player name,
+		 */
+		String name;
+
+		/**
+		 * The statistics file.
+		 */
+		ServerStatsCounter stats;
+
+		/**
+		 * Constructs the PlayerInfo instance.
+		 *
+		 * @param id The player id.
+		 * @param name The player name.
+		 * @param stats The statistics file.
+		 */
+		PlayerInfo(UUID id, String name, ServerStatsCounter stats) {
+			this.id = id;
+			this.name = name;
+			this.stats = stats;
+		}
 	}
 }

@@ -21,6 +21,11 @@ import io.prometheus.client.Histogram;
 public abstract class MinecraftCollector extends Collector implements Collector.Describable {
 
 	/**
+	 * The initial capacity for the dimensions ticks map.
+	 */
+	private static final int DIM_INIT = 3;
+
+	/**
 	 * The logger to use.
 	 */
 	private static final Logger LOG = LogManager.getLogger();
@@ -46,6 +51,11 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	protected static final String NAME_PLAYER_LIST = "mc_player_list";
 
 	/**
+	 * The name of the player stats total metric.
+	 */
+	protected static final String NAME_PLAYER_STAT_TOTAL = "mc_player_stat_total";
+
+	/**
 	 * The name of the scrape duration seconds metric.
 	 */
 	private static final String NAME_SCRAPE_DURATION_SECONDS = "mc_scrape_duration_seconds";
@@ -54,6 +64,11 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 * The name of the server tick seconds metric.
 	 */
 	private static final String NAME_SERVER_TICK_SECONDS = "mc_server_tick_seconds";
+
+	/**
+	 * The initial capacity for the players map. This is arbitrary.
+	 */
+	protected static final int PLAYERS_INIT = 20;
 
 	/**
 	 * The histogram buckets to use for ticks.
@@ -90,9 +105,20 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	private final ConcurrentHashMap<String, Histogram.Timer> dim_tick_timers;
 
 	/**
+	 * Maps each dimension (unique name) to whether there have been any dimension
+	 * ticks.
+	 */
+	private final ConcurrentHashMap.KeySetView<String, Boolean> dims_have_ticked;
+
+	/**
 	 * Gauge metric for recording scrape durations.
 	 */
 	private final Gauge scrape_duration;
+
+	/**
+	 * Whether there have been any server ticks.
+	 */
+	private boolean server_has_ticked;
 
 	/**
 	 * Histogram metrics for server tick timing.
@@ -112,7 +138,8 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 */
 	public MinecraftCollector(ServerConfig config) {
 		this.config = config;
-		this.dim_tick_timers = new ConcurrentHashMap<>(3);
+		this.dim_tick_timers = new ConcurrentHashMap<>(DIM_INIT);
+		this.dims_have_ticked = ConcurrentHashMap.newKeySet(DIM_INIT);
 
 		// Setup scrape metrics.
 		this.scrape_duration = Gauge.build()
@@ -151,11 +178,20 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 			MetricFamilySamples dim_chunks_loaded = this.collectDimensionChunksLoaded();
 			List<MetricFamilySamples> dim_ticks = this.collectDimensionTickSeconds();
 
+			// Collect entity metrics.
 			MetricFamilySamples entities = null;
 			int entities_init = 0;
 			if (this.config.collector_mc_entities) {
 				entities = collectEntitiesTotal();
 				entities_init = 1;
+			}
+
+			// Collect player stats metrics.
+			MetricFamilySamples player_stats = null;
+			int player_stats_init = 0;
+			if (this.config.collector_mc_player_stats) {
+				player_stats = this.collectPlayerStatsTotal();
+				player_stats_init = 1;
 			}
 
 			// Collect scrape durations last.
@@ -168,6 +204,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 				+ server_ticks.size()
 				+ 1 /* dim_chunks_loaded */
 				+ dim_ticks.size()
+				+ player_stats_init
 				+ scrape_durations.size()
 			);
 			metrics.add(player_list);
@@ -177,6 +214,9 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 			metrics.addAll(server_ticks);
 			metrics.add(dim_chunks_loaded);
 			metrics.addAll(dim_ticks);
+			if (player_stats != null) {
+				metrics.add(player_stats);
+			}
 			metrics.addAll(scrape_durations);
 
 			return metrics;
@@ -219,6 +259,13 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	protected abstract GaugeMetricFamily collectPlayerList();
 
 	/**
+	 * Get the general player stats.
+	 *
+	 * @return The player stats metric.
+	 */
+	protected abstract GaugeMetricFamily collectPlayerStatsTotal();
+
+	/**
 	 * Collect the metrics for the server ticks (in seconds).
 	 *
 	 * @return The server tick metrics.
@@ -245,6 +292,10 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		descs.addAll(this.server_tick_seconds.describe());
 		descs.add(newDimensionChunksLoadedMetric());
 		descs.addAll(this.dim_tick_seconds.describe());
+		if (this.config.collector_mc_player_stats) {
+			descs.add(newPlayerStatsTotalMetric());
+		}
+		descs.addAll(this.scrape_duration.describe());
 		return descs;
 	}
 
@@ -288,6 +339,19 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	}
 
 	/**
+	 * Create a new metric for the player stats.
+	 *
+	 * @return The general player stats metric.
+	 */
+	protected static GaugeMetricFamily newPlayerStatsTotalMetric() {
+		return new GaugeMetricFamily(
+			NAME_PLAYER_STAT_TOTAL,
+			"The general stats about players.",
+			List.of("code", "name", "player_id", "player_name")
+		);
+	}
+
+	/**
 	 * Record when a dimension tick begins.
 	 *
 	 * @param dim The unique dimension name.
@@ -316,6 +380,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		String id_str = Integer.toString(dim_id);
 		timer = this.dim_tick_seconds.labels(id_str, dim).startTimer();
 		this.dim_tick_timers.put(dim, timer);
+		this.dims_have_ticked.add(dim);
 	}
 
 	/**
@@ -340,6 +405,7 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		}
 
 		this.server_tick_timer = this.server_tick_seconds.startTimer();
+		this.server_has_ticked = true;
 	}
 
 	/**
@@ -351,6 +417,12 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 		// Get active timer.
 		Histogram.Timer timer = this.dim_tick_timers.remove(dim);
 		if (timer == null) {
+			if (!this.dims_have_ticked.contains(dim)) {
+				// WARNING: After restarting the collector, we may start during a
+				// dimension tick. Do not fail in this scenario.
+				return;
+			}
+
 			switch (this.config.collector_mc_dimension_tick_errors) {
 				case IGNORE -> {}  // Ignore error.
 				case LOG -> LOG.debug(
@@ -374,6 +446,11 @@ public abstract class MinecraftCollector extends Collector implements Collector.
 	 */
 	public void stopServerTick() {
 		if (this.server_tick_timer == null) {
+			if (!this.server_has_ticked) {
+				// WARNING: After restarting the collector, we may start during a server
+				// tick. Do not fail in this scenario.
+				return;
+			}
 			throw new IllegalStateException((
 				"Server tick stopped without an active tick."
 			));
