@@ -2,17 +2,13 @@ Change History
 ==============
 
 
-1.4.0 for Minecraft 1.21.11 with Forge 61.0.0 (TBD)
+1.4.0 for Minecraft 1.21.11 with Forge 61.0.0 (2026-02-23)
 ----------------------------------------------------------
-
-TODO:
-
-- Update example output.
-- Update example config.
 
 New features:
 
-- Support Minecraft 1.21.11 with Forge.
+- [Issue #44](https://github.com/cpburnz/minecraft-prometheus-exporter/issues/44): Support Minecraft 1.21.11 with Forge.
+
 - Added scrape stats in the new "mc_scrape_duration_seconds" metric.
 
 

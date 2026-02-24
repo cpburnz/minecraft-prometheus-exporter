@@ -17,6 +17,16 @@
 	mc_dimension_tick_errors = "LOG"
 	#Enable collecting metrics about the entities in each dimension (world).
 	mc_entities = true
+	#Enable collecting metrics about general player stats.
+	mc_player_stats = true
+
+#Command settings.
+[command]
+	#The permission level required to run the "/prometheus" command. Range is 0-4.
+	#  0: Any player.
+	#  1-4: Varying levels of "op". The default permission for op is 4.
+	#Range: 0 ~ 4
+	permission_level = 4
 
 #Web server settings.
 [web]
