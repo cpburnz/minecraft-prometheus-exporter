@@ -262,8 +262,9 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			//   Minecraft 1.19 and earlier.
 			String id_str = profile.getId().toString();
 			String name = profile.getName();
+			String ip = player.getIpAddress();
 
-			metric.addMetric(List.of(id_str, name), 1);
+			metric.addMetric(List.of(id_str, name, ip), 1);
 		}
 		return metric;
 	}
@@ -438,7 +439,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		return new GaugeMetricFamily(
 			"mc_player_list",
 			"The players connected to the server.",
-			List.of("id", "name")
+			List.of("id", "name", "ip")
 		);
 	}
 
