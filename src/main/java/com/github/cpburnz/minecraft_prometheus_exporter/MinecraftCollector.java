@@ -164,7 +164,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		for (ServerLevel world : this.mc_server.getAllLevels()) {
 			ResourceKey<Level> dim = world.dimension();
 			String id_str = Integer.toString(getDimensionId(dim));
-			String name = dim.location().getPath();
+			String name = dim.identifier().getPath();
 			int loaded = world.getChunkSource().getLoadedChunksCount();
 			metric.addMetric(List.of(id_str, name), loaded);
 		}
@@ -183,7 +183,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			// Get dimension info.
 			ResourceKey<Level> dim_resource = world.dimension();
 			int dim_id = getDimensionId(dim_resource);
-			String dim = dim_resource.location().getPath();
+			String dim = dim_resource.identifier().getPath();
 
 			// Get entity info.
 			for (Entity entity : world.getAllEntities()) {
@@ -230,8 +230,8 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 			// Get player info.
 			// - NOTICE: Both "id" and "name" are required to be non-null, unlike in
 			//   Minecraft 1.19 and earlier.
-			String id_str = profile.getId().toString();
-			String name = profile.getName();
+			String id_str = profile.id().toString();
+			String name = profile.name();
 
 			metric.addMetric(List.of(id_str, name), 1);
 		}
@@ -276,7 +276,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 		} else if (dim.equals(Level.NETHER)) {
 			return -1;
 		} else {
-			String name = dim.location().getPath();
+			String name = dim.identifier().getPath();
 			return name.hashCode();
 		}
 	}
@@ -327,7 +327,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 */
 	public void startDimensionTick(ResourceKey<Level> dim) {
 		// Get dimension name.
-		String name = dim.location().getPath();
+		String name = dim.identifier().getPath();
 
 		// Check for forgotten timer.
 		Histogram.Timer timer = this.dim_tick_timers.get(dim);
@@ -374,7 +374,7 @@ public class MinecraftCollector extends Collector implements Collector.Describab
 	 */
 	public void stopDimensionTick(ResourceKey<Level> dim) {
 		// Get dimension name.
-		String name = dim.location().getPath();
+		String name = dim.identifier().getPath();
 
 		// Get active timer.
 		Histogram.Timer timer = this.dim_tick_timers.remove(dim);

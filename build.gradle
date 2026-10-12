@@ -9,10 +9,10 @@ plugins {
 	id 'idea'
 
 	// NeoForge Gradle plugin (required).
-	id 'net.neoforged.gradle.userdev' version '7.0.161'
+	id 'net.neoforged.gradle.userdev' version '7.1.39'
 
 	// Shadow Jar plugin: bundle dependencies.
-	id 'com.gradleup.shadow' version '8.3.0'
+	id 'com.gradleup.shadow' version '9.6.1'
 }
 
 // Project settings.
@@ -23,8 +23,8 @@ base {
 	archivesName = 'Prometheus-Exporter'
 }
 
-// Mojang ships Java 21 to end users starting in 1.20.5, so mods should target Java 21.
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// Mojang ships Java 25 to end users starting in 26.1, so mods should target Java 25.
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 //minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -47,25 +47,18 @@ runs {
 		// Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
 		systemProperty 'forge.logging.console.level', 'debug'
 
-		modSource project.sourceSets.main
+		workingDirectory project.layout.projectDirectory.dir('run').dir(name)
 
-		dependencies {
-			// Every shadowed dependency has to be relisted here for the runClient and
-			// runServer commands to work.
-			runtime 'io.prometheus:simpleclient:0.16.0'
-			runtime 'io.prometheus:simpleclient_common:0.16.0'
-			runtime 'io.prometheus:simpleclient_httpserver:0.16.0'
-			runtime 'io.prometheus:simpleclient_hotspot:0.16.0'
-		}
+		modSource project.sourceSets.main
 	}
 
 	client {
 		// Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-		systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+		systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
 	}
 
 	server {
-		systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+		systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
 		argument '--nogui'
 	}
 
@@ -73,10 +66,10 @@ runs {
 	// By default, the server will crash when no gametests are provided.
 	// The gametest system is also enabled by default for other run configs under the /test command.
 	gameTestServer {
-		systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+		systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
 	}
 
-	data {
+	clientData {
 		// example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
 		// workingDirectory project.file('run-data')
 
@@ -98,7 +91,7 @@ configurations {
 	// Create the `compileAndShadow` group to be both compile time dependencies
 	// and shadow dependencies (bundle via Shadow Jar).
 	compileAndShadow
-	compile.extendsFrom compileAndShadow
+	implementation.extendsFrom compileAndShadow
 	shadow.extendsFrom compileAndShadow
 }
 
@@ -147,7 +140,6 @@ dependencies {
 // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
 tasks.withType(ProcessResources).configureEach {
 	var replaceProperties = [
-		loader_version_range: loader_version_range,
 		minecraft_version_range: minecraft_version_range,
 		mod_authors: mod_authors,
 		mod_description: mod_description,
@@ -158,13 +150,14 @@ tasks.withType(ProcessResources).configureEach {
 		mod_tracker_url: mod_tracker_url,
 		mod_url: mod_url,
 		mod_version: mod_version,
+		neo_version: neo_version,
 		neo_version_range: neo_version_range,
 	]
 
 	// Record the inputs so Gradle knows when to regenerate the resource files.
 	inputs.properties replaceProperties
 
-	filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+	filesMatching(['META-INF/neoforge.mods.toml']) {
 		expand replaceProperties + [project: project]
 	}
 }
@@ -197,7 +190,7 @@ tasks.named('shadowJar').configure {
 	archiveClassifier = tasks.jar.archiveClassifier
 
 	// Relocate shadowed dependencies.
-	enableRelocation = true
+	enableAutoRelocation = true
 	relocationPrefix = "${mod_package}.vendors"
 
 	// Only bundle dependencies explicitly marked to shadow.
