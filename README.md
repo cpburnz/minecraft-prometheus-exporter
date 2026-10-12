@@ -4,6 +4,7 @@ systems monitoring toolkit, [Prometheus]. The mod is intended for server-side
 use, and does not need to be installed client-side. This currently has builds
 for the following versions:
 
+- Minecraft 26.1.2 with NeoForge 26.1.2.109.
 - Minecraft 1.21.1 with Forge 52.0.0.
 - Minecraft 1.21.1 with NeoForge 21.1.0.
 - Minecraft 1.20.6 with Forge 50.1.0.
@@ -31,7 +32,7 @@ Installation
 
 The Prometheus Exporter mod only needs to be installed on the server. It can be
 downloaded from [GitHub] and [Curse Forge]. To install it, copy the JAR
-(*Prometheus-Exporter-{MC Version}-forge-{Mod Version}.jar*) to the server
+(*Prometheus-Exporter-{MC Version}-neoforge-{Mod Version}.jar*) to the server
 *mods/* directory. Since this mod does not add anything to the Minecraft world,
 it can be safely upgraded by simply replacing an older version with a newer
 version.
@@ -63,8 +64,8 @@ Known compatible Grafana dashboards are listed in [dashboards.md].
 [Curse Forge]: https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter
 [GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/releases
 [Prometheus]: https://prometheus.io/
-[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.1-neoforge/dashboards.md
+[dashboards.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc26.1.2-neoforge/dashboards.md
 [issue on GitHub]: https://github.com/cpburnz/minecraft-prometheus-exporter/issues
-[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.1-neoforge/metrics.md
-[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.1-neoforge/examples/output.txt
-[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc1.21.1-neoforge/examples/prometheus_exporter-server.toml
+[metrics.md]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc26.1.2-neoforge/metrics.md
+[output.txt]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc26.1.2-neoforge/examples/output.txt
+[prometheus_exporter-server.toml]: https://github.com/cpburnz/minecraft-prometheus-exporter/blob/mc26.1.2-neoforge/examples/prometheus_exporter-server.toml
