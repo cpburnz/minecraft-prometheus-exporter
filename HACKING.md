@@ -5,14 +5,19 @@ Java Environment
 ----------------
 
 Create a ".env" file, and assign the `JAVA_HOME` variable to the path of the
-Java 21 JDK. E.g.,
+Java 25 JDK. E.g.,
 
 ```shell
 # Define the version of Java to use with Gradle (i.e., "./gradlew").
-JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+JAVA_HOME=/usr/lib/jvm/java-25-openjdk
 ```
 
 The "env-gradlew" script is a wrapper around "gradlew", and loads the ".env" file to ensure Gradle is run with the proper version of Java.
+
+Mojang ships Java 25 to end users starting in Minecraft 26.1, so the mod
+targets Java 25 (see "build.gradle"). If a Java 25 JDK is not installed
+locally, Gradle's foojay toolchain resolver (configured in "settings.gradle")
+will auto-provision one for the compile toolchain.
 
 
 IDE Projects
@@ -52,4 +57,4 @@ The release JAR can be compiled by running the "assemble" task:
 ./env-gradlew assemble
 ```
 
-The release JAR will be located at "build/libs/Prometheus-Exporter-{MC Version}-forge-{Mod Version}.jar".
+The release JAR will be located at "build/libs/Prometheus-Exporter-{MC Version}-neoforge-{Mod Version}.jar".

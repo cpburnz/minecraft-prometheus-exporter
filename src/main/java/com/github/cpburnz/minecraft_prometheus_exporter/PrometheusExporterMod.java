@@ -8,6 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -59,14 +60,16 @@ public class PrometheusExporterMod {
 
 	/**
 	 * Construct the instance.
+	 *
+	 * @param modContainer The mod container provided by FML.
 	 */
-	public PrometheusExporterMod() {
+	public PrometheusExporterMod(ModContainer modContainer) {
 		// Register to receive events.
 		NeoForge.EVENT_BUS.register(this);
 
 		// Register the server config.
 		this.config = new ServerConfig();
-		this.config.register();
+		this.config.register(modContainer);
 	}
 
 	/**

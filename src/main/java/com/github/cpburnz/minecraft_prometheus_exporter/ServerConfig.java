@@ -1,10 +1,9 @@
 package com.github.cpburnz.minecraft_prometheus_exporter;
 
 import com.mojang.logging.LogUtils;
-import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 
 /**
@@ -40,14 +39,19 @@ public class ServerConfig {
 	public boolean collector_mc_entities;
 
 	/**
-	 * The Forge config specification.
+	 * The NeoForge config specification.
 	 */
-	private final ModConfigSpec forge_spec;
+	private final ModConfigSpec spec;
 
 	/**
-	 * The server-side config specifications.
+	 * The individual config value handles.
 	 */
-	private final InternalSpec internal_spec;
+	private final ModConfigSpec.BooleanValue collector_jvm_value;
+	private final ModConfigSpec.BooleanValue collector_mc_value;
+	private final ModConfigSpec.EnumValue<TickErrorPolicy> collector_mc_dimension_tick_errors_value;
+	private final ModConfigSpec.BooleanValue collector_mc_entities_value;
+	private final ModConfigSpec.ConfigValue<String> web_listen_address_value;
+	private final ModConfigSpec.IntValue web_listen_port_value;
 
 	/**
 	 * Whether the config has been loaded.
@@ -68,10 +72,83 @@ public class ServerConfig {
 	 * Construct the instance.
 	 */
 	public ServerConfig() {
-		// Setup config specs.
-		Pair<InternalSpec, ModConfigSpec> result = new ModConfigSpec.Builder().configure(InternalSpec::new);
-		this.internal_spec = result.getLeft();
-		this.forge_spec = result.getRight();
+		// The default address to listen on. This defaults to listening everywhere
+		// because it is the most useful default.
+		String defaultAddress = "0.0.0.0";
+
+		// The default TCP port ot use. This is completely arbitrary. It was derived
+		// from the Minecraft port (25565) and the Prometheus exporter ports
+		// (9100+).
+		int defaultPort = 19565;
+
+		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+
+		builder
+			.comment("Collector settings.")
+			.push("collector");
+
+		this.collector_jvm_value = builder
+			.comment("Enable collecting metrics about the JVM process.")
+			.define("jvm", true);
+
+		this.collector_mc_value = builder
+			.comment("Enable collecting metrics about the Minecraft server.")
+			.define("mc", true);
+
+		this.collector_mc_dimension_tick_errors_value = builder
+			.comment(
+				(
+					"Configure how to handle dimension (world) tick errors. Some mods "
+					+ "handle the tick events for their custom dimensions, and may not "
+					+ "reliably start and stop ticks as expected."
+				),
+				(
+					"  IGNORE: Ignore tick errors. If a mod really botches tick "
+					+ "events, it could emit up to 20 log statements per second for "
+					+ "each dimension. This would cause large ballooning of the "
+					+ "\"logs/debug.txt\" file. Use this setting, or figure out how to "
+					+ "filter out DEBUG messages for "
+					+ "\"com.github.cpburnz.minecraft_prometheus_exporter.MinecraftCollector/\" "
+					+ "in \"log4j2.xml\"."
+				),
+				"  LOG: Log tick errors. This is the new default.",
+				(
+					"  STRICT: Raise an exception on tick error. This will crash the "
+					+ "server if an error occurs."
+				)
+			)
+			.defineEnum("mc_dimension_tick_errors", TickErrorPolicy.LOG);
+
+		this.collector_mc_entities_value = builder
+			.comment(
+				"Enable collecting metrics about the entities in each dimension "
+				+ "(world)."
+			)
+			.define("mc_entities", true);
+
+		builder.pop();
+		builder
+			.comment("Web server settings.")
+			.push("web");
+
+		this.web_listen_address_value = builder
+			.comment(
+				"The IP address to listen on. To only allow connections from the "
+				+ "local machine, use \"127.0.0.1\". To allow connections from "
+				+ "remote machines, use \"0.0.0.0\"."
+			)
+			.define("listen_address", defaultAddress);
+
+		this.web_listen_port_value = builder
+			.comment(
+				"The TCP port to listen on. Ports 1-1023 will not work unless "
+				+ "Minecraft is run as root which is not recommended."
+			)
+			.defineInRange("listen_port", defaultPort, 0, 65535);
+
+		builder.pop();
+
+		this.spec = builder.build();
 	}
 
 	/**
@@ -87,12 +164,12 @@ public class ServerConfig {
 	 */
 	public void loadValues() {
 		// Get config values.
-		this.collector_jvm = this.internal_spec.collector_jvm.get();
-		this.collector_mc = this.internal_spec.collector_mc.get();
-		this.collector_mc_dimension_tick_errors = this.internal_spec.collector_mc_dimension_tick_errors.get();
-		this.collector_mc_entities = this.internal_spec.collector_mc_entities.get();
-		this.web_listen_address = this.internal_spec.web_listen_address.get();
-		this.web_listen_port = this.internal_spec.web_listen_port.get();
+		this.collector_jvm = this.collector_jvm_value.get();
+		this.collector_mc = this.collector_mc_value.get();
+		this.collector_mc_dimension_tick_errors = this.collector_mc_dimension_tick_errors_value.get();
+		this.collector_mc_entities = this.collector_mc_entities_value.get();
+		this.web_listen_address = this.web_listen_address_value.get();
+		this.web_listen_port = this.web_listen_port_value.get();
 
 		// Record that the config is loaded.
 		this.is_loaded = true;
@@ -109,119 +186,12 @@ public class ServerConfig {
 	}
 
 	/**
-	 * Register the server-side config with Forge.
+	 * Register the server-side config with NeoForge.
+	 *
+	 * @param modContainer The mod container to register the config against.
 	 */
-	public void register() {
-		ModLoadingContext.get().getActiveContainer().registerConfig(ModConfig.Type.SERVER, this.forge_spec);
-	}
-
-	/**
-	 * The InternalSpec class is used to define the server-side Forge config
-	 * specifications.
-	 */
-	private static class InternalSpec {
-
-		/**
-		 * The default address to listen on. This defaults to listening everywhere
-		 * because it is the most useful default.
-		 */
-		private static final String DEFAULT_ADDRESS = "0.0.0.0";
-
-		/**
-		 * The default TCP port ot use. This is completely arbitrary. It was derived
-		 * from the Minecraft port (25565) and the Prometheus exporter ports
-		 * (9100+).
-		 */
-		private static final int DEFAULT_PORT = 19565;
-
-		/**
-		 * The maximum TCP port.
-		 */
-		private static final int TCP_PORT_MAX = 65535;
-
-		/**
-		 * The minimum TCP port.
-		 */
-		private static final int TCP_PORT_MIN = 0;
-
-		public final ModConfigSpec.BooleanValue collector_jvm;
-		public final ModConfigSpec.BooleanValue collector_mc;
-		public final ModConfigSpec.EnumValue<TickErrorPolicy> collector_mc_dimension_tick_errors;
-		public final ModConfigSpec.BooleanValue collector_mc_entities;
-		public final ModConfigSpec.ConfigValue<String> web_listen_address;
-		public final ModConfigSpec.IntValue web_listen_port;
-
-		/**
-		 * Construct the instance.
-		 *
-		 * @param builder The Forge config builder.
-		 */
-		public InternalSpec(ModConfigSpec.Builder builder) {
-			builder
-				.comment("Collector settings.")
-				.push("collector");
-
-			this.collector_jvm = builder
-				.comment("Enable collecting metrics about the JVM process.")
-				.define("jvm", true);
-
-			this.collector_mc = builder
-				.comment("Enable collecting metrics about the Minecraft server.")
-				.define("mc", true);
-
-			this.collector_mc_dimension_tick_errors = builder
-				.comment(
-					(
-						"Configure how to handle dimension (world) tick errors. Some mods "
-						+ "handle the tick events for their custom dimensions, and may not "
-						+ "reliably start and stop ticks as expected."
-					),
-					(
-						"  IGNORE: Ignore tick errors. If a mod really botches tick "
-						+ "events, it could emit up to 20 log statements per second for "
-						+ "each dimension. This would cause large ballooning of the "
-						+ "\"logs/debug.txt\" file. Use this setting, or figure out how to "
-						+ "filter out DEBUG messages for "
-						+ "\"com.github.cpburnz.minecraft_prometheus_exporter.MinecraftCollector/\" "
-						+ "in \"log4j2.xml\"."
-					),
-					"  LOG: Log tick errors. This is the new default.",
-					(
-						"  STRICT: Raise an exception on tick error. This will crash the "
-						+ "server if an error occurs."
-					)
-				)
-				.defineEnum("mc_dimension_tick_errors", TickErrorPolicy.LOG);
-
-			this.collector_mc_entities = builder
-				.comment(
-					"Enable collecting metrics about the entities in each dimension "
-					+ "(world)."
-				)
-				.define("mc_entities", true);
-
-			builder.pop();
-			builder
-				.comment("Web server settings.")
-				.push("web");
-
-			this.web_listen_address = builder
-				.comment(
-					"The IP address to listen on. To only allow connections from the "
-					+ "local machine, use \"127.0.0.1\". To allow connections from "
-					+ "remote machines, use \"0.0.0.0\"."
-				)
-				.define("listen_address", DEFAULT_ADDRESS);
-
-			this.web_listen_port = builder
-				.comment(
-					"The TCP port to listen on. Ports 1-1023 will not work unless "
-					+ "Minecraft is run as root which is not recommended."
-				)
-				.defineInRange("listen_port", DEFAULT_PORT, TCP_PORT_MIN, TCP_PORT_MAX);
-
-			builder.pop();
-		}
+	public void register(ModContainer modContainer) {
+		modContainer.registerConfig(ModConfig.Type.SERVER, this.spec);
 	}
 
 	/**

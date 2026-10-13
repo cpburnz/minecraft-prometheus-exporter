@@ -3,6 +3,7 @@
 /bin/
 /build/
 /runs/
+/run/
 
 # Eclipse
 .classpath
